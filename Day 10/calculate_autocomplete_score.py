@@ -29,8 +29,13 @@ def getLineScore(charList):
     lineScore = 0
 
     for char in charList:
+        print(lineScore)
         lineScore = lineScore * 5
+        print(lineScore)
         lineScore += getCharScore(char)
+        print(char)
+        print(lineScore)
+        print("----")
 
     return lineScore
 
@@ -95,7 +100,7 @@ def autocompleteChar(line):
         if startChar == "(" or startChar == "{" or startChar == "[" or startChar == "<":
             endChar = autocompleteChar(line)
             if endChar == "-":
-                scoringString = startChar + scoringString
+                scoringString = scoringString + startChar
                 return "-"
         else:
             return startChar
@@ -115,16 +120,16 @@ def completeLines(lines):
         EOL = False
         scoringString = str()
         autocompleteChar(line)
-        #print(scoringString)
+        print(scoringString)
         #print(len(scoringString))
-        #print(line)
+        print(line)
         scores.append(getLineScore(scoringString))
 
 checkLines("nav_subsystem.txt")
 #print(incomplete_lines)
 completeLines(incomplete_lines)
 
-#print(scores)
+print(scores)
 scores.sort()
 #print(scores)
 final_score = scores[int(len(scores) / 2)]
