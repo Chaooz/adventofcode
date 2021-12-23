@@ -22,6 +22,18 @@ def loadfile(filename):
     file.close()
     return lines
 
+#
+# Create a list of tuples from the textfile
+#
+def listFromFile(textfile, delimiter):
+    file_lines = loadfile(textfile)
+    my_list = list()
+    for line in file_lines:
+        line = line.strip("\n")
+        key_value = line.split(delimiter)
+        my_list.append(key_value)
+    return my_list
+
 def createMatrix(textfile):
     file_lines = loadfile(textfile)
     matrix = list()
@@ -33,3 +45,35 @@ def createMatrix(textfile):
                 row_list.append(int(char))
         matrix.append(row_list)
     return matrix
+
+def print_list(text, list):
+    print ("--- " + text + " ---")
+    print(str(list))
+    #for line in list:
+    #    print(line)
+    print ("")
+
+
+def print_matrix(text,size_x,size_y,matrix):
+    print ("--- " + text + " ---")
+    for x in range(size_x):
+        line = ""
+        for y in range(size_y):
+            value = matrix[x][y]
+            if ( value == 0):
+                line = line + bcolors.BOLD + bcolors.WARNING
+            else:
+                line = line + bcolors.RESET
+
+            if ( value < 10 ):
+                line = line + "0"
+            line = line + str(value) + " "
+        print(line)
+    print ("")
+
+def unittest( func, expected, filename ):
+    code_result = func(filename)
+    if code_result == expected:
+        print(bcolors.OKGREEN + "[OK]    Unittest " + filename + " with " + str(code_result) + " steps is OK! " + bcolors.RESET)
+    else:
+        print(bcolors.WARNING + "[ERROR] Unittest " + filename + " with " + str(code_result) + " steps is NOT OK! Got:" + str(code_result) + " Expected:" + str(expected) + bcolors.RESET)

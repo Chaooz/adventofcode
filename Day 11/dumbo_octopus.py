@@ -53,24 +53,6 @@ def count_reset_blocks(size_x, size_y, matrix):
                 num_reset_blocks = num_reset_blocks + 1
     return num_reset_blocks
 
-
-def print_matrix(text,size_x,size_y,matrix):
-    print ("--- " + text + " ---")
-    for x in range(size_x):
-        line = ""
-        for y in range(size_y):
-            value = matrix[x][y]
-            if ( value == 0):
-                line = line + bcolors.BOLD + bcolors.WARNING
-            else:
-                line = line + bcolors.RESET
-
-            if ( value < 10 ):
-                line = line + "0"
-            line = line + str(value) + " "
-        print(line)
-    print ("")
-
 #
 # Run our code
 #
