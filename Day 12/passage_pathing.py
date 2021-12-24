@@ -8,7 +8,9 @@ import sys
 sys.path.insert(1, '../Libs')
 from advent_libs import *
 
+#
 # Code 
+#
 
 # Capital letters are BIG caves and can be revisited
 def can_revisit(node_list, node_name, max_visits):
@@ -41,6 +43,7 @@ def get_exits(node_list,from_point):
             lines.append( node[1] )
     return lines
 
+# Get all connected points TO a specific point
 def get_entrance(node_list,from_point):
     lines = list()
     for node in node_list:
@@ -48,6 +51,7 @@ def get_entrance(node_list,from_point):
             lines.append( node[0] )
     return lines
 
+# Sort key values to make sure start is first and end is last
 def sort_values(old_list, start,end):
     new_list = list()
     for entry in old_list:
@@ -65,7 +69,16 @@ def create_path(node_list, from_point, to_point, full_path, max_visits):
 
     full_path.append(from_point)
 
-    #print_list("create_path",full_path)
+    # If we have enabled double visit on small caves, check if we visited twice
+    if from_point.islower() and max_visits > 1:
+        num_visits = 0
+        for node in full_path:
+            if node == from_point:
+                num_visits = num_visits + 1
+                if num_visits >= max_visits:
+                    #print ( "MAX: " + str(num_visits) + str(node_list) + " : " + node_name)
+                    max_visits = 1
+                    break
 
     exits = get_exits( node_list,from_point )
     for exit in exits:
@@ -73,26 +86,15 @@ def create_path(node_list, from_point, to_point, full_path, max_visits):
         if exit != to_point:
             if can_revisit(full_path,exit, max_visits):
                 num_paths = num_paths + create_path( node_list, exit, to_point, full_path, max_visits )
-            elif max_visits > 1:
-                print ("change visits from " + str(max_visits) + " to 1")
-                max_visits = 1
         else:
             num_paths = num_paths + 1
             #print ( "Full path" + str(full_path) + " " + to_point )
-
-    if from_point == to_point:
-        print("EQQQQQ" + to_point)
-        full_path.remove(from_point)
-        return num_paths
 
     entrances = get_entrance(node_list, from_point)
     for entrance in entrances:
         if can_revisit(full_path, entrance, max_visits) and entrance != to_point:
             #print("From [entrance] " + str(from_point) + " => " + str(entrance))
             num_paths = num_paths + create_path( node_list, entrance, to_point, full_path, max_visits )
-        elif max_visits > 1:
-            print ("change visits from " + str(max_visits) + " to 1")
-            max_visits = 1
 
     full_path.pop()
 
@@ -117,9 +119,11 @@ unittest(run_pathing,10,"passage_pathing_data_example1.txt")
 unittest(run_pathing,19,"passage_pathing_data_example2.txt")
 unittest(run_pathing,226,"passage_pathing_data_example3.txt")
 
-# Actual assignment
-unittest(run_pathing,4885,"passage_pathing_data.txt")
-
 unittest(run_pathing_two,36,"passage_pathing_data_example1.txt")
 unittest(run_pathing_two,103,"passage_pathing_data_example2.txt")
-#unittest(run_pathing_two,3509,"passage_pathing_data_example3.txt")
+unittest(run_pathing_two,3509,"passage_pathing_data_example3.txt")
+
+
+# Actual assignment
+unittest(run_pathing,4885,"passage_pathing_data.txt")
+unittest(run_pathing_two,117095,"passage_pathing_data.txt")
