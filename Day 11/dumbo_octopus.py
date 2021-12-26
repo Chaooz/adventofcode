@@ -63,12 +63,12 @@ def run_code_loops(steps, filename, exit_on_allflash):
     size_y = int(len(matrix))
     size_x = int(len(matrix[0]))
 
-    #print_matrix("Before run", size_x, size_y, matrix)
+    #print_matrix("Before run", matrix)
 
     num_resets = 0
     for step in range(steps):
         increase_all_blocks(size_x,size_y, matrix)
-        visited_matrix = [[0 for col in range(size_y)] for row in range(size_x)]
+        visited_matrix = create_empty_matrix(size_x,size_y)
 
         for y in range(size_y):
             for x in range(size_x):
@@ -82,10 +82,10 @@ def run_code_loops(steps, filename, exit_on_allflash):
         num_resets =  num_resets + resets
 
         if exit_on_allflash and resets == size_x * size_y:
-            #print_matrix("After run #" + str(step),size_x, size_y, matrix)
+            #print_matrix("After run #" + str(step),matrix)
             return step + 1
 
-    #print_matrix("After run #" + str(resets),size_x, size_y, matrix)
+    #print_matrix("After run #" + str(resets),matrix)
     return num_resets
 
 #

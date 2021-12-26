@@ -30,9 +30,13 @@ def listFromFile(textfile, delimiter):
     my_list = list()
     for line in file_lines:
         line = line.strip("\n")
-        key_value = line.split(delimiter)
+        key_value = line.split(delimiter)        
         my_list.append(key_value)
     return my_list
+
+def create_empty_matrix(size_x,size_y):
+    matrix = [[0 for col in range(size_y)] for row in range(size_x)]
+    return matrix
 
 def createMatrix(textfile):
     file_lines = loadfile(textfile)
@@ -46,6 +50,29 @@ def createMatrix(textfile):
         matrix.append(row_list)
     return matrix
 
+def get_matrix_size(matrix):
+    size_x = int(len(matrix))
+    size_y = int(len(matrix[0]))
+    return (size_x,size_y)
+
+# Get the max x and y in a list (used to create matrix)
+def max_point_in_list(point_list):
+    max_x = 0
+    max_y = 0
+
+    for input in point_list:
+        x = int(input[0])
+        y = int(input[1])
+
+        if x > max_x:
+            max_x = x
+
+        if y > max_y:
+            max_y = y
+
+    return (max_x, max_y)
+
+
 def print_list(text, list):
     print ("--- " + text + " ---")
     print(str(list))
@@ -53,12 +80,16 @@ def print_list(text, list):
     #    print(line)
     print ("")
 
+def print_matrix(text,matrix):
+    size = get_matrix_size(matrix)
 
-def print_matrix(text,size_x,size_y,matrix):
-    print ("--- " + text + " ---")
-    for x in range(size_x):
+    size_x = size[0]
+    size_y = size[1]
+
+    print ("--- " + text + " " + str(size_x) + "x" + str(size_y) + " ---")
+    for y in range(size_y):
         line = ""
-        for y in range(size_y):
+        for x in range(size_x):
             value = matrix[x][y]
             if ( value == 0):
                 line = line + bcolors.BOLD + bcolors.WARNING
@@ -69,7 +100,7 @@ def print_matrix(text,size_x,size_y,matrix):
                 line = line + "0"
             line = line + str(value) + " "
         print(line)
-    print ("")
+    print ("" + bcolors.RESET)
 
 def unittest( func, expected, filename ):
     code_result = func(filename)
