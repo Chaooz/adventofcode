@@ -14,6 +14,7 @@ class bcolors:
     ENDC = '\033[0m'
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
+    DARK_GREY = '\033[1;30;40m'
 
 
 def loadfile(filename):
@@ -54,6 +55,66 @@ def get_matrix_size(matrix):
     size_x = int(len(matrix))
     size_y = int(len(matrix[0]))
     return (size_x,size_y)
+
+def compress_matrix(matrix, rate):
+    size = get_matrix_size(matrix)
+    size_x = int(size[0])
+    size_y = int(size[1])
+
+    compressed_size_x = int(size_x / rate) + 1
+    compressed_size_y = int(size_y / rate) + 1
+
+    #print("Compress matrix " + str(size_x) + "x" + str(size_y) + " => " + str(compressed_size_x) + "x" + str(compressed_size_y))
+    compressed_matrix = create_empty_matrix(compressed_size_x, compressed_size_y)
+
+    for y in range(size_y):
+        for x in range(size_x):
+            xx = int(x/rate)
+            yy = int(y/rate)
+
+            val = matrix[x][y]
+            compressed_matrix[xx][yy] = compressed_matrix[xx][yy] + val
+
+    return compressed_matrix
+
+def matrix_cut(matrix,start_x, start_y, end_x, end_y):
+
+    print("matrix cut:" + str(start_x) + "x" + str(start_y) + " => " + str(end_x) + "x" + str(end_y))
+
+    cut_matrix = create_empty_matrix( end_x - start_x, end_y - start_y)
+
+    xx = 0
+    yy = 0
+    for y in range(start_y, end_y):
+        for x in range( start_x, end_x):
+            cut_matrix[xx][yy] = matrix[x][y]
+            xx = xx + 1
+        v = cut_matrix[0][yy]
+        v2 = matrix[0][yy]
+        #print(str(yy) + " => " + str(v) + " : " + str(v2))
+
+        xx = 0
+        yy = yy + 1
+
+    return cut_matrix
+
+def matrix_splice_x(matrix1, matrix2):
+    size1 = get_matrix_size(matrix1)
+    size2 = get_matrix_size(matrix2)
+    size_x = size1[0] + size2[0]
+    size_y = size1[1]
+
+    spliced_matrix = create_empty_matrix( size_x, size_y )
+
+    for y in range(size1[1]):
+        for x in range(size1[0]):
+            spliced_matrix[x][y] = matrix1[x][y]
+
+    for y in range(size2[1]):
+        for x in range(size2[0]):
+            spliced_matrix[ size1[0] + x][y] = matrix2[x][y]
+
+    return spliced_matrix
 
 # Get the max x and y in a list (used to create matrix)
 def max_point_in_list(point_list):
@@ -102,9 +163,40 @@ def print_matrix(text,matrix):
         print(line)
     print ("" + bcolors.RESET)
 
+def print_matrix_color(text,matrix,value_highlight,color):
+    size = get_matrix_size(matrix)
+
+    size_x = size[0]
+    size_y = size[1]
+
+    print ("--- " + text + " " + str(size_x) + "x" + str(size_y) + " ---")
+    for y in range(size_y):
+        line = ""
+        for x in range(size_x):
+            value = matrix[x][y]
+            if ( value == value_highlight):
+                line = line + bcolors.BOLD + color
+            else:
+                line = line + bcolors.RESET
+
+            if ( value < 10 ):
+                line = line + "0"
+            line = line + str(value) + " "
+        print(line)
+    print ("" + bcolors.RESET)
+
 def unittest( func, expected, filename ):
     code_result = func(filename)
     if code_result == expected:
-        print(bcolors.OKGREEN + "[OK]    Unittest " + filename + " with " + str(code_result) + " steps is OK! " + bcolors.RESET)
+        print_ok("Unittest " + filename + " with " + str(code_result) + " steps is OK! ")
     else:
-        print(bcolors.WARNING + "[ERROR] Unittest " + filename + " with " + str(code_result) + " steps is NOT OK! Got:" + str(code_result) + " Expected:" + str(expected) + bcolors.RESET)
+        print_error("Unittest " + filename + " with " + str(code_result) + " steps is NOT OK! Got:" + str(code_result) + " Expected:" + str(expected))
+
+def print_error(text):
+    print(bcolors.WARNING + "[ERROR]   " + text + bcolors.RESET)
+
+def print_warning(text):
+    print(bcolors.WARNING + "[WARNING] " + text + bcolors.RESET)
+
+def print_ok(text):
+    print(bcolors.OKGREEN + "[OK]      " + text + bcolors.RESET)
