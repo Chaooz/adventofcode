@@ -188,9 +188,17 @@ def print_matrix_color(text,matrix,value_highlight,color):
 def unittest( func, expected, filename ):
     code_result = func(filename)
     if code_result == expected:
-        print_ok("Unittest " + filename + " with " + str(code_result) + " steps is OK! ")
+        print_ok("Unittest " + filename + " with " + str(code_result) + " is OK! ")
     else:
-        print_error("Unittest " + filename + " with " + str(code_result) + " steps is NOT OK! Got:" + str(code_result) + " Expected:" + str(expected))
+        print_error("Unittest " + filename + " with " + str(code_result) + " is NOT OK! Got:" + str(code_result) + " Expected:" + str(expected))
+
+def unittest_input( func, input, expected, filename ):
+    code_result = func(filename, input)
+    if code_result == expected:
+        print_ok("Unittest " + func.__name__ + "(" + str(input) + ") with " + str(code_result) + " is OK! file:" + filename)
+    else:
+        print_error("Unittest " + func.__name__ + "(" + str(input) + ") with " + str(code_result) + " is NOT OK! Got:" + str(code_result) + " Expected:" + str(expected) + " file:" + filename)
+
 
 def print_error(text):
     print(bcolors.WARNING + "[ERROR]   " + text + bcolors.RESET)
