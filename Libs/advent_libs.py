@@ -39,6 +39,10 @@ def create_empty_matrix(size_x,size_y):
     matrix = [[0 for col in range(size_y)] for row in range(size_x)]
     return matrix
 
+def create_empty_matrix2(size):
+    matrix = [[0 for col in range(size[0])] for row in range(size[1])]
+    return matrix
+
 def createMatrix(textfile):
     file_lines = loadfile(textfile)
     matrix = list()
@@ -136,6 +140,7 @@ def max_point_in_list(point_list):
 
 def print_list(text, list):
     print ("--- " + text + " ---")
+    
     print(str(list))
     #for line in list:
     #    print(line)
@@ -152,11 +157,6 @@ def print_matrix(text,matrix):
         line = ""
         for x in range(size_x):
             value = matrix[x][y]
-            if ( value == 0):
-                line = line + bcolors.BOLD + bcolors.WARNING
-            else:
-                line = line + bcolors.RESET
-
             if ( value < 10 ):
                 line = line + "0"
             line = line + str(value) + " "
@@ -169,15 +169,47 @@ def print_matrix_color(text,matrix,value_highlight,color):
     size_x = size[0]
     size_y = size[1]
 
-    print ("--- " + text + " " + str(size_x) + "x" + str(size_y) + " ---")
+    print ("      --- " + text + " " + str(size_x) + "x" + str(size_y) + " ---")
+    print("")
+
+    header  = bcolors.DARK_GREY + "    + "
+    header2 = bcolors.DARK_GREY + "      "
+    for x in range(size_x):
+        if ( x < 100 ):
+            header2 = header2 + "0"
+
+        if ( x < 10 ):
+            header2 = header2 + "0"
+
+        header = header + "--- "
+        header2 = header2 + str(x) + " "
+
+    print(header2)
+    print(header)
+
     for y in range(size_y):
         line = ""
+        line = line + bcolors.BOLD + color
+
+        if ( y < 100 ):
+            line = line + "0"
+
+        if ( y < 10 ):
+            line = line + "0"
+
+        line = line + str(y)
+        line = line + bcolors.DARK_GREY
+        line = line + " | "
+
         for x in range(size_x):
             value = matrix[x][y]
             if ( value == value_highlight):
                 line = line + bcolors.BOLD + color
             else:
                 line = line + bcolors.RESET
+
+            if ( value < 100 ):
+                line = line + "0"
 
             if ( value < 10 ):
                 line = line + "0"
