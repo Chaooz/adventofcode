@@ -120,6 +120,18 @@ def matrix_splice_x(matrix1, matrix2):
 
     return spliced_matrix
 
+def matrix_copy(matrix):
+
+    size = get_matrix_size(matrix)
+    matrix_copy = create_empty_matrix( size[0], size[1] )
+
+    for y in range(size[1]):
+        for x in range(size[0]):
+            matrix_copy[x][y] = matrix[x][y]
+
+    return matrix_copy
+
+
 # Get the max x and y in a list (used to create matrix)
 def max_point_in_list(point_list):
     max_x = 0
@@ -146,6 +158,15 @@ def print_list(text, list):
     #    print(line)
     print ("")
 
+def pad_number(number,pad):
+    num_str = str(number)
+    l = len(pad)
+    l2 = l - len(num_str)
+    if ( l2 > 0 ):
+        for i in range(l2):
+            num_str = pad[0] + num_str
+    return num_str
+
 def print_matrix(text,matrix):
     size = get_matrix_size(matrix)
 
@@ -164,40 +185,51 @@ def print_matrix(text,matrix):
     print ("" + bcolors.RESET)
 
 def print_matrix_color(text,matrix,value_highlight,color):
+    print_matrix_color_padded(text,matrix,value_highlight,color,"00")
+
+def print_matrix_color_padded(text,matrix,value_highlight,color, pad):
     size = get_matrix_size(matrix)
 
     size_x = size[0]
     size_y = size[1]
+    pad_size = len(pad)
+    pady_size = len(str(size_y-1))
 
-    print ("      --- " + text + " " + str(size_x) + "x" + str(size_y) + " ---")
+    print ("      --- " + text + " " + str(size_x) + "x" + str(size_y)  + " ---")
     print("")
 
-    header  = bcolors.DARK_GREY + "    + "
-    header2 = bcolors.DARK_GREY + "      "
+    space = " "
+    if pad_size == 1:
+        space = ""
+
+    header  = bcolors.DARK_GREY
+    header2 = bcolors.DARK_GREY
+
+    for i in range(pady_size):
+        header = header + " " 
+        header2 = header2 + " "
+
+    header = header + " + "
+    header2 = header2 + "   "
+
     for x in range(size_x):
-        if ( x < 100 ):
-            header2 = header2 + "0"
+        header2 += pad_number( x , pad )
+        for i in range(pad_size):
+            header = header + "-"
+        header2 = header2 + space
+        header = header + space
 
-        if ( x < 10 ):
-            header2 = header2 + "0"
-
-        header = header + "--- "
-        header2 = header2 + str(x) + " "
-
-    print(header2)
+#    print(header2)
     print(header)
+
+    pady = ""
+    for i in range(pady_size):
+        pady += "0"
 
     for y in range(size_y):
         line = ""
         line = line + bcolors.BOLD + color
-
-        if ( y < 100 ):
-            line = line + "0"
-
-        if ( y < 10 ):
-            line = line + "0"
-
-        line = line + str(y)
+        line = line + pad_number(y,pady)
         line = line + bcolors.DARK_GREY
         line = line + " | "
 
@@ -208,12 +240,8 @@ def print_matrix_color(text,matrix,value_highlight,color):
             else:
                 line = line + bcolors.RESET
 
-            if ( value < 100 ):
-                line = line + "0"
-
-            if ( value < 10 ):
-                line = line + "0"
-            line = line + str(value) + " "
+            line += pad_number( value , pad )
+            line += space
         print(line)
     print ("" + bcolors.RESET)
 
