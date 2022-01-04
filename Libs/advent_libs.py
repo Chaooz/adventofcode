@@ -246,16 +246,16 @@ def print_matrix_color_padded(text,matrix,value_highlight,color, pad, space = " 
 def unittest( func, expected, filename ):
     code_result = func(filename)
     if code_result == expected:
-        print_ok("Unittest " + filename + " with " + str(code_result) + " is OK! ")
+        print_ok("Unittest " + func.__name__ + " with " + str(code_result) + " is OK! input:" + filename)
     else:
-        print_error("Unittest " + filename + " with " + str(code_result) + " is NOT OK! Got:" + str(code_result) + " Expected:" + str(expected))
+        print_error("Unittest " + func.__name__ + " with " + str(code_result) + " is NOT OK! Got:" + str(code_result) + " Expected:" + str(expected) + " input:" + filename)
 
 def unittest_input( func, input, expected, filename ):
     code_result = func(filename, input)
     if code_result == expected:
-        print_ok("Unittest " + func.__name__ + "(" + str(input) + ") with " + str(code_result) + " is OK! file:" + filename)
+        print_ok("Unittest " + func.__name__ + "(" + str(input) + ") with " + str(code_result) + " is OK! input:" + filename)
     else:
-        print_error("Unittest " + func.__name__ + "(" + str(input) + ") with " + str(code_result) + " is NOT OK! Got:" + str(code_result) + " Expected:" + str(expected) + " file:" + filename)
+        print_error("Unittest " + func.__name__ + "(" + str(input) + ") with " + str(code_result) + " is NOT OK! Got:" + str(code_result) + " Expected:" + str(expected) + " input:" + filename)
 
 
 def print_error(text):
