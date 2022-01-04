@@ -65,8 +65,8 @@ def compress_matrix(matrix, rate):
     size_x = int(size[0])
     size_y = int(size[1])
 
-    compressed_size_x = int(size_x / rate) + 1
-    compressed_size_y = int(size_y / rate) + 1
+    compressed_size_x = int(size_x / rate)
+    compressed_size_y = int(size_y / rate)
 
     #print("Compress matrix " + str(size_x) + "x" + str(size_y) + " => " + str(compressed_size_x) + "x" + str(compressed_size_y))
     compressed_matrix = create_empty_matrix(compressed_size_x, compressed_size_y)
@@ -187,7 +187,7 @@ def print_matrix(text,matrix):
 def print_matrix_color(text,matrix,value_highlight,color):
     print_matrix_color_padded(text,matrix,value_highlight,color,"00")
 
-def print_matrix_color_padded(text,matrix,value_highlight,color, pad):
+def print_matrix_color_padded(text,matrix,value_highlight,color, pad, space = " "):
     size = get_matrix_size(matrix)
 
     size_x = size[0]
@@ -197,10 +197,6 @@ def print_matrix_color_padded(text,matrix,value_highlight,color, pad):
 
     print ("      --- " + text + " " + str(size_x) + "x" + str(size_y)  + " ---")
     print("")
-
-    space = " "
-    if pad_size == 1:
-        space = ""
 
     header  = bcolors.DARK_GREY
     header2 = bcolors.DARK_GREY
@@ -213,13 +209,15 @@ def print_matrix_color_padded(text,matrix,value_highlight,color, pad):
     header2 = header2 + "   "
 
     for x in range(size_x):
-        header2 += pad_number( x , pad )
+        xx = x % 10
+
+        header2 += pad_number( xx , pad )
         for i in range(pad_size):
             header = header + "-"
         header2 = header2 + space
         header = header + space
 
-#    print(header2)
+    print(header2)
     print(header)
 
     pady = ""

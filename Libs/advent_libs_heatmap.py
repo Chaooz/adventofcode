@@ -20,7 +20,7 @@ def path_heatmap_astar(matrix, from_pos, to_position):
     path = list()
     short_path = list()
 
-    print("Start Heatmap : " + str(from_pos) + " => " + str(to_position))
+    #print("Start Heatmap : " + str(from_pos) + " => " + str(to_position))
 
     val = traverse_path(matrix, visited_matrix, from_pos[0], from_pos[1], to_position[0], to_position[1])
     new_path = create_path_from_matrix( visited_matrix, 0, 0, to_position[0] - 1, to_position[1] - 1)
