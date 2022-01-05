@@ -15,7 +15,7 @@ def read_char(string, from_pos, num_chars):
     char = ""
 
     if ( from_pos + num_chars > len(string )):
-        print("ERROR IN LENGTH")
+        print_error("ERROR IN LENGTH")
         return char
 
     for i in range(from_pos,(from_pos+num_chars)):
@@ -35,13 +35,13 @@ def remove_string(binary_string:str, num):
 # TypeID 4
 # Literal values represent a single number 
 def read_literal(packet:DataPacket,binary_string):
-    block_list = ""
+    block_list = str()
     while ( True ):
         is_end = read_int(binary_string,0,1) 
         block = read_char(binary_string,1,4)
         block_list += block
         binary_string = remove_string(binary_string,5)
-        packet.add_block("read_literal",0,block)
+        packet.add_literal_block("read_literal",0,block)
         if is_end == 0:
             break
 
@@ -69,44 +69,42 @@ def read_operator(packet:DataPacket,binary_string):
    
     return binary_string
 
-def read_packet(binary_string, packet):
+def read_packet(binary_string, packet:DataPacket):
     packet_version = read_int(binary_string,0,3)
     packet_typeId  = read_int(binary_string,3,3)
     binary_string = remove_string(binary_string,6)
-    packet = DataPacket(packet_version,packet_typeId)
 
     # Sum packets
     if packet_typeId == 4:
-#        if packet is None:
-#        packet = DataPacket(packet_version,packet_typeId)
         binary_string = read_literal(packet,binary_string)
+        packet.add_version(packet_version)
+        return (binary_string,None)
     else:
-#        packet = DataPacket(packet_version,packet_typeId)
-        binary_string = read_operator(packet,binary_string)
-    return (binary_string,packet)
+        new_packet = DataPacket(packet_version,packet_typeId)
+        binary_string = read_operator(new_packet,binary_string)
+        packet.add_child(new_packet)
+        return (binary_string,new_packet)
 
 def decode_binary_packet(binary_string, packet):
+
+    #print_debug("decode_binary_packet:" + binary_string)
 
     if ( len ( binary_string ) < 11 ):
         return None
 
     (binary_string,new_packet) = read_packet(binary_string,packet)
 
-    #if packet is None:
-    #    print("change packet")
-    packet = new_packet
-
     # Read sub packets
-    for (d,block) in packet.blocks:
-        child_packet = decode_binary_packet(block,packet)
-        if not child_packet is None:
-            packet.add_child(child_packet)
+    if not new_packet is None:
+        for (d,block) in new_packet.blocks:
+            decode_binary_packet(block,new_packet)
 
-    if len(binary_string) > 0 :
-        p = decode_binary_packet(binary_string, packet)
-        if not p is None:
-            packet.add_child(p)
-#            print("P:" + p.to_string())
+        if len(binary_string) > 0 :
+            print_debug("binary leftover")
+            p = decode_binary_packet(binary_string, new_packet)
+    else:
+        if len(binary_string) > 0 :
+            p = decode_binary_packet(binary_string, packet)
 
     return packet
 
@@ -114,7 +112,7 @@ def decode_string_packet(string):
     binary_string = ""
     for j in range(len(string)):
         binary_string += str(hex_to_binary(string[j]))
-    return decode_binary_packet(binary_string, None)
+    return decode_binary_packet(binary_string, DataPacket())
 
 def run_literal_sum(binary_string):
     packet = decode_string_packet(binary_string)
@@ -122,11 +120,12 @@ def run_literal_sum(binary_string):
 
 def run_version_sum(binary_string):
     packet = decode_string_packet(binary_string)
+#    print(packet.to_string())
     return packet.version_sum()
 
 def run_calculate(binary_string):
     packet = decode_string_packet(binary_string)
-    print(packet.to_string())
+    #print(packet.to_string())
     return packet.calculate_all()
 
 def run_puzzle1(filename):
@@ -156,5 +155,7 @@ unittest(run_calculate, 0 , "F600BC2D8F")
 unittest(run_calculate, 0 , "9C005AC2F8F0")
 unittest(run_calculate, 1 , "9C0141080250320F1802104A08")
 
-#unittest(run_puzzle1, 886 , "packet_data.txt")
-#unittest(run_puzzle2, 886 , "packet_data.txt")
+unittest(run_puzzle1, 886 , "packet_data.txt")
+unittest(run_puzzle2, 446899 , "packet_data.txt")
+
+# 13476220616073 <- too high
