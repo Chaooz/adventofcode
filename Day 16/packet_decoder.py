@@ -55,7 +55,7 @@ def decode_binary_packet(binary_string):
 
     if packet.typeId == 4:
         binary_string,value = get_literal_value(binary_string)
-        packet.add_number(value)
+        packet.set_value(value)
         return binary_string,packet
     else:
 
@@ -68,11 +68,6 @@ def decode_binary_packet(binary_string):
         else:
             binary_string, packet_list = decode_subpackets_by_number(binary_string)
             packet.add_children(packet_list)
-
-#    if len(binary_string) > 0 :
-#        child = decode_binary_packet(binary_string)
-#        if not child is None:
-#            packet.add_child(child)
 
     return (binary_string,packet)
 
@@ -153,6 +148,4 @@ unittest(run_calculate, 0 , "9C005AC2F8F0")
 unittest(run_calculate, 1 , "9C0141080250320F1802104A08")
 
 unittest(run_puzzle1, 886 , "packet_data.txt")
-unittest(run_puzzle2, 446899 , "packet_data.txt")
-
-# 13476220616073 <- too high
+unittest(run_puzzle2, 184487454837 , "packet_data.txt")

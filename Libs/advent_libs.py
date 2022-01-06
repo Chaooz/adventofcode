@@ -272,6 +272,6 @@ def print_ok(text):
     print(bcolors.OKGREEN + "[OK]      " + text + bcolors.RESET)
 
 def print_debug(text):
-    #print(text)
+    print(text)
     pass
 
