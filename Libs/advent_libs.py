@@ -257,6 +257,10 @@ def unittest_input( func, input, expected, filename ):
     else:
         print_error("Unittest " + func.__name__ + "(" + str(input) + ") with " + str(code_result) + " is NOT OK! Got:" + str(code_result) + " Expected:" + str(expected) + " input:" + filename)
 
+def print_assert(value,text):
+    if not value:
+        print(bcolors.FAIL + "[ASSERT]  " + text + bcolors.RESET)
+        assert False
 
 def print_error(text):
     print(bcolors.WARNING + "[ERROR]   " + text + bcolors.RESET)
