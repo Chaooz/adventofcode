@@ -111,12 +111,12 @@ unittest_input(run_puzzle1,100,1656, "day11_data_unittest_large.txt")
 unittest(run_puzzle2,195,"day11_data_unittest_large.txt")
 
 # Unittest actual data
-unittest_input(run_puzzle1,100,1749, "day11_data_puzzle.txt")
-unittest(run_puzzle2,285,"day11_data_puzzle.txt")
+unittest_input(run_puzzle1,100,1749, "thor_day11_data.txt")
+unittest(run_puzzle2,285,"thor_day11_data.txt")
 
 # Run actual program
-res = run_puzzle1("day11_data_puzzle.txt", 100)
+res = run_puzzle1("thor_day11_data.txt", 100)
 print("Puzzle #1 : Number of flashes after 100 loops = " + str(res))
 
-res_allflash = run_puzzle2("day11_data_puzzle.txt")
+res_allflash = run_puzzle2("thor_day11_data.txt")
 print("Puzzle #2 : Number of loops for all to flash at the same time = " + str(res_allflash))

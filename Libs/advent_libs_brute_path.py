@@ -3,6 +3,7 @@ from os import path
 import sys
 sys.path.insert(1, '../Libs')
 from advent_libs import *
+from advent_libs_matrix import *
 
 global star_loops
 

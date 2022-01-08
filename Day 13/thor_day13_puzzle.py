@@ -5,6 +5,7 @@
 import sys
 sys.path.insert(1, '../Libs')
 from advent_libs import *
+from advent_libs_matrix import *
 
 #
 # Decode data into point list and fold list
@@ -138,12 +139,12 @@ def fold_paper_full(filename):
     return count_markers(matrix)
 
 # Run unitests
-unittest(fold_paper_first,17,"transparent_origami_data_example1.txt")
-unittest(fold_paper_full,16,"transparent_origami_data_example1.txt")
-unittest(fold_paper_first,602,"transparent_origami_data.txt")
-unittest(fold_paper_full,92,"transparent_origami_data.txt")
+unittest(fold_paper_first,17,"day13_data_unittest.txt")
+unittest(fold_paper_full,16,"day13_data_unittest.txt")
+unittest(fold_paper_first,602,"thor_day13_data.txt")
+unittest(fold_paper_full,92,"thor_day13_data.txt")
 
 # Run actual code
-matrix = fold_paper_base("transparent_origami_data.txt", False)
-print_matrix_color("Code:", matrix, 0, bcolors.DARK_GREY)
+matrix = fold_paper_base("thor_day13_data.txt", False)
+print_matrix_color("Code:", matrix, 0, bcolors.DARK_GREY, "00", "")
 

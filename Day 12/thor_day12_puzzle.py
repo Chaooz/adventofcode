@@ -123,5 +123,5 @@ unittest(run_pathing_two,103,"day12_data_unittest2.txt")
 unittest(run_pathing_two,3509,"day12_data_unittest3.txt")
 
 # Actual assignment
-unittest(run_pathing,4885,"day12_data_puzzle.txt")
-unittest(run_pathing_two,117095,"day12_data_puzzle.txt")
+unittest(run_pathing,4885,"thor_day12_data.txt")
+unittest(run_pathing_two,117095,"thor_day12_data.txt")

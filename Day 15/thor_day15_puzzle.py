@@ -8,7 +8,7 @@ sys.path.insert(1, '../Libs')
 from advent_libs import *
 from advent_libs_path import *
 # Pathfinding lib
-#from advent_libs_astar import heuristic_astar_path4
+from advent_libs_matrix import *
 from advent_libs_heatmap import path_heatmap_astar
 from advent_libs_brute_path import path_brute_path
 
@@ -225,17 +225,14 @@ show_graphs = False
 
 # Unittest first implementation
 #unittest(generate_path, 40,"chiton_data_example.txt")
-unittest_input(generate_heat_path2, show_graphs, 315,"chiton_data_example.txt")
+unittest_input(generate_heat_path2, show_graphs, 315,"day15_unittest_data.txt")
+unittest_input(generate_brute_map1, show_graphs, 40,"day15_unittest_data.txt")
+unittest_input(generate_brute_map2, show_graphs, 315,"day15_unittest_data.txt")
 
-
-# Unittest examples
-unittest_input(generate_brute_map1, show_graphs, 40,"chiton_data_example.txt")
-unittest_input(generate_brute_map2, show_graphs, 315,"chiton_data_example.txt")
-
-# Unittest results
-unittest_input(generate_brute_map1, show_graphs, 447,"chiton_data.txt")
-unittest_input(generate_brute_map2, show_graphs, 2825,"chiton_data.txt")
+# Unittest actual puzzle
+unittest_input(generate_brute_map1, show_graphs, 447,"thor_day15_data.txt")
+unittest_input(generate_brute_map2, show_graphs, 2825,"thor_day15_data.txt")
 
 # Show
-print("Puzzle 1 : " + str(generate_brute_map1("chiton_data.txt",show_graphs)))
-print("Puzzle 2 : " + str(generate_brute_map2("chiton_data.txt",show_graphs)))
+print("Puzzle 1 : " + str(generate_brute_map1("thor_day15_data.txt",show_graphs)))
+print("Puzzle 2 : " + str(generate_brute_map2("thor_day15_data.txt",show_graphs)))
