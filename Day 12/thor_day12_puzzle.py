@@ -115,15 +115,13 @@ def run_pathing_two(filename):
     return num_paths
 
 # Run unittests
-unittest(run_pathing,10,"passage_pathing_data_example1.txt")
-unittest(run_pathing,19,"passage_pathing_data_example2.txt")
-unittest(run_pathing,226,"passage_pathing_data_example3.txt")
-
-unittest(run_pathing_two,36,"passage_pathing_data_example1.txt")
-unittest(run_pathing_two,103,"passage_pathing_data_example2.txt")
-unittest(run_pathing_two,3509,"passage_pathing_data_example3.txt")
-
+unittest(run_pathing,10,"day12_data_unittest1.txt")
+unittest(run_pathing,19,"day12_data_unittest2.txt")
+unittest(run_pathing,226,"day12_data_unittest3.txt")
+unittest(run_pathing_two,36,"day12_data_unittest1.txt")
+unittest(run_pathing_two,103,"day12_data_unittest2.txt")
+unittest(run_pathing_two,3509,"day12_data_unittest3.txt")
 
 # Actual assignment
-unittest(run_pathing,4885,"passage_pathing_data.txt")
-unittest(run_pathing_two,117095,"passage_pathing_data.txt")
+unittest(run_pathing,4885,"day12_data_puzzle.txt")
+unittest(run_pathing_two,117095,"day12_data_puzzle.txt")
