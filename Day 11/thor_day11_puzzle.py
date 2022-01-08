@@ -92,40 +92,31 @@ def run_code_loops(steps, filename, exit_on_allflash):
 #
 # Run code examples through our test to make sure the code runs ok
 # 
-def unittest_loops(steps, result, filename):
-    code_res = run_code_loops(steps, filename,False)
-    if code_res == result:
-        print(bcolors.OKGREEN + "[OK]    Unittest loops " + filename + " with " + str(steps) + " steps is OK! " + bcolors.RESET)
-    else:
-        print(bcolors.WARNING + "[ERROR] Unittest loops " + filename + " with " + str(steps) + " steps is NOT OK! Got:" + str(code_res) + " Expected:" + str(result) + bcolors.RESET)
 
-def unittest_allflash(needed_steps, filename):
-    code_res = run_code_loops(10000, filename, True)
-    if code_res == needed_steps:
-        print(bcolors.OKGREEN + "[OK]    Unittest allflash " + filename + " with " + str(needed_steps) + " steps is OK! " + bcolors.RESET)
-    else:
-        print(bcolors.WARNING + "[ERROR] Unittest allflash " + filename + " with " + str(needed_steps) + " steps is NOT OK! Got:" + str(code_res) + " Expected:" + str(needed_steps) + bcolors.RESET)
+def run_puzzle1(filename,steps):
+    return run_code_loops(steps, filename, False)
 
+def run_puzzle2(filename):
+    return run_code_loops(10000, filename, True)
 
 #
 # Main code
 #
 
 # Test algorithm for examples in challenge
-unittest_loops(1,9, "dumbo_octopus_data_unittest_small.txt")
-unittest_loops(2,9, "dumbo_octopus_data_unittest_small.txt")
-unittest_loops(10,204, "dumbo_octopus_data_unittest_large.txt")
-unittest_loops(100,1656, "dumbo_octopus_data_unittest_large.txt")
+unittest_input(run_puzzle1,1,9, "day11_data_unittest_small.txt")
+unittest_input(run_puzzle1,2,9, "day11_data_unittest_small.txt")
+unittest_input(run_puzzle1,10,204, "day11_data_unittest_large.txt")
+unittest_input(run_puzzle1,100,1656, "day11_data_unittest_large.txt")
+unittest(run_puzzle2,195,"day11_data_unittest_large.txt")
 
-# Testing result of puzzle part 1
-unittest_loops(100,1749, "dumbo_octopus_data_puzzle.txt")
-
-# From example on webpage
-unittest_allflash(195,"dumbo_octopus_data_unittest_large.txt")
+# Unittest actual data
+unittest_input(run_puzzle1,100,1749, "day11_data_puzzle.txt")
+unittest(run_puzzle2,285,"day11_data_puzzle.txt")
 
 # Run actual program
-res = run_code_loops(100,"dumbo_octopus_data_puzzle.txt", False)
+res = run_puzzle1("day11_data_puzzle.txt", 100)
 print("Puzzle #1 : Number of flashes after 100 loops = " + str(res))
 
-res_allflash = run_code_loops(10000,"dumbo_octopus_data_puzzle.txt", True)
+res_allflash = run_puzzle2("day11_data_puzzle.txt")
 print("Puzzle #2 : Number of loops for all to flash at the same time = " + str(res_allflash))
