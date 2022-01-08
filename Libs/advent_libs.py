@@ -48,6 +48,21 @@ def max_point_in_list(point_list):
             max_y = y
     return (max_x, max_y)
 
+def min_point_in_list(point_list):
+    min_x = 0
+    min_y = 0
+    for input in point_list:
+        x = int(input[0])
+        y = int(input[1])
+        if x < min_x:
+            min_x = x
+        if y < min_y:
+            min_y = y
+    return (min_x, min_y)
+
+def point_to_str(text,point):
+    return text + str(point[0]) + "x" + str(point[1])
+
 def print_list(text, list):
     print ("--- " + text + " ---")
     
