@@ -147,5 +147,5 @@ unittest(run_calculate, 0 , "F600BC2D8F")
 unittest(run_calculate, 0 , "9C005AC2F8F0")
 unittest(run_calculate, 1 , "9C0141080250320F1802104A08")
 
-unittest(run_puzzle1, 886 , "packet_data.txt")
-unittest(run_puzzle2, 184487454837 , "packet_data.txt")
+unittest(run_puzzle1, 886 , "thor_day16_data.txt")
+unittest(run_puzzle2, 184487454837 , "thor_day16_data.txt")
