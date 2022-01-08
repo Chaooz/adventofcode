@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 # Open file containing the depth measurements for reading
 file = open("measurements.txt", "r")
 

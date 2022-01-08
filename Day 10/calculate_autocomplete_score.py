@@ -135,3 +135,6 @@ scores.sort()
 final_score = scores[int(len(scores) / 2)]
 
 print(final_score)
+
+
+	
