@@ -6,6 +6,7 @@
 import sys
 sys.path.insert(1, '../Libs')
 from advent_libs import *
+from advent_libs_matrix import *
 
 # Flash blocks
 def flash_block(x,y, size_x, size_y, matrix, visited_matrix):
@@ -58,7 +59,7 @@ def count_reset_blocks(size_x, size_y, matrix):
 #
 def run_code_loops(steps, filename, exit_on_allflash):
 
-    matrix = createMatrix(filename)
+    matrix = create_matrix_from_file(filename)
 
     size_y = int(len(matrix))
     size_x = int(len(matrix[0]))
