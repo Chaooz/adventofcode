@@ -3,6 +3,7 @@
 # Day 17 Trick Shot : https://adventofcode.com/2021/day/17
 # 
 
+from dis import show_code
 import sys
 import time
 sys.path.insert(1, '../Libs')
@@ -15,20 +16,78 @@ from advent_libs_matrix import *
 # Due to drag, the probe's x velocity changes by 1 toward the value 0; that is, it decreases by 1 if it is greater than # 0, increases by 1 if it is less than 0, or does not change if it is already 0.
 #Due to gravity, the probe's y velocity decreases by 1.
 
-def mark_area(matrix, start_pos, end_pos):
-    for y in range(start_pos[1],end_pos[1]):
-        for x in range(start_pos[0],end_pos[0]):
-            matrix[x][y] = "T"
+#
+# Debug function to mark the area for impact in the debug print function
+#
+def debug_mark_area(matrix, start_pos, end_pos, move_x, move_y):
+    y1 = min(start_pos[1],end_pos[1])
+    y2 = max(start_pos[1],end_pos[1])
+    for y in range(y1,y2 + 1):
+        for x in range(start_pos[0],end_pos[0] + 1):
+            matrix[x + move_x][y + move_y] = "T"
 
-def calculate_path(start_pos, end_pos, velocity):
+def debug_move_path_on_matrix(path,incx,incy):
+    new_path = list()
+    for (x,y,value) in path:
+        new_path.append( ( x + incx, y + incy, value ))
+    return new_path
+
+def debug_flip_matrix_y(matrix):
+    size = get_matrix_size(matrix)
+    size_x = size[0]
+    size_y = size[1]
+
+    flipped_matrix = create_empty_matrix(size_x, size_y)
+
+    for y in range(size_y):
+        for x in range(size_x):
+            flipped_matrix[x][size_y - y - 1] = matrix[x][y]
+    return flipped_matrix
+
+def debug_print_graph(path, target_start_pos, target_end_pos):
+
+    (maxx,maxy) = max_point_in_list(path)
+    (minx,miny) = min_point_in_list(path)
+
+    # Make sure target pos fits in matrix
+    minx = min( minx, target_start_pos[0])
+    minx = min( minx, target_end_pos[0])
+    miny = min( miny, target_start_pos[1])
+    miny = min( miny, target_end_pos[1])
+
+    maxx = max( maxx, target_start_pos[0])
+    maxx = max( maxx, target_end_pos[0])
+    maxy = max( maxy, target_start_pos[1])
+    maxy = max( maxy, target_end_pos[1])
+
+    diff_x = abs(min(0,minx))
+    diff_y = abs(min(0,miny))
+
+    # Since coordinates can go from - on the coordinates, adjust everthing to start at 0
+    mx = maxx + diff_x
+    my = maxy + diff_y
+
+    # Move path to fit inside matrix
+    matrix = create_empty_matrix(mx+1,my+1,".")
+    matrix_path = debug_move_path_on_matrix(path, diff_x, diff_y)
+    #flipped_path = flip_path_on_y(path)
+    debug_mark_area(matrix,target_start_pos, target_end_pos, diff_x, diff_y)
+    matrix_plot_list(matrix,matrix_path)
+    flipped_matrix = debug_flip_matrix_y(matrix)
+    print_matrix_color("path",flipped_matrix, ".", bcolors.DARK_GREY, "0","")
+
+#
+# Calculate the path based on the velocity vector
+#
+def calculate_path(target_start_pos, target_end_pos, velocity):
     shot_list = list()
+    max_path_length = 1000
 
-    (x,y) = start_pos
+    (x,y) = (0,0)
     (vx,vy) = velocity
     shot_list.append((x,y, "S"))
-#    print(point_to_str("end", end_pos))
 
-    for i in range(10):
+    for i in range(max_path_length):
         # The probe's x position increases by its x velocity.
         x += vx
         # The probe's y position increases by its y velocity.
@@ -36,76 +95,155 @@ def calculate_path(start_pos, end_pos, velocity):
         # Due to drag, the probe's x velocity changes by 1 toward the value 0; that is, it decreases by 1 if it is greater than 0, increases by 1 if it is less than 0, or does not change if it is already 0.
         if vx > 0:
             vx -= 1
-#        else:
-#            vx -= 1    
 
         # Due to gravity, the probe's y velocity decreases by 1.
         vy -= 1
-        shot_list.append((x,y, "#"))
 
-        if x > end_pos[0] and y < end_pos[1]:
+        # If we have not passed end-point
+        if x <= target_end_pos[0] and y >= target_end_pos[1]:
+            shot_list.append((x,y, "#"))
+#        else:
+#            print("outside of grid ? " + str(x) + "x" + str(y) + " target_end_pos:" + str(target_end_pos))
+
+        # If we have passed start point 
+        if x > target_start_pos[0] and y < target_start_pos[1]:
+#            print("passed_end_pos " + str(x) + "x" + str(y) + " target_start_pos:" + str(target_start_pos))
             return shot_list
         
     return shot_list
 
-def move_path_on_matrix(path,mx,my):
+def get_target_area(input_text):
+    # "target area: x=20..30, y=-10..-5"
+    points_text = input_text.split(":")  # => "target area" and " x=20..30, y=-10..-5"
+    xy_text = points_text[1].split(",")  # => "x=20..30" and "y=-10..-5"
+    str_xx = xy_text[0].split("=")[1]        # => "20..30"
+    str_yy = xy_text[1].split("=")[1]        # => "-10..-5"
+    xx = str_xx.split("..")                  # => "20" and "30"
+    yy = str_yy.split("..")                  # => "-10" and "-5"
 
-    if mx >= 0 and my >= 0:
-        return path
+    y1 = int(yy[0])
+    y2 = int(yy[1])
 
-    incx = 0
-    incy = 0
-    if mx < 0:
-        incx = 0 - mx
-    if my < 0:
-        incy = 0 - my
+    start_point = (int(xx[0]),max(y1,y2))    # => (20,-10)
+    end_point = (int(xx[1]),min(y1,y2))      # => (-30,-5)
+    return start_point,end_point
 
-    new_path = list()
+
+def get_point_in_area(path,start,end):
+    if len(path) > 0:
+        path.reverse()
+        last_point = path[0]
+#        print("get_point_in_area point : " + str(last_point))
+#        print("get_point_in_area start : " + str(start))
+#        print("get_point_in_area end   : " + str(end))
+        if last_point[0] >= start[0] and last_point[0] <= end[0]:
+            if last_point[1] <= start[1] and last_point[1] >= end[1]:
+                return (last_point[0],last_point[1])
+
+    return None
+
+def get_max_y_in_path(path):
+    max_y = -99999
     for (x,y,value) in path:
-        new_path.append( ( x + incx, y + incy, value ))
-    return new_path
+        max_y = max(y,max_y)           
+    return max_y
 
-def fire_shot(input,velocity):
+def fire_shot(input, parameters):
 
-    x1 = 30
-    y1 = 14
+    velocity,show_graph = parameters
+    start_pos, end_pos = get_target_area(input)
 
-    start_pos = (0,0)
-    #velocity = input
-    end_pos = ( -10,-5 )
+    path = calculate_path(start_pos, end_pos, velocity)
 
-    path = calculate_path(start_pos,end_pos, velocity)
+    # Check if last point is inside start/end position
 
-    (maxx,maxy) = max_point_in_list(path)
-    (minx,miny) = min_point_in_list(path)
-    
-    mx = maxx
-    if ( minx < 0 ):
-        mx -= minx
-    my = maxy
-    if ( miny < 0 ):
-        my -= miny    
+    if show_graph:
+        debug_print_graph(path, start_pos, end_pos)
 
-    matrix = create_empty_matrix(mx+1,my+1,".")
+    point = get_point_in_area(path, start_pos, end_pos)
+    if not point is None:
+        return get_max_y_in_path(path)
+    return -1
 
-    # Move path to fit inside matrix
-    path = move_path_on_matrix(path, minx, miny)
+def puzzle1_fire(input):
+    start_pos, end_pos = get_target_area(input)
 
-    #flipped_path = flip_path_on_y(path)
+    max_y = 0
+    p = (0,0)
+    pp = None
+    for y in range(1,1000):
+        for x in range(1,21):
+            velocity = (x,y)
+            path = calculate_path(start_pos, end_pos, velocity)
+            point = get_point_in_area(path, start_pos, end_pos)
+            if not point is None:
+                yy = get_max_y_in_path(path)
+                if ( yy > max_y ):
+                    max_y = yy
+                    p = (x,y)
+                    pp = path
 
-    # Mark areay on impact
-    #mark_area(matrix,(x1-11,y1-6), (x1,y1))
-    # Plot path    
-    matrix_plot_list(matrix,path)
-    print_matrix_color("path",matrix, ".", bcolors.DARK_GREY, "0","")
+    #print("fire_best_shot : " + str(p[0]) + "x" + str(p[1]) + " height:" + str(max_y))
+    return max_y
 
-    return 0
 
-# Unittests
-unittest_input(fire_shot, (7,2), 0, "target area: x=20..30, y=-10..-5")
-unittest_input(fire_shot, (6,3), 0, "target area: x=20..30, y=-10..-5")
-unittest_input(fire_shot, (9,0), 0, "target area: x=20..30, y=-10..-5")
-unittest_input(fire_shot, (17,-4), 0, "target area: x=20..30, y=-10..-5")
-unittest_input(fire_shot, (6,9), 0, "target area: x=20..30, y=-10..-5")
+def fire_best_shot_velocity(input, parameters):
+    velocity, show_graph = parameters
+    start_pos, end_pos = get_target_area(input)
 
-# Puzzle input : target area: x=206..250, y=-105..-57
+    num_paths = 0
+    path = calculate_path(start_pos, end_pos, velocity)
+    point = get_point_in_area(path, start_pos, end_pos)
+    if not point is None:
+        num_paths += 1
+    return num_paths
+
+def puzzle2_fire(input):
+    start_pos, end_pos = get_target_area(input)
+
+    mx = 0
+    miy = 0
+    may = 0
+    num_paths = 0
+    for y in range(-200,200):
+        for x in range(1,500):
+            velocity = (x,y)
+            path = calculate_path(start_pos, end_pos, velocity)
+            point = get_point_in_area(path, start_pos, end_pos)
+            if not point is None:
+                #print("fire_best_shot_number : " + str(x) + "x" + str(y) + " height:" + str(point))
+                num_paths += 1
+                mx = max(mx,x)
+                miy = min(miy,y)
+                may = max(may,y)
+
+#    print("range: max-x:" + str(mx) + " => min-y:" + str(miy) + " max-y:" + str(may))
+    return num_paths
+
+
+test_range = "target area: x=20..30, y=-10..-5"
+puzzle_range = "target area: x=206..250, y=-105..-57"
+
+# Unittests for exmample with velocity
+unittest_input(fire_shot, ((7,2),True), 3, test_range)
+unittest_input(fire_shot, ((6,3),False), 6, test_range)
+unittest_input(fire_shot, ((9,0),False), 0, test_range)
+unittest_input(fire_shot, ((17,-4),False), -1, test_range)
+unittest_input(fire_shot, ((6,9),False), 45, test_range)
+
+# Unittest for example (without velocity)
+unittest(puzzle1_fire, 45, test_range)
+
+# Unittest puzzle 2 : Test two if the numbers in the list to make sure it is correct
+unittest_input(fire_best_shot_velocity, ((23,-10),False), 1, test_range)
+unittest_input(fire_best_shot_velocity, ((8,0),False), 1, test_range)
+unittest(puzzle2_fire, 112, test_range)
+
+# Unittest puzzles
+unittest(puzzle1_fire, 5460, puzzle_range)
+unittest(puzzle2_fire, 3618, puzzle_range)
+
+puzzle1 = puzzle1_fire(puzzle_range)
+print("Day 17 puzzle 1: Height = " + str(puzzle1))
+puzzle2 = puzzle2_fire(puzzle_range)
+print("Day 17 puzzle 2: Number of occurances = " + str(puzzle2))
