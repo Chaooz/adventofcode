@@ -63,6 +63,10 @@ def min_point_in_list(point_list):
 def point_to_str(text,point):
     return text + str(point[0]) + "x" + str(point[1])
 
+def string_highlight(string,highlight, color):
+    new_text = color + highlight + bcolors.RESET
+    return string.replace(highlight, new_text,1)
+
 def print_list(text, list):
     print ("--- " + text + " ---")
     
@@ -70,6 +74,20 @@ def print_list(text, list):
     #for line in list:
     #    print(line)
     print ("")
+
+def print_tree_list(spacer, tree_list : list):
+    for line in tree_list:
+        if isinstance(line,list):
+#            print("Tree1:" + spacer + str(line))
+            print("Tree1:" + spacer + "T")
+            if spacer =="":
+                spacer = "+"
+            print_tree_list( spacer + "-", line)
+        elif isinstance(line,str):
+            print("Tree2:" + spacer + " " + line)
+        else:
+            print("Tree3:" + spacer + " " + str(line))
+#    print ("")
 
 def pad_number(number,pad):
     num_str = str(number)

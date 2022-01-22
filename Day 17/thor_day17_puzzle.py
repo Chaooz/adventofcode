@@ -10,14 +10,9 @@ sys.path.insert(1, '../Libs')
 from advent_libs import *
 from advent_libs_matrix import *
 
-# Rules
-# The probe's x position increases by its x velocity.
-# The probe's y position increases by its y velocity.
-# Due to drag, the probe's x velocity changes by 1 toward the value 0; that is, it decreases by 1 if it is greater than # 0, increases by 1 if it is less than 0, or does not change if it is already 0.
-#Due to gravity, the probe's y velocity decreases by 1.
-
 #
-# Debug function to mark the area for impact in the debug print function
+# Debug: Add a field in the printed graph with T that markes the
+#        valid end position area.
 #
 def debug_mark_area(matrix, start_pos, end_pos, move_x, move_y):
     y1 = min(start_pos[1],end_pos[1])
@@ -26,24 +21,34 @@ def debug_mark_area(matrix, start_pos, end_pos, move_x, move_y):
         for x in range(start_pos[0],end_pos[0] + 1):
             matrix[x + move_x][y + move_y] = "T"
 
+#
+# Debug: Adjust the path up/down on y-axis to make it fit in the 
+#        pretty printed graph that we draw
+#
 def debug_move_path_on_matrix(path,incx,incy):
     new_path = list()
     for (x,y,value) in path:
         new_path.append( ( x + incx, y + incy, value ))
     return new_path
 
+#
+# Debug: Since graph in assignment is upside down ( y is negative ), 
+#        flip matrix to make y go up ( to make it pretty in print )
+#
 def debug_flip_matrix_y(matrix):
     size = get_matrix_size(matrix)
     size_x = size[0]
     size_y = size[1]
-
     flipped_matrix = create_empty_matrix(size_x, size_y)
-
     for y in range(size_y):
         for x in range(size_x):
             flipped_matrix[x][size_y - y - 1] = matrix[x][y]
     return flipped_matrix
 
+#
+# Debug: Print a pretty graph to be able to see if the paths matches
+#        the examples in the assignment
+#
 def debug_print_graph(path, target_start_pos, target_end_pos):
 
     (maxx,maxy) = max_point_in_list(path)
@@ -76,8 +81,15 @@ def debug_print_graph(path, target_start_pos, target_end_pos):
     flipped_matrix = debug_flip_matrix_y(matrix)
     print_matrix_color("path",flipped_matrix, ".", bcolors.DARK_GREY, "0","")
 
+
 #
 # Calculate the path based on the velocity vector
+# Rules:
+# * The probe's x position increases by its x velocity.
+# * The probe's y position increases by its y velocity.
+# * Due to drag, the probe's x velocity changes by 1 toward the value 0; that is, it decreases by 1 if it
+#   is greater than # 0, increases by 1 if it is less than 0, or does not change if it is already 0.
+# * Due to gravity, the probe's y velocity decreases by 1.
 #
 def calculate_path(target_start_pos, target_end_pos, velocity):
     shot_list = list()
@@ -102,16 +114,18 @@ def calculate_path(target_start_pos, target_end_pos, velocity):
         # If we have not passed end-point
         if x <= target_end_pos[0] and y >= target_end_pos[1]:
             shot_list.append((x,y, "#"))
-#        else:
-#            print("outside of grid ? " + str(x) + "x" + str(y) + " target_end_pos:" + str(target_end_pos))
 
         # If we have passed start point 
         if x > target_start_pos[0] and y < target_start_pos[1]:
-#            print("passed_end_pos " + str(x) + "x" + str(y) + " target_start_pos:" + str(target_start_pos))
             return shot_list
         
     return shot_list
 
+#
+# Split the input area text into start and end points
+# "target area: x=20..30, y=-10..-5" will be split into (20,-10) and (30,-5)
+# Argument: input_text  - The text we wan to split into landing points
+#
 def get_target_area(input_text):
     # "target area: x=20..30, y=-10..-5"
     points_text = input_text.split(":")  # => "target area" and " x=20..30, y=-10..-5"
@@ -125,17 +139,19 @@ def get_target_area(input_text):
     y2 = int(yy[1])
 
     start_point = (int(xx[0]),max(y1,y2))    # => (20,-10)
-    end_point = (int(xx[1]),min(y1,y2))      # => (-30,-5)
+    end_point = (int(xx[1]),min(y1,y2))      # => (30,-5)
     return start_point,end_point
 
-
+#
+# Return the last point in a path if it is inside the landing area
+# Argument: Path  - The path we want to check
+# Argument: Start - Start point for the landing area, f.ex (20,-10)
+# Argument: End   - End point for the landing area, f.ex (30,-5)
+#
 def get_point_in_area(path,start,end):
     if len(path) > 0:
         path.reverse()
         last_point = path[0]
-#        print("get_point_in_area point : " + str(last_point))
-#        print("get_point_in_area start : " + str(start))
-#        print("get_point_in_area end   : " + str(end))
         if last_point[0] >= start[0] and last_point[0] <= end[0]:
             if last_point[1] <= start[1] and last_point[1] >= end[1]:
                 return (last_point[0],last_point[1])
