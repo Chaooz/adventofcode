@@ -23,6 +23,17 @@ def loadfile(filename):
     file.close()
     return lines
 
+def listToString(s):
+    str1 = ""
+    for ele in s:
+        if str1 == "":
+            str1 += "["
+        else:
+            str1 += ","
+        str1 += str(ele)
+    str1 += "]"
+    return str1
+
 #
 # Create a list of tuples from the textfile
 #
@@ -104,6 +115,17 @@ def unittest( func, expected, filename ):
         print_ok("Unittest " + func.__name__ + " with " + str(code_result) + " is OK! input:" + filename)
     else:
         print_error("Unittest " + func.__name__ + " with " + str(code_result) + " is NOT OK! Got:" + str(code_result) + " Expected:" + str(expected) + " input:" + filename)
+
+def unittest_list( func, expected, filename ):
+    code_result = func(filename)
+    s_result = listToString(code_result)
+    s_input = listToString(filename)
+    if code_result == expected:
+        print_ok("Unittest " + func.__name__ + " with " + str(s_result) + " is OK! input:" + s_input)
+    else:
+        print_error("Unittest " + func.__name__ + " with " + str(s_result) + " is NOT OK! Got:" + str(s_result) + " Expected:" + str(expected) + " input:" + s_input)
+
+
 
 def unittest_input( func, input, expected, filename ):
     code_result = func(filename, input)
