@@ -2,6 +2,7 @@
 # Library for Advent of Code solutions
 # https://adventofcode.com/
 #
+import time
 
 class bcolors:
     RESET = '\033[39m'
@@ -110,29 +111,42 @@ def pad_number(number,pad):
     return num_str
 
 def unittest( func, expected, filename ):
+    st = time.time()
     code_result = func(filename)
+    et = time.time()
+    strTime = " (execution time:" + str(round(et-st,2)) + ")"
+
     if code_result == expected:
-        print_ok("Unittest " + func.__name__ + " with " + str(code_result) + " is OK! input:" + filename)
+        print_ok("Unittest " + func.__name__ + " with " + str(code_result) + " is OK! input:" + filename + strTime)
     else:
-        print_error("Unittest " + func.__name__ + " with " + str(code_result) + " is NOT OK! Got:" + str(code_result) + " Expected:" + str(expected) + " input:" + filename)
+        print_error("Unittest " + func.__name__ + " with " + str(code_result) + " is NOT OK! Got:" + str(code_result) + " Expected:" + str(expected) + " input:" + filename + strTime)
 
 def unittest_list( func, expected, filename ):
+    st = time.time()
     code_result = func(filename)
+    et = time.time()
+    strTime = " (execution time:" + str(round(et-st,2)) + ")"
+
     s_result = listToString(code_result)
     s_input = listToString(filename)
     if code_result == expected:
-        print_ok("Unittest " + func.__name__ + " with " + str(s_result) + " is OK! input:" + s_input)
+        print_ok("Unittest " + func.__name__ + " with " + str(s_result) + " is OK! input:" + s_input + strTime)
     else:
-        print_error("Unittest " + func.__name__ + " with " + str(s_result) + " is NOT OK! Got:" + str(s_result) + " Expected:" + str(expected) + " input:" + s_input)
+        print_error("Unittest " + func.__name__ + " with " + str(s_result) + " is NOT OK! Got:" + str(s_result) + " Expected:" + str(expected) + " input:" + s_input + strTime)
 
 
 
 def unittest_input( func, input, expected, filename ):
+
+    st = time.time()
     code_result = func(filename, input)
+    et = time.time()
+    strTime = " (execution time:" + str(round(et-st,2)) + ")"
+
     if code_result == expected:
-        print_ok("Unittest " + func.__name__ + "(" + str(input) + ") with " + str(code_result) + " is OK! input:" + filename)
+        print_ok("Unittest " + func.__name__ + "(" + str(input) + ") with " + str(code_result) + " is OK! input:" + filename + strTime)
     else:
-        print_error("Unittest " + func.__name__ + "(" + str(input) + ") with " + str(code_result) + " is NOT OK! Got:" + str(code_result) + " Expected:" + str(expected) + " input:" + filename)
+        print_error("Unittest " + func.__name__ + "(" + str(input) + ") with " + str(code_result) + " is NOT OK! Got:" + str(code_result) + " Expected:" + str(expected) + " input:" + filename + strTime)
 
 def print_assert(value,text):
     if not value:
