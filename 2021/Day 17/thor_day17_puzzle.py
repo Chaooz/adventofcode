@@ -6,7 +6,7 @@
 from dis import show_code
 import sys
 import time
-sys.path.insert(1, '../Libs')
+sys.path.insert(1, '../../Libs')
 from advent_libs import *
 from advent_libs_matrix import *
 
