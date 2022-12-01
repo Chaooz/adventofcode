@@ -49,6 +49,11 @@ unittest_input( topElfsFoodLoad, 3, 45000, "unittest_example1.txt")
 # Run puzzles
 result1 = topElfsFoodLoad("puzzleinput.txt", 1)
 result2 = topElfsFoodLoad("puzzleinput.txt", 3)
-
 print_ok("Thor: Puzzle1 = " + str(result1))
 print_ok("Thor: Puzzle2 = " + str(result2))
+
+# Run puzzles for Thor@Work
+result1w = topElfsFoodLoad("puzzleinput_work.txt", 1)
+result2w = topElfsFoodLoad("puzzleinput_work.txt", 3)
+print_ok("Thor-Work: Puzzle1 = " + str(result1w))
+print_ok("Thor-Work: Puzzle2 = " + str(result2w))
