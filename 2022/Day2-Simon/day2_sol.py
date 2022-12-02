@@ -48,11 +48,47 @@ def getPointsForResult(gameList):
                     points += 3
     return points
 
+def getPointsForStrategy(gameList):
+    points = 0
+    for game in gameList:
+        them = game[0]
+        result = game[1]
+        match them:
+            case "A":
+                if result == "X":
+                    points += 3
+                elif result == "Y":
+                    points += 4
+                elif result == "Z":
+                    points += 8
+            case "B":
+                if result == "X":
+                    points += 1
+                elif result == "Y":
+                    points += 5
+                elif result == "Z":
+                    points += 9
+            case "C":
+                if result == "X":
+                    points += 2
+                elif result == "Y":
+                    points += 6
+                elif result == "Z":
+                    points += 7
+    return points
+
 def getTotalScore(inputFile):
-    totalPoints = 0
     gameList = listFromFile(inputFile, " ")
-    totalPoints += getPointsForSelection(gameList)
-    totalPoints += getPointsForResult(gameList)
-    print("The total number of points gained is " + str(totalPoints))
+    
+    totalScore1 = 0
+    totalScore1 += getPointsForSelection(gameList)
+    totalScore1 += getPointsForResult(gameList)
+    print("The total number of points gained for part 1 is " + str(totalScore1))
+    print("------------------")
+
+    totalScore2 = 0
+    totalScore2 = getPointsForStrategy(gameList)
+    print("The total number of points gained for part 2 is " + str(totalScore2))
+
 
 getTotalScore("input.txt")
