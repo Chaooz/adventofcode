@@ -7,7 +7,7 @@ sys.path.insert(1, '../../Libs')
 from advent_libs import *
 
 #
-# Figure out which block contains most calories
+# Return all elfs and their calories count
 # 
 def get_elfs_with_calories(filename):
     lines = loadfile(filename)
@@ -22,11 +22,13 @@ def get_elfs_with_calories(filename):
         else:
             caleries += int(line)
 
+    # Make sure we get the last elf as well :)
     elfs.append(caleries)
+    
     return elfs
 
 # 
-# Return the calorie count for the top 3 elfs
+# Return the calorie count for the top X elfs
 #
 def topElfsFoodLoad(filename, numElfs):
     elfs = get_elfs_with_calories(filename)
