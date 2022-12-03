@@ -120,7 +120,7 @@ def matrix_copy(matrix):
     return matrix_copy
 
 def print_matrix(text,matrix):
-    print_matrix_color_padded(text,matrix,"",bcolors.RESET,"")
+    print_matrix_color(text,matrix,"",bcolors.RESET,"")
 
 def print_matrix_color(text,matrix,value_highlight,color, pad = "00", space = " "):
     size = get_matrix_size(matrix)
