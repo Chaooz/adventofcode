@@ -3,7 +3,7 @@
 import sys
 
 # Import custom libraries
-sys.path.insert(1, '../../Libs')
+sys.path.insert(1, '../../../Libs')
 from advent_libs import *
 
 # This function takes a list of tuples, each containing two strings as it´s 
