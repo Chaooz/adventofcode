@@ -102,3 +102,5 @@ unittest(solvePuzzle2, 70, "unittest2.txt")
 
 unittest(solvePuzzle1, 7428, "puzzleinput.txt")
 unittest(solvePuzzle2, 2650, "puzzleinput.txt")
+unittest(solvePuzzle1, 8240, "puzzleinput_work.txt")
+unittest(solvePuzzle2, 2587, "puzzleinput_work.txt")
