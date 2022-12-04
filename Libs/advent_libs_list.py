@@ -1,5 +1,6 @@
 
 import sys
+from advent_libs import *
 
 def listToString(s):
     str1 = ""
@@ -19,7 +20,7 @@ def listFromFile(textfile, delimiter):
     file_lines = loadfile(textfile)
     my_list = list()
     for line in file_lines:
-        line = line.strip("\n")
+        line = line.strip()
         key_value = line.split(delimiter)        
         my_list.append(key_value)
     return my_list
