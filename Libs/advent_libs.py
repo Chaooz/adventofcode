@@ -107,6 +107,9 @@ def print_warning(text):
 def print_ok(text):
     print(bcolors.OKGREEN + "[OK]      " + text + bcolors.RESET)
 
+def print_color(text,color):
+    print(color + "          " + text + bcolors.RESET)
+
 def print_debug(text):
     print(text)
     pass
