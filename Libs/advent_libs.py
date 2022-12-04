@@ -64,7 +64,7 @@ def unittest( func, expected, filename ):
     if code_result == expected:
         print_ok("Unittest " + func.__name__ + " with " + str(code_result) + " is OK! input:" + str(filename) + strTime)
     else:
-        print_error("Unittest " + func.__name__ + " with " + str(code_result) + " is NOT OK! Got:" + str(code_result) + " Expected:" + str(expected) + " input:" + str(filename) + strTime)
+        print_error("Unittest " + func.__name__ + " with " + str(code_result) + " is NOT OK!  Expected:" + str(expected) + " input:" + str(filename) + strTime)
 
 def unittest_list( func, expected, filename ):
     st = time.time()
