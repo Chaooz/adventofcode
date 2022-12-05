@@ -21,8 +21,12 @@ class bcolors:
 def loadfile(filename):
     file = open(filename)
     lines = file.readlines()
+    newLines = []
+    for line in lines:
+        line.strip()
+        newLines.append(line)
     file.close()
-    return lines
+    return newLines
 
 def point_to_str(text,point):
     return text + str(point[0]) + "x" + str(point[1])
