@@ -12,10 +12,6 @@ from advent_libs import *
 
 # start of packet marker ( 4 characters that are all different )
 
-print("")
-print_color("Day 6: Tuning Trouble", bcolors.OKGREEN)
-print("")
-
 def decodeMessage(message, numCharacters):    
 
     code = message[0]
@@ -54,6 +50,11 @@ def solvePuzzle2(filename):
     file = open(filename)
     message = file.read()
     return decodeLargeMessage(message)
+
+
+print("")
+print_color("Day 6: Tuning Trouble", bcolors.OKGREEN)
+print("")
 
 unittest(decodeSmallMessage, 7, "mjqjpqmgbljsphdztnvjfqwrcgsmlb")
 unittest(decodeSmallMessage, 5, "bvwbjplbgvbhsrlpgdmjqwftvncz")
