@@ -16,6 +16,7 @@ class bcolors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
     DARK_GREY = '\033[1;30;40m'
+    WHITE = '\033[1;37;40m'
 
 
 def loadfile(filename):
