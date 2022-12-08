@@ -153,8 +153,11 @@ def solvePuzzle2(filename):
     return min
 
 unittest(solvePuzzle1, 95437 , "unittest.txt")
-unittest(solvePuzzle1, 1141028 , "puzzleinput.txt")
 unittest(solvePuzzle2, 24933642 , "unittest.txt")
+
+unittest(solvePuzzle1, 1141028 , "puzzleinput.txt")
 unittest(solvePuzzle2, 8278005 , "puzzleinput.txt")
 
+unittest(solvePuzzle1, 1141028 , "puzzleinput_work.txt")
+unittest(solvePuzzle2, 8278005 , "puzzleinput_work.txt")
 
