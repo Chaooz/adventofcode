@@ -167,10 +167,18 @@ def print_matrix_colorlist(text,matrix,valueList, color, defaultColor, pad = "00
     header = header + " + "
     header2 = header2 + "   "
 
+    pad_header_x = ""
+    if len(pad)>1:
+        for i in range(pad_size):
+            pad_header_x += "0"
+        pad_header_x = pad[0] + pad_header_x[0] + pad_header_x[1]
+
     for x in range(size_x):
         xx = x % 10
+        if len(pad) > 1:
+            xx = x % 100
 
-        header2 += pad_number( xx , pad )
+        header2 += pad_number( xx , pad_header_x )
         for i in range(pad_size):
             header = header + "-"
         header2 = header2 + space
@@ -195,11 +203,16 @@ def print_matrix_colorlist(text,matrix,valueList, color, defaultColor, pad = "00
 
             highlight_color = defaultColor
             v = "" + str(value)
-            for highlight_value in valueList:
-                if isinstance(highlight_value,int) and value == highlight_value:
+
+            if isinstance(valueList,int):
+                if value == valueList:
                     highlight_color = bcolors.BOLD + color
-                elif isinstance(highlight_value,str) and highlight_value in v:
-                    highlight_color = bcolors.BOLD + color
+            else:
+                for highlight_value in valueList:
+                    if isinstance(highlight_value,int) and value == highlight_value:
+                        highlight_color = bcolors.BOLD + color
+                    elif isinstance(highlight_value,str) and highlight_value in v:
+                        highlight_color = bcolors.BOLD + color
 
             line = line + highlight_color
             line += pad_number( value , pad )

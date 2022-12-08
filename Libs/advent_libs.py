@@ -17,6 +17,7 @@ class bcolors:
     UNDERLINE = '\033[4m'
     DARK_GREY = '\033[1;30;40m'
     WHITE = '\033[1;37;40m'
+    YELLOW = '\033[1;33;40m'
 
 
 def loadfile(filename):
@@ -52,8 +53,8 @@ def pad_number(number,pad):
     l = len(pad)
     l2 = l - len(num_str)
     if ( l2 > 0 ):
-        for i in range(l2):
-            num_str = pad[0] + num_str
+        for i in range(0,l2):
+            num_str = pad[l2-i-1] + num_str
     return num_str
 
 def unittest( func, expected, filename ):
