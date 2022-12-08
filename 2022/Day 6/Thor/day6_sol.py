@@ -70,3 +70,5 @@ unittest(decodeLargeMessage, 26, "zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw")
 
 unittest(solvePuzzle1, 1794, "puzzleinput.txt")
 unittest(solvePuzzle2, 2851, "puzzleinput.txt")
+unittest(solvePuzzle1, 1766, "puzzleinput_work.txt")
+unittest(solvePuzzle2, 2383, "puzzleinput_work.txt")

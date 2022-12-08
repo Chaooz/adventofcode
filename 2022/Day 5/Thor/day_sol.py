@@ -108,7 +108,7 @@ def moveBoxes():
             box = replaceBox(moveFrom, lineFrom, ".")
             check = replaceBox(moveTo, lineTo, box)
 
-        print(" move " + str(numberOfBoxes) + " times " + str(moveFrom+1) + " => " + str(moveTo+1))
+        #print(" move " + str(numberOfBoxes) + " times " + str(moveFrom+1) + " => " + str(moveTo+1))
         #debugPrintStacks()
 
 def moveMultiBoxes():
@@ -135,4 +135,4 @@ def moveMultiBoxes():
 #            print(" move " + str(numberOfBoxes) + " times " + str(moveFrom+1) + " => " + str(moveTo+1) + " Box:" + box + " check:" + check)
 #        debugPrintStacks()
 
-organizeInput("puzzleinput.txt")
+organizeInput("puzzleinput_work.txt")
