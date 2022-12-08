@@ -136,30 +136,3 @@ def moveMultiBoxes():
 #        debugPrintStacks()
 
 organizeInput("input.txt")
-
-# .......R.
-# .......R.
-# .......F.
-# .......P.
-# .......J.
-# .......H.
-# .......F.
-# .......V.
-# .......S.
-# .......L.
-# .......R.
-# .......H.
-# .......L.
-# C......D.
-# Q......J.
-# B......P.
-# T......C.
-# JD.....J.
-# TZT....C.
-# RCW....H.
-# HNR....L.
-# MTH.Z..B.
-# DPR.Z.BG.
-# SBSQFHGGS
-
-# CDTQZHBRS
