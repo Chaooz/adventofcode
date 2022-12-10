@@ -10,6 +10,7 @@ sys.path.insert(1, '../../../Libs')
 from advent_libs import *
 from advent_libs_matrix import *
 from advent_libs_list import *
+from advent_libs_vector2 import *
 
 # Rules
 # Tail is trying to follow Head
@@ -22,166 +23,97 @@ from advent_libs_list import *
 bridgeWidth = 6
 bridgeLength = 1000
 
-def moveOneStep( matrix, position, direction, character ):
-    posX = position[0]
-    posY = position[1]
+#
+# getDirection
+# @str dir - The direction in RLDU letters
+# return Vector with direction
+#
+def getDirection(dir:str):
+    if dir == "R": return Vector2(1,0)
+    elif dir == "L": return Vector2(-1,0)
+    elif dir == "D": return Vector2(0,1)
+    elif dir == "U": return Vector2(0,-1)
+    return Vector2(0,0)
 
-#    oldPos = (posX,posY)
-    posX += direction[0]
-    posY += direction[1]
+def isNeighbour(pos1,pos2):
+    return abs(pos2.x - pos1.x) < 2 and abs(pos2.y - pos1.y) < 2
 
-    if posX >= bridgeWidth:
-        posX = 0
-        posY += 1
-    elif posX < 0:
-        posX = bridgeWidth - 1
-        posY -= 1
+def moveHead( list:Vector2List, position: Vector2, direction: Vector2, steps:int, maxWidth:int) -> Vector2List:
+    for index in range(0,steps):
+        position += direction
+        if position.x > maxWidth:
+            position.y += int( position.x / maxWidth )
+        elif position.x < 0:
+            position.y -= 1
+            position.x += maxWidth
+            if position.x < 0:
+                print_warning("moveHead: broken!")
+        position.x %= maxWidth
+        list.append(position)
+    return position
 
-#    print("move:" + str(oldPos[0]) + "x" + str(oldPos[1]) + " => " + str(posX) + "x" + str(posY))
+def solveInternalPuzzle(name, moveList, debug, head, tail):
+    headList = Vector2List("head")
+    headList.append(head)
 
-    if posX >= 0 and posX < bridgeWidth and posY >= 0 and posY < bridgeLength:
-        if character == "":
-            matrix[posX][posY] += 1
-    else:
-        print_warning("outside:" + str(posX) + "x" + str(posY))
+    tailList = Vector2List("tail")
+    tailList.append(tail)
 
-    return (posX,posY)
+    # Move head
+    position = head
+    for index in range(0, len(moveList)):
+        move = moveList[index]
+        direction = getDirection(move[0])
+        position = moveHead( headList, position, direction, int(move[1]), 6 )
 
-# Follow Position
-def followPosition(matrix, startPos, endPos, character):
+    # Make tail follow head
+    tailPos = tail
+    for index in range(0, headList.len()):
+        headPos = headList.Get(index)
+        if isNeighbour(headPos,tailPos):
+            continue
+        tailPos = headList.Get(index-1)
+        if tailList.GetWithPos(tailPos) == None:
+            tailList.append(tailPos)
 
-    posX = startPos[0]
-    posY = startPos[1]
-
-    # If we have to go diagonally
-    if posX != endPos[0] and posY != endPos[1] and 2==1:
-        # Go diagonally
-        print_warning("Dialognal!!")
-        pass
-    else:
-        dirX = endPos[0] - posX
-        dirY = endPos[1] - posY
-
-        if dirX < 0:
-            posX -= 1
-        elif dirX > 0:
-            posX += 1
-       
-        if dirY < 0 :
-            posY -=1
-        elif dirY > 0:
-            posY += 1
-
-        # Cannot go into head
-        if posX == endPos[0] and posY == endPos[1]:
-            return startPos
-
-#        print("move" + str(startPos[0]) + "x" + str(startPos[1]) + " => " + str(endPos[0]) + "x" + str(endPos[1]) + " end:" + str(posX) + "x" + str(posY))
-
-    if character != "":
-        SetMatrixPoint(matrix,posX,posY,character)
-
-    return (posX,posY)
-       
-def SetMatrixPoint(matrix, x, y, character ):
-    if x >= 0 and x < bridgeWidth and y >= 0 and y < bridgeLength:
-        matrix[x][y] = character
-    else:
-        print_warning("SetMatrixPoint : " + str(x) + "x" + str(y) + " is outsde of matrix")
-
-# Move both Head and Tail x steps with the move command
-def moveSquare( matrix, debug, head, tail, direction, steps, character ):
+    # Debug print matrix with head movements
     if debug:
-        matrix[tail[0]][tail[1]] =  " T "
-        matrix[head[0]][head[1]] =  " H "
-        print_matrix_color("moveSquare:Start", matrix, 0, bcolors.DARK_GREY, "   ", " " )
+        matrixHead = Matrix(name + ":Head", bridgeWidth, 10, ".")
+        matrixHead.InsertFromVector2List(headList,"#")
+        matrixHead.Print("#", bcolors.WHITE)
 
-    for step in range(0,steps):
-        if debug:
-            matrix[head[0]][head[1]] =  " . "
-            matrix[tail[0]][tail[1]] =  " . "
+        # Debug print matrix with movements
+        matrixTail = Matrix(name + ":Tail",bridgeWidth, 10, 0)
+        matrixTail.InsertFromVector2List(tailList, "")
+        matrixTail.Print("0", bcolors.DARK_GREY)
 
-        head = moveOneStep(matrix, head, direction, character)
-        tail = followPosition(matrix, tail, head, character)
+        headList.Print()
 
-        if debug:
-            matrix[tail[0]][tail[1]] =  " T "
-            matrix[head[0]][head[1]] =  " H "
-            print_matrix_color("moveSquare:" + str(step), matrix, 0, bcolors.DARK_GREY, "   ", " " )
-
-    return (head,tail)
-
-# Execute a move order
-def moveOrder( matrix, debug, order, head, tail, steps, character ):
-    if order == "R":
-        head,tail = moveSquare(matrix, debug, head, tail, (1,0), steps, character)
-    elif order == "L":
-        head,tail = moveSquare(matrix, debug, head, tail, (-1,0), steps, character)
-    elif order == "D":
-        head,tail = moveSquare(matrix, debug, head, tail, (0,1), steps, character)
-    elif order == "U":
-        head,tail = moveSquare(matrix, debug, head, tail, (0,-1), steps, character)
-    return head, tail
-
-#
-# calcVisitedSteps
-# @Matrix matrix - The matrix to find number of steps in
-#
-def calcVisitedSteps(matrix):
-    numVisits = 1
-    for x in range(0, bridgeWidth):
-        for y in range(0,bridgeLength):
-            if ( matrix[x][y] == "#" ):
-                numVisits += 1
-    return numVisits
+    return tailList.len()
 
 #
 #
 #
 def testMove(order, input):
-    global bridgeWidth
-    global bridgeLength
-
-    start, head, tail, debug = input.split(",")
-    start = ( int(start[0]), int(start[2]))
-    head = ( int(head[0]), int(head[2]))
-    tail = ( int(tail[0]), int(tail[2]))
+    head, tail, debug = input.split(",")
+    head = Vector2( int(head[0]), int(head[2]))
+    tail = Vector2( int(tail[0]), int(tail[2]))
     debug = debug == "True"
 
-    matrix = create_empty_matrix( bridgeWidth, 10, " . ")
-    parts = order.split(" ")
-    steps = int(parts[1])
-    head,tail = moveOrder(matrix, debug, parts[0], head, tail, steps, " # ")
+    moveList = list()
+    moveList.append( order.split(" "))
 
-    # Mark these positions
-    matrix[start[0]][start[1]] = " s "
-    matrix[tail[0]][tail[1]] = " T "
-    matrix[head[0]][head[1]] = " H "
-    if debug:
-        print_matrix_color("Order:" + order + " - ", matrix, 0, bcolors.DARK_GREY, "   ", " " )
-    return 0
+    return solveInternalPuzzle(order, moveList, debug, head, tail)
 
 def solvePuzzle1(filename):
-    global bridgeWidth
-    global bridgeLength
+    moveList = listFromFile(filename, " ")
 
-    matrix = create_empty_matrix( bridgeWidth, bridgeLength, "  .")
-    lines = loadfile(filename)
-    y = int(bridgeLength/2)
-    startPos = (0,y)
-    start = startPos
-    tail = startPos
-    head = startPos
+#    newList = list()
+#    for index in range(0,5):
+#        move = moveList[index]
+#        newList.append(move)
 
-    for move in lines:
-        parts = move.split(" ")
-        steps = int(parts[1])
-        head,tail = moveOrder(matrix, False, parts[0], head, tail, steps, "#")
-
-    matrix[start[0]][start[1]] = "s"
-
-    #print_matrix_color("Bridge", matrix, " . ", bcolors.DARK_GREY, "   ", " " )
-    return calcVisitedSteps(matrix)
+    return solveInternalPuzzle("solvePuzzle1", moveList, False, Vector2(0,250), Vector2(0,250))
 
 def solvePuzzle2(filename):
     return 0
@@ -191,16 +123,17 @@ print_color("Day 9: Rope Bridge", bcolors.OKGREEN)
 print("")
 
 debug = "False"
-#unittest_input(testMove, "0 5,0 5,0 5," + debug, (4,5), "R 4")
-#unittest_input(testMove, "0 5,4 5,3 5," + debug, 0, "U 4")
-#unittest_input(testMove, "0 5,4 0,4 1," + debug, 0, "L 3")
-#unittest_input(testMove, "0 5,1 0,2 0," + debug, 0, "D 1")
-#unittest_input(testMove, "0 5,1 1,2 0," + debug, 0, "R 4")
-#unittest_input(testMove, "0 5,5 1,4 1," + debug, 0, "D 1")
-#unittest_input(testMove, "0 5,5 2,4 1," + debug, 0, "L 5")
-#unittest_input(testMove, "0 5,0 2,1 2," + debug, 0, "R 2")
+unittest_input(testMove, "0 5,0 5," + debug, 4, "R 4")
+unittest_input(testMove, "4 5,3 5," + debug, 4, "U 4")
+unittest_input(testMove, "4 0,4 1," + debug, 0, "L 3")
+unittest_input(testMove, "1 0,2 0," + debug, 0, "D 1")
+unittest_input(testMove, "1 1,2 0," + debug, 0, "R 4")
+unittest_input(testMove, "5 1,4 1," + debug, 0, "D 1")
+unittest_input(testMove, "5 2,4 1," + debug, 0, "L 5")
+unittest_input(testMove, "0 2,1 2," + debug, 0, "R 2")
 
 unittest(solvePuzzle1, 13, "unittest.txt")
+unittest(solvePuzzle1, 5, "unittest2.txt")
 #unittest(solvePuzzle2, 1, "unittest.txt")
-unittest(solvePuzzle1, 13, "puzzleinput_work.txt")
+unittest(solvePuzzle1, 3488, "puzzleinput_work.txt") # 3488 = TooLow
 #unittest(solvePuzzle2, 1, "puzzleinput_work.txt")

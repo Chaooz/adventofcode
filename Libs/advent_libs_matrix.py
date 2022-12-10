@@ -2,6 +2,45 @@ from os import path
 import sys
 sys.path.insert(1, '../Libs')
 from advent_libs import *
+from advent_libs_list import *
+from advent_libs_vector2 import *
+
+class Matrix:
+
+    name:str
+    sizeX:int
+    sizeY:int
+
+    def __init__(self, name:str, sizeX:int, sizeY:int, value) -> None:
+        self.name = name
+        self.sizeX = sizeX
+        self.sizeY = sizeY
+        self.data = [[value for col in range(sizeY)] for row in range(sizeX)]
+
+    def InsertFromVector2List(self,vectorList:Vector2List, character:str = ""):
+        for vector in vectorList:
+            d = self.data[vector.x][vector.y]
+            if ( isinstance(d,int)):
+                self.data[vector.x][vector.y] += 1
+            else:
+                self.data[vector.x][vector.y] = character
+
+    def Set(self,x, y, character ):
+        if x >= 0 and x < self.sizeX and y >= 0 and y < self.sizeY:
+            self.data[x][y] = character
+        else:
+            print_warning("SetMatrixPoint : " + str(x) + "x" + str(y) + " is outsde of matrix")
+
+
+
+    def Print(self,value_highlight:str = "", color = bcolors.DARK_GREY, pad = "", space = " "):
+        # TODO:Move function here and depricateother function
+        print_matrix_color(self.name, self.data,value_highlight,color, pad,space)
+
+
+#
+# Depricated
+#
 
 def create_empty_matrix(size_x,size_y, value = 0):
     matrix = [[value for col in range(size_y)] for row in range(size_x)]
@@ -44,7 +83,6 @@ def create_matrix_from_file(textfile):
         for x in range(len(line)):
             data = line[x]
             matrix[x][y] = data
-
     return matrix
 
 def matrix_to_list(matrix):
