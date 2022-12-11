@@ -51,6 +51,16 @@ class Vector2List:
                 return pos
         return None
 
+    def First(self) -> Vector2:
+        if len(self.data) > 0:
+            return self.data[0]
+        return None
+
+    def Last(self) -> Vector2:
+        if len(self.data) > 0:
+            return self.data[ len(self.data) - 1]
+        return None
+
     def ToString(self, maxLines = 100) -> str:
         s = ""
         for line in self.data:

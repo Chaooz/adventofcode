@@ -37,13 +37,13 @@ class Vector2:
         return Vector2(x,y)
 
     def Normalize(self) :
-        scale = 1
-        if self.x > scale: scale = self.x
-        if self.y > scale: scale = self.y
-        self.x / scale
-        self.y / scale
+        if self.x > 0: self.x = 1
+        if self.x < 0: self.x = -1
+        if self.y > 0: self.y = 1
+        if self.y < 0: self.y = -1
+        if self.x == 0 and self.y == 0:
+            print("BUG!" + self.ToString())
         return self
-
 
     # def __gt__
     # def __eq__
