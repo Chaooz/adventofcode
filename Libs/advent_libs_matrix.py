@@ -31,7 +31,11 @@ class Matrix:
         else:
             print_warning("SetMatrixPoint : " + str(x) + "x" + str(y) + " is outsde of matrix")
 
-
+    def Get(self,x, y):
+        if x >= 0 and x < self.sizeX and y >= 0 and y < self.sizeY:
+            return self.data[x][y]
+        else:
+            print_warning("SetMatrixPoint : " + str(x) + "x" + str(y) + " is outsde of matrix")
 
     def Print(self,value_highlight:str = "", color = bcolors.DARK_GREY, pad = "", space = " "):
         # TODO:Move function here and depricateother function
@@ -216,7 +220,13 @@ def print_matrix_colorlist(text,matrix,valueList, color, defaultColor, pad = "00
         if len(pad) > 1:
             xx = x % 100
 
-        header2 += pad_number( xx , pad_header_x )
+        xxPad = pad_number( xx , pad_header_x )
+
+        if xx == 0:
+            xxPad = bcolors.BOLD + bcolors.WHITE + xxPad
+        xxPad = xxPad + bcolors.BOLD + bcolors.DARK_GREY
+
+        header2 += xxPad
         for i in range(pad_size):
             header = header + "-"
         header2 = header2 + space
