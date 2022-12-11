@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-The actual input for day 9 is goes here
-=======
 R 2
 U 2
 L 2
@@ -2001,4 +1998,3 @@ L 12
 D 3
 L 18
 U 3
->>>>>>> 202209-Thor

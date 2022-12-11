@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-The actual work input for day 9 is goes here
-=======
 R 1
 D 1
 L 1
@@ -2001,4 +1998,3 @@ D 11
 L 4
 U 18
 L 9
->>>>>>> 202209-Thor
