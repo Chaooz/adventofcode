@@ -59,7 +59,7 @@ def count_reset_blocks(size_x, size_y, matrix):
 #
 def run_code_loops(steps, filename, exit_on_allflash):
 
-    matrix = create_matrix_from_file(filename)
+    matrix = create_matrix_from_file_flipped(filename)
 
     size_y = int(len(matrix))
     size_x = int(len(matrix[0]))

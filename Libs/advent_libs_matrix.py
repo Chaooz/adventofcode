@@ -16,7 +16,7 @@ def get_matrix_size(matrix):
     size_y = int(len(matrix[0]))
     return (size_x,size_y)
 
-def create_matrix_from_file(textfile):
+def create_matrix_from_file_flipped(textfile):
     file_lines = loadfile(textfile)
     matrix = list()
     for line in file_lines:
@@ -26,6 +26,25 @@ def create_matrix_from_file(textfile):
             if not char == "\n":
                 row_list.append(int(char))
         matrix.append(row_list)
+    return matrix
+
+#
+# Create a full matrix from file
+#
+def create_matrix_from_file(textfile):
+    file_lines = loadfile(textfile)
+
+    ySize = len(file_lines)
+    xSize = len(file_lines[0].strip())
+    matrix = create_empty_matrix(xSize,ySize)
+
+    for y in range(0,len(file_lines)):
+        line = file_lines[y]
+        line = line.strip()
+        for x in range(len(line)):
+            data = line[x]
+            matrix[x][y] = data
+
     return matrix
 
 def matrix_to_list(matrix):
@@ -123,6 +142,11 @@ def print_matrix(text,matrix):
     print_matrix_color(text,matrix,"",bcolors.RESET,"")
 
 def print_matrix_color(text,matrix,value_highlight,color, pad = "00", space = " "):
+    valueList = list()
+    valueList.append(value_highlight)
+    print_matrix_colorlist(text,matrix,valueList, color, bcolors.WHITE, pad, space)
+
+def print_matrix_colorlist(text,matrix,valueList, color, defaultColor, pad = "00", space = " "):
     size = get_matrix_size(matrix)
 
     size_x = size[0]
@@ -133,8 +157,8 @@ def print_matrix_color(text,matrix,value_highlight,color, pad = "00", space = " 
     print ("      --- " + text + " " + str(size_x) + "x" + str(size_y)  + " ---")
     print("")
 
-    header  = bcolors.DARK_GREY
-    header2 = bcolors.DARK_GREY
+    header  = defaultColor
+    header2 = color
 
     for i in range(pady_size):
         header = header + " " 
@@ -143,17 +167,25 @@ def print_matrix_color(text,matrix,value_highlight,color, pad = "00", space = " 
     header = header + " + "
     header2 = header2 + "   "
 
+    pad_header_x = ""
+    if len(pad)>1:
+        for i in range(pad_size):
+            pad_header_x += "0"
+        pad_header_x = pad[0] + pad_header_x[0] + pad_header_x[1]
+
     for x in range(size_x):
         xx = x % 10
+        if len(pad) > 1:
+            xx = x % 100
 
-        header2 += pad_number( xx , pad )
+        header2 += pad_number( xx , pad_header_x )
         for i in range(pad_size):
             header = header + "-"
         header2 = header2 + space
         header = header + space
 
-    print(header2)
-    print(header)
+    print(bcolors.BOLD + color + header2)
+    print(bcolors.BOLD + defaultColor + header)
 
     pady = ""
     for i in range(pady_size):
@@ -163,16 +195,26 @@ def print_matrix_color(text,matrix,value_highlight,color, pad = "00", space = " 
         line = ""
         line = line + bcolors.BOLD + color
         line = line + pad_number(y,pady)
-        line = line + bcolors.DARK_GREY
+        line = line + defaultColor
         line = line + " | "
 
         for x in range(size_x):
             value = matrix[x][y]
-            if ( value == value_highlight):
-                line = line + bcolors.BOLD + color
-            else:
-                line = line + bcolors.RESET
 
+            highlight_color = defaultColor
+            v = "" + str(value)
+
+            if isinstance(valueList,int):
+                if value == valueList:
+                    highlight_color = bcolors.BOLD + color
+            else:
+                for highlight_value in valueList:
+                    if isinstance(highlight_value,int) and value == highlight_value:
+                        highlight_color = bcolors.BOLD + color
+                    elif isinstance(highlight_value,str) and highlight_value in v:
+                        highlight_color = bcolors.BOLD + color
+
+            line = line + highlight_color
             line += pad_number( value , pad )
             line += space
         print(line)

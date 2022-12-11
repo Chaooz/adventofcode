@@ -39,12 +39,12 @@ def organizeInput(inputfile):
     moveMultiBoxes()
     debugPrintStacks()
 
-    ll = ""
-    for r in range(0,9):
-        l = getLineNumberFromStack(r)
-        box = replaceBox(r,l,".")
-        ll += box
-    print(ll)
+#    ll = ""
+#    for r in range(0,8):
+#        l = getLineNumberFromStack(r)
+#        box = replaceBox(r,l,".")
+#        ll += box
+#    print(ll)
 
 # Hente index for når første bokstav starter
 
@@ -108,7 +108,7 @@ def moveBoxes():
             box = replaceBox(moveFrom, lineFrom, ".")
             check = replaceBox(moveTo, lineTo, box)
 
-        #print(" move " + str(numberOfBoxes) + " times " + str(moveFrom+1) + " => " + str(moveTo+1))
+        print(" move " + str(numberOfBoxes) + " times " + str(moveFrom+1) + " => " + str(moveTo+1))
         #debugPrintStacks()
 
 def moveMultiBoxes():
@@ -135,4 +135,4 @@ def moveMultiBoxes():
 #            print(" move " + str(numberOfBoxes) + " times " + str(moveFrom+1) + " => " + str(moveTo+1) + " Box:" + box + " check:" + check)
 #        debugPrintStacks()
 
-organizeInput("puzzleinput_work.txt")
+organizeInput("input.txt")
