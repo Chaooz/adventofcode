@@ -41,14 +41,14 @@ def isNeighbour(pos1,pos2):
 def moveHead( list:Vector2List, position: Vector2, direction: Vector2, steps:int, maxWidth:int) -> Vector2List:
     for index in range(0,steps):
         position += direction
-        if position.x > maxWidth:
-            position.y += int( position.x / maxWidth )
-        elif position.x < 0:
-            position.y -= 1
-            position.x += maxWidth
-            if position.x < 0:
-                print_warning("moveHead: broken!")
-        position.x %= maxWidth
+#        if position.x > maxWidth:
+#            position.y += int( position.x / maxWidth )
+#        elif position.x < 0:
+#            position.y -= 1
+#            position.x += maxWidth
+#            if position.x < 0:
+#                print_warning("moveHead: broken!")
+#        position.x %= maxWidth
         list.append(position)
     return position
 
@@ -135,5 +135,6 @@ unittest_input(testMove, "0 2,1 2," + debug, 0, "R 2")
 unittest(solvePuzzle1, 13, "unittest.txt")
 unittest(solvePuzzle1, 5, "unittest2.txt")
 #unittest(solvePuzzle2, 1, "unittest.txt")
+unittest(solvePuzzle1, 3488, "puzzleinput.txt") # 3488 = TooLow
 unittest(solvePuzzle1, 3488, "puzzleinput_work.txt") # 3488 = TooLow
 #unittest(solvePuzzle2, 1, "puzzleinput_work.txt")
