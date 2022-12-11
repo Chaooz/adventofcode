@@ -1,3 +1,4 @@
+#!/usr/local/bin/python3
 #
 # 2022 Day 7: No Space Left On Device
 #
@@ -7,7 +8,6 @@
 # 70000000 is max space
 # Need at least 70000000
 
-#!/usr/lib/python3
 import sys
 
 # Import custom libraries
