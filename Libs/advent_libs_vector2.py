@@ -44,7 +44,6 @@ class Vector2:
         self.y / scale
         return self
 
-
     # def __gt__
     # def __eq__
 
