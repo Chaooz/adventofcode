@@ -11,7 +11,7 @@ from advent_libs_vector2 import *
 
 
 print("")
-print_color("Day 9: Rope Bridge", bcolors.OKGREEN)
+print_color("Day 10: Cathode-Ray Tube", bcolors.OKGREEN)
 print("")
 
 def checkCycle(cycle:int, checkPointList:list, signalStrength:int):
@@ -89,6 +89,8 @@ def solvePuzzle2(filename):
 
 unittest(solvePuzzle1, 13140, "unittest.txt")
 unittest(solvePuzzle1, 15020, "puzzleinput.txt")
+unittest(solvePuzzle1, 17180, "puzzleinput_work.txt")
 
 #unittest(solvePuzzle2, 15020, "unittest.txt")
-unittest(solvePuzzle2, 15020, "puzzleinput.txt")
+unittest(solvePuzzle2, 0, "puzzleinput.txt")
+unittest(solvePuzzle2, 0, "puzzleinput_work.txt")
