@@ -10,10 +10,6 @@ from advent_libs_list import *
 from advent_libs_vector2 import *
 
 
-print("")
-print_color("Day 10: Cathode-Ray Tube", bcolors.OKGREEN)
-print("")
-
 def checkCycle(cycle:int, checkPointList:list, signalStrength:int):
     if cycle in checkPointList:
 #        print("checkCycle: cycle: " + str(cycle) + " signal:" + str(signalStrength) + " = " + str(cycle * signalStrength))
@@ -86,6 +82,10 @@ def solvePuzzle2(filename):
     return sum
 
 
+
+print("")
+print_color("Day 10: Cathode-Ray Tube", bcolors.OKGREEN)
+print("")
 
 unittest(solvePuzzle1, 13140, "unittest.txt")
 unittest(solvePuzzle1, 15020, "puzzleinput.txt")
