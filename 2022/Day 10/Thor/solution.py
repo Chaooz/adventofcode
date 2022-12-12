@@ -83,7 +83,7 @@ def solvePuzzle2(filename):
             spritePosition += signal
 
     matrix.Print(".", bcolors.DARK_GREY, "", "")
-    return sum
+    return 0
 
 
 
@@ -91,4 +91,4 @@ unittest(solvePuzzle1, 13140, "unittest.txt")
 unittest(solvePuzzle1, 15020, "puzzleinput.txt")
 
 #unittest(solvePuzzle2, 15020, "unittest.txt")
-unittest(solvePuzzle2, 15020, "puzzleinput.txt")
+unittest(solvePuzzle2, 0, "puzzleinput.txt")
