@@ -215,8 +215,9 @@ debug = "True"
 #unittest(solvePuzzle1, 5, "unittest2.txt")
 #unittest(solvePuzzle2, 1, "unittest.txt")
 
-unittest(solvePuzzle1, 3488, "puzzleinput.txt") # 3488 = TooLow
-#unittest(solvePuzzle1, 3488, "puzzleinput_work.txt") # 3488 = TooLow
+unittest(solvePuzzle1, 5735, "puzzleinput.txt") # 3488 = TooLow
+unittest(solvePuzzle1, 6522, "puzzleinput_work.txt") # 3488 = TooLow
 
 unittest(solvePuzzle2, 36, "unittest3.txt")
-unittest(solvePuzzle2, 2802, "puzzleinput.txt")
+unittest(solvePuzzle2, 2478, "puzzleinput.txt")
+unittest(solvePuzzle2, 2717, "puzzleinput_work.txt")
