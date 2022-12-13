@@ -26,21 +26,37 @@ class Matrix:
             else:
                 self.data[vector.x][vector.y] = character
 
+    # If point is inside the matrix
+    def IsInside(self,x,y) -> bool:
+        return x >= 0 and x < self.sizeX and y >= 0 and y < self.sizeY
+
+    def IsPointInside(self, point:Vector2 ) -> bool:
+        return point.x >= 0 and point.x < self.sizeX and point.y >= 0 and point.y < self.sizeY
+
     def Set(self,x, y, character ):
-        if x >= 0 and x < self.sizeX and y >= 0 and y < self.sizeY:
+        if self.IsInside(x,y):
             self.data[x][y] = character
         else:
-            print_warning("SetMatrixPoint : " + str(x) + "x" + str(y) + " is outsde of matrix")
+            print_warning("Matrix.Set : " + str(x) + "x" + str(y) + " is outsde of matrix")
 
-    def Get(self,x, y):
-        if x >= 0 and x < self.sizeX and y >= 0 and y < self.sizeY:
-            return self.data[x][y]
-        else:
-            print_warning("SetMatrixPoint : " + str(x) + "x" + str(y) + " is outsde of matrix")
+    def Get(self, input1, input2 = None):
+        if isinstance(input1,int) and isinstance(input2,int) and self.IsInside(input1,input2):
+            return self.data[input1][input2]
+        elif ( isinstance(input1), Vector2) and self.IsPointInside(input1):
+            return self.data[input1.x, input1.y]
+        print_warning("Matrix.Get : " + str(x) + "x" + str(y) + " is outsde of matrix")
+
+    def GetPoint(self, point:Vector2):
+        if self.IsPointInside(point):
+            return self.data[point.x, point.y]
+        print_warning("Matrix.GetPoint : " + point.ToString() + " is outsde of matrix")
 
     def Print(self,value_highlight:str = "", color = bcolors.DARK_GREY, pad = "", space = " "):
         # TODO:Move function here and depricateother function
         print_matrix_color(self.name, self.data,value_highlight,color, pad,space)
+
+    def PrintMultiple(self,valueList, color, defaultColor =bcolors.DARK_GREY, pad = "00", space = " "):
+        print_matrix_colorlist(self.name,self.data,valueList, color, defaultColor, pad = "00", space = " ")
 
     def CreateFromFile(textfile:str, defaultValue:str):
         file_lines = loadfile(textfile)

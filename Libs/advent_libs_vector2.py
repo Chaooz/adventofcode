@@ -3,15 +3,17 @@ class Vector2:
     x:int
     y:int
 
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-        self.ToString()
-
-    def __init__(self, vector):
-        self.x = vector.x
-        self.y = vector.y
-        self.ToString()
+    def __init__(self, input1 = None, input2 = None ):
+        if isinstance(input1, Vector2):
+            self.x = input1.x
+            self.y = input1.y
+        elif isinstance(input1,int) and isinstance(input2,int):
+            self.x = input1
+            self.y = input2
+        else:
+            self.x = 0
+            self.y = 0
+       
 
     def __eq__(self, other):
         if isinstance(other, Vector2):
