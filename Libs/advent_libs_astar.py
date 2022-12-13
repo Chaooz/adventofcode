@@ -9,7 +9,7 @@ import sys
 sys.path.insert(1, '../Libs')
 from advent_libs_matrix import *
 
-class Vector2():
+class Vector2b():
     x = int()
     y = int()
 

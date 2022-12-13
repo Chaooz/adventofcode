@@ -8,6 +8,11 @@ class Vector2:
         self.y = y
         self.ToString()
 
+    def __init__(self, vector):
+        self.x = vector.x
+        self.y = vector.y
+        self.ToString()
+
     def __eq__(self, other):
         if isinstance(other, Vector2):
             return self.x == other.x and self.y == other.y

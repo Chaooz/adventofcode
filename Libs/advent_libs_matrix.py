@@ -15,7 +15,8 @@ class Matrix:
         self.name = name
         self.sizeX = sizeX
         self.sizeY = sizeY
-        self.data = [[value for col in range(sizeY)] for row in range(sizeX)]
+        if sizeX > 0 and sizeY > 0:
+            self.data = [[value for col in range(sizeY)] for row in range(sizeX)]
 
     def InsertFromVector2List(self,vectorList:Vector2List, character:str = ""):
         for vector in vectorList:
@@ -41,6 +42,19 @@ class Matrix:
         # TODO:Move function here and depricateother function
         print_matrix_color(self.name, self.data,value_highlight,color, pad,space)
 
+    def CreateFromFile(textfile:str, defaultValue:str):
+        file_lines = loadfile(textfile)
+
+        sizeY = len(file_lines)
+        sizeX = len(file_lines[0].strip())
+        matrix = Matrix(textfile,sizeX, sizeY, defaultValue)
+
+        for y in range(0,len(file_lines)):
+            line = file_lines[y]
+            line = line.strip()
+            for x in range(len(line)):
+                matrix.data[x][y] = line[x]
+        return matrix
 
 #
 # Depricated
