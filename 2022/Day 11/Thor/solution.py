@@ -39,21 +39,26 @@ class Monkey:
         for oldItem in tempList:
             self.iteration += 1
             newItem = self.Operation(oldItem)
-            if supermod == 0:
-                newItem = int(newItem / 3)
-            else:
+            if supermod != 0:
                 newItem = newItem % supermod
+            else:
+                newItem = int(newItem / 3)
             self.items.remove(oldItem)
             if self.Test(newItem):
                 monkeyList[self.monkeyTrue].items.append(newItem)
             else:
                 monkeyList[self.monkeyFalse].items.append(newItem)
-       
+
+# Helper to sort monkeys on iteration
+def sortMonkeysOnIteration(monkey):
+    return monkey.iteration
+
 def solvePuzzle(filename, iterations, puzzleNumber):
 
     # Start with empty list
     monkeyList.clear()
 
+    # Load data
     data = benedict.from_yaml(filename)
     for key in data:
         monkey = Monkey(key.split()[1])
@@ -66,21 +71,23 @@ def solvePuzzle(filename, iterations, puzzleNumber):
 
         monkeyList.append(monkey)
 
+    # For puzzle2 we have to find "magic" to decrease threat
     supermod = 0
     if puzzleNumber == 2:
         supermod = 1
         for monkey in monkeyList:
             supermod *= monkey.test
 
+    # Go x iterations and make each monky examine item
     for i in range(0,iterations):
         for monkey in monkeyList:
             monkey.ExamineItems(supermod)
 
-    active = list()
-    for monkey in monkeyList:
-        active.append( monkey.iteration )
-    active.sort(reverse=True)
-    return active[0] * active[1]
+    # Sort the monkey list based on iteratio
+    monkeyList.sort(key=sortMonkeysOnIteration, reverse=True)
+
+    # Return the two monkeys with the most iterations
+    return monkeyList[0].iteration * monkeyList[1].iteration
 
 def solvePuzzle1(filename):
     return solvePuzzle(filename, 20, 1)
@@ -94,5 +101,7 @@ print("")
 
 unittest(solvePuzzle1, 10605, "unittest.yaml")
 unittest(solvePuzzle1, 66124, "puzzleinput.yaml")
+unittest(solvePuzzle1, 54752, "puzzleinput_work.yaml")
 unittest(solvePuzzle2, 2713310158, "unittest.yaml")
 unittest(solvePuzzle2, 19309892877, "puzzleinput.yaml")
+unittest(solvePuzzle2, 13606755504, "puzzleinput_work.yaml")
