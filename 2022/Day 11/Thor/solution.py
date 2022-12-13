@@ -26,7 +26,7 @@ class Monkey:
         self.iteration = 0
 
     def ToString(self):
-        return "Monkey " + str(self.number) + " inspected items " + str(self.iteration) + " times."
+        return "Monkey " + str(self.number) + " inspected items " + str(self.iteration) + " times. items:" + str(self.items)
 
     def Operation(self, old):
         return eval(self.operation)
@@ -50,6 +50,10 @@ class Monkey:
                 monkeyList[self.monkeyFalse].items.append(newItem)
        
 def solvePuzzle(filename, iterations, puzzleNumber):
+
+    # Start with empty list
+    monkeyList.clear()
+
     data = benedict.from_yaml(filename)
     for key in data:
         monkey = Monkey(key.split()[1])
@@ -62,17 +66,15 @@ def solvePuzzle(filename, iterations, puzzleNumber):
 
         monkeyList.append(monkey)
 
-    supermod = 1
+    supermod = 0
     if puzzleNumber == 2:
+        supermod = 1
         for monkey in monkeyList:
             supermod *= monkey.test
 
     for i in range(0,iterations):
         for monkey in monkeyList:
             monkey.ExamineItems(supermod)
-
-    for monkey in monkeyList:
-        print(monkey.ToString())
 
     active = list()
     for monkey in monkeyList:
