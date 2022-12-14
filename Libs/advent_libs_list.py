@@ -40,7 +40,13 @@ class Vector2List:
         self.data.append(data)
 #        print("VecList.append[" + self.name + "]:" + data.ToString() + " " + str(self.len()))
 
+    def pop(self, SupportsIndex = ...) -> Vector2:
+        return self.data.pop(SupportsIndex)
+
     def Get(self, index:int) -> Vector2:
+        return self.GetWithIndex(index)
+
+    def GetWithIndex(self, index:int) -> Vector2:
         d = self.data[index]
 #        print("VecList.Get[" + self.name + "]:" + str(index) + " => " + d.ToString())
         return d

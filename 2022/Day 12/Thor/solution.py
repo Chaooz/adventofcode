@@ -38,7 +38,7 @@ def solvePuzzle1(filename):
 
     valueList = list()
     valueList.append(26)
-    matrix.PrintMultiple(valueList, bcolors.YELLOW, bcolors.DARK_GREY, "000"," ")
+#    matrix.PrintMultiple(valueList, bcolors.YELLOW, bcolors.DARK_GREY, "000"," ")
 
     # Remap the heighmap into numbers
     for y in range(0,matrix.sizeY):
@@ -48,7 +48,7 @@ def solvePuzzle1(filename):
                 matrix.Set(x,y,0)
                 pass
             elif character == "E":
-                matrix.Set(x,y,26)
+                matrix.Set(x,y,0)
                 pass
             else:
                 number = int(ord(character) - ord("a"))
@@ -58,15 +58,17 @@ def solvePuzzle1(filename):
 
     pathfinding = Pathfinding()
     shortestPath = pathfinding.AStarPathTo( matrix, startPos, endPos, 1 )
+#    shortestPath = pathfinding.HeuristicAstarPathTo( matrix, startPos, endPos, 1 )
 
     # Print path in 
     pathMatrix = Matrix("Path", matrix.sizeX, matrix.sizeY, 0)
     for index in range(len(shortestPath)):
-        point = shortestPath[index]
-        pathMatrix.Set(point.x,point.y, str(index))
-    pathMatrix.Print(0, bcolors.DARK_GREY,"00", " ")
+        point,cost = shortestPath[index]
+        pathMatrix.Set(point.x,point.y, "X")
+    pathMatrix.Print(0, bcolors.DARK_GREY,"0", "")
 
     return len(shortestPath) - 1
 
-unittest(solvePuzzle1, 31, "unittest.txt")
-unittest(solvePuzzle1, 31, "puzzleinput.txt")
+#unittest(solvePuzzle1, 31, "unittest.txt")
+unittest(solvePuzzle1, 31, "puzzleinput.txt")           # 908 is too high
+#unittest(solvePuzzle1, 31, "puzzleinput_work.txt")

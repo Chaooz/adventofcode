@@ -62,7 +62,7 @@ class Matrix:
         print_matrix_color(self.name, self.data,value_highlight,color, pad,space)
 
     def PrintMultiple(self,valueList, color, defaultColor =bcolors.DARK_GREY, pad = "00", space = " "):
-        print_matrix_colorlist(self.name,self.data,valueList, color, defaultColor, pad = "00", space = " ")
+        print_matrix_colorlist(self.name,self.data,valueList, color, defaultColor, pad, space)
 
     def CreateFromFile(textfile:str, defaultValue:str):
         file_lines = loadfile(textfile)
