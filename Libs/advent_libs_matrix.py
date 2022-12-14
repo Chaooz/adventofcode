@@ -39,6 +39,12 @@ class Matrix:
         else:
             print_warning("Matrix.Set : " + str(x) + "x" + str(y) + " is outsde of matrix")
 
+    def SetPoint(self, point, character ):
+        if self.IsPointInside(point):
+            self.data[point.x][point.y] = character
+        else:
+            print_warning("Matrix.Set : " + str(x) + "x" + str(y) + " is outsde of matrix")
+
     def Get(self, input1, input2 = None):
         if isinstance(input1,int) and isinstance(input2,int) and self.IsInside(input1,input2):
             return self.data[input1][input2]
@@ -48,7 +54,7 @@ class Matrix:
 
     def GetPoint(self, point:Vector2):
         if self.IsPointInside(point):
-            return self.data[point.x, point.y]
+            return self.data[point.x][point.y]
         print_warning("Matrix.GetPoint : " + point.ToString() + " is outsde of matrix")
 
     def Print(self,value_highlight:str = "", color = bcolors.DARK_GREY, pad = "", space = " "):

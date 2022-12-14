@@ -8,17 +8,20 @@ from advent_libs import *
 from advent_libs_matrix import *
 from advent_libs_list import *
 from advent_libs_vector2 import *
-from advent_libs_brute_path import *
+from advent_libs_pathfinding import *
 
 # Rules
-# At most 5 up
 # Start pos : S
 # End pos :E
+# Can only go 1 up or equal
 
 print("")
 print_color("Day 12: Hill Climbing Algorithm", bcolors.OKGREEN)
 print("")
 
+#
+# Finds a character in the matrix and returns position
+#
 def getPosition(matrix:Matrix,character:str) -> Vector2:
     for y in range(0,matrix.sizeY):
         for x in range(0,matrix.sizeX):
@@ -33,33 +36,37 @@ def solvePuzzle1(filename):
     endPos = getPosition(matrix,"E")
     print("Try to path " + startPos.ToString() + " => " + endPos.ToString() )
 
-    matrix.PrintMultiple(valueList, bcolors.YELLOW, bcolors.DARK_GREY, ".."," ")
+    valueList = list()
+    valueList.append(26)
+    matrix.PrintMultiple(valueList, bcolors.YELLOW, bcolors.DARK_GREY, "000"," ")
 
     # Remap the heighmap into numbers
     for y in range(0,matrix.sizeY):
         for x in range(0,matrix.sizeX):
             character = matrix.Get(x,y)
             if character == "S":
-                matrix.Set(x,y,999)
-            elif character == "E":
                 matrix.Set(x,y,0)
+                pass
+            elif character == "E":
+                matrix.Set(x,y,26)
+                pass
             else:
                 number = int(ord(character) - ord("a"))
                 matrix.Set(x,y,number)
 
-    valueList = list()
-    valueList.append("S")
-    valueList.append("E")
-    matrix.PrintMultiple(valueList, bcolors.YELLOW, bcolors.DARK_GREY, "00"," ")
+    matrix.PrintMultiple(valueList, bcolors.YELLOW, bcolors.DARK_GREY, "00","")
 
-    pathfinding = HeightPathfinding(matrix)
-    heightmap = pathfinding.CreatePathCost(startPos)
+    pathfinding = Pathfinding()
+    shortestPath = pathfinding.AStarPathTo( matrix, startPos, endPos, 1 )
 
-    heightmap.PrintMultiple(valueList, bcolors.YELLOW, bcolors.DARK_GREY, "00"," ")
+    # Print path in 
+    pathMatrix = Matrix("Path", matrix.sizeX, matrix.sizeY, 0)
+    for index in range(len(shortestPath)):
+        point = shortestPath[index]
+        pathMatrix.Set(point.x,point.y, str(index))
+    pathMatrix.Print(0, bcolors.DARK_GREY,"00", " ")
 
-#    pathList = path_brute_path(matrix.data, startPos, endPos)
-#    print(pathList)
+    return len(shortestPath) - 1
 
-    return 0
-
-unittest(solvePuzzle1, 13140, "unittest.txt")
+unittest(solvePuzzle1, 31, "unittest.txt")
+unittest(solvePuzzle1, 31, "puzzleinput.txt")
