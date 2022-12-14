@@ -1,10 +1,10 @@
 #
-# Day 15 Chiton : https://adventofcode.com/2021/day/14
+# Day 15 Chiton : https://adventofcode.com/2021/day/15
 # 
 
 import sys
 import time
-sys.path.insert(1, '../Libs')
+sys.path.insert(1, '../../Libs')
 from advent_libs import *
 from advent_libs_path import *
 # Pathfinding lib
