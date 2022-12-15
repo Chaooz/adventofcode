@@ -60,6 +60,12 @@ class Vector2List:
     def SetWithIndex(self, index:int, value):
         self.data.insert(index, value)
 
+    def RemoveFirst(self):
+        self.RemoveWithIndex(0)
+        
+    def RemoveWithIndex(self, index:int):
+        del self.data[index]
+
     def First(self) -> Vector2:
         if len(self.data) > 0:
             return self.data[0]

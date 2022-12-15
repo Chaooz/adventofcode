@@ -38,38 +38,35 @@ def solvePuzzle1(filename):
 
     valueList = list()
     valueList.append(26)
-#    matrix.PrintMultiple(valueList, bcolors.YELLOW, bcolors.DARK_GREY, "000"," ")
 
     # Remap the heighmap into numbers
     for y in range(0,matrix.sizeY):
         for x in range(0,matrix.sizeX):
             character = matrix.Get(x,y)
             if character == "S":
-                matrix.Set(x,y,0)
+                matrix.Set(x,y, 0)
                 pass
             elif character == "E":
-                matrix.Set(x,y,0)
+                matrix.Set(x,y, 26) # z value
                 pass
             else:
                 number = int(ord(character) - ord("a"))
                 matrix.Set(x,y,number)
 
-    matrix.PrintMultiple(valueList, bcolors.YELLOW, bcolors.DARK_GREY, "00","")
+#    matrix.PrintMultiple(valueList, bcolors.YELLOW, bcolors.DARK_GREY, "00"," ")
 
     pathfinding = Pathfinding()
-#    shortestPath = pathfinding.AStarPathTo( matrix, startPos, endPos, 1 )
-    shortestPath = pathfinding.HeuristicAstarPathTo( matrix, startPos, endPos, 1 )
-    print(shortestPath)
+    shortestPath = pathfinding.HeuristicAstarPathTo( matrix, startPos, endPos, pathfinding.oneStepPathRule )
 
     # Print path in 
-    pathMatrix = Matrix("Path", matrix.sizeX, matrix.sizeY, 0)
+    pathMatrix = matrix.EmptyCopy("ShowPath", ".")
     for index in range(len(shortestPath)):
-        point,cost = shortestPath[index]
+        point = shortestPath[index]
         pathMatrix.Set(point.x,point.y, "X")
-    pathMatrix.Print(0, bcolors.DARK_GREY,"0", "")
+    pathMatrix.Print(".", bcolors.DARK_GREY, "0", "")
 
     return len(shortestPath) - 1
 
 #unittest(solvePuzzle1, 31, "unittest.txt")
-unittest(solvePuzzle1, 31, "puzzleinput.txt")           # 908 is too high
-#unittest(solvePuzzle1, 31, "puzzleinput_work.txt")
+#unittest(solvePuzzle1, 31, "puzzleinput.txt")
+unittest(solvePuzzle1, 31, "puzzleinput_work.txt")

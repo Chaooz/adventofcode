@@ -26,6 +26,13 @@ class Matrix:
             else:
                 self.data[vector.x][vector.y] = character
 
+    #
+    # Create a new empty matrix with the same size
+    #
+    def EmptyCopy(self, newTitle:str, defaultValue = 0):
+        newMatrix = Matrix(newTitle, self.sizeX, self.sizeY, defaultValue)
+        return newMatrix
+
     # If point is inside the matrix
     def IsInside(self,x,y) -> bool:
         return x >= 0 and x < self.sizeX and y >= 0 and y < self.sizeY

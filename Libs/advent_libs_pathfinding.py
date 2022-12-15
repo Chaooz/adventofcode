@@ -25,6 +25,8 @@ class PathNode:
 
 class Pathfinding:
 
+    MAX_ITERATINS = 1000000
+
     neighbours = [ Vector2(-1,0), Vector2(1,0), Vector2(0,-1), Vector2(0,1) ]
     matrix:Matrix
     shortestPath:list
@@ -50,9 +52,6 @@ class Pathfinding:
 
         # If the cost is already lower, abandon this path
         cost = int(visitedMatrix.GetPoint(fromPosition))
-
-#        if cost < 10000:
-#            return
 
         if cost <= totalCost:
             return
@@ -111,62 +110,99 @@ class Pathfinding:
     def heuristic(self,startPos:Vector2,endPos:Vector2):
         return ((startPos.x - endPos.x) ** 2) + ((startPos.y - endPos.y) ** 2)
 
-    def HeuristicAstarPathTo(self, matrix:Matrix, startPosition:Vector2, endPositon:Vector2, maxStep:int) -> Vector2List:
+    #
+    # Pathfinding rule:
+    # Default rule: Can move in all positions inside matrix
+    #
+    def defaultPathRule(self,pathfindingArea:Matrix, startPosition:Vector2, endPositon:Vector2):
+        # Outside of matrix?
+        if not pathfindingArea.IsPointInside(endPositon):
+            return None
+        return endPositon
+
+    #
+    # Pathfinding rule:
+    # Can move max 1 step up ( can always move forward or down )
+    #
+    def oneStepPathRule(self, pathfindingArea:Matrix, startPosition:Vector2, endPositon:Vector2):
+        endPositon = self.defaultPathRule(pathfindingArea, startPosition, endPositon)
+        if endPositon != None:
+            a = pathfindingArea.GetPoint(startPosition)
+            b = pathfindingArea.GetPoint(endPositon)
+            if b > a + 1:
+                return None
+        return endPositon
+
+    def HeuristicAstarPathTo(self, pathfindingArea:Matrix, startPosition:Vector2, endPositon:Vector2, pathRuleFunction) -> Vector2List:
+
+        # Used for debug
+        debugPathMatrix = pathfindingArea.EmptyCopy("debug path", 0)
 
         # Add the start node with 0 cost
         checkList = Vector2List()
         checkList.append( PathNode( startPosition, 0) )
 
-        # Add startpos with cost 0
-        cellCost = {}
-        cellCost[startPosition.Tuple()] = 0
+        # Add start position to the cost matrix
+        costMatrix = pathfindingArea.EmptyCopy("CostMatrix", -1)
+        costMatrix.SetPoint( startPosition, 0 )
 
         # Global path
         cameFrom = {}
         cameFrom[startPosition.Tuple()] = None
 
-        while( checkList.len() > 0):
+        iterations = 0
+
+        while( checkList.len() > 0 and iterations < Pathfinding.MAX_ITERATINS ):
+            iterations += 1
             currentNode:PathNode = checkList.GetWithIndex( 0 )
+            checkList.RemoveWithIndex(0)
 
             # Success
             if ( currentNode.position == endPositon ):
-                print("SUCCESS")
                 break
 
             # Go through path
             for neighbour in self.neighbours:
-                nextPos = currentNode.position + neighbour
 
-                # Outside of matrix?
-                if not matrix.IsPointInside(nextPos):
+                # Pathfinding rule
+                nextPos = pathRuleFunction(pathfindingArea, currentNode.position, currentNode.position + neighbour)
+
+                # Pathfinding rule is not allowing this move
+                if nextPos == None:
                     continue
 
-                cost = cellCost[currentNode.position.Tuple()] 
-                cost += self.heuristic(nextPos, currentNode.position)
+                # Normal Heuristic A* path finding
+                oldCost = costMatrix.GetPoint(nextPos)
+                newCost = costMatrix.GetPoint(currentNode.position) + self.heuristic(nextPos, currentNode.position)
+                if oldCost == -1 or newCost < oldCost:
+                    costMatrix.SetPoint( nextPos, newCost )
 
-                # If we should path here due to cost
-                nextPosTuple = nextPos.Tuple()
-                if not nextPosTuple in cellCost or cost < cellCost[nextPosTuple]:
-                    cellCost[nextPosTuple] = cost
+                    i = 0
+                    while i < checkList.len():
+                        checkPoint:PathNode = checkList.GetWithIndex(i)
+                        if checkPoint.cost > newCost:
+                            break
+                        i = i + 1
 
-                i = 0
-                while i < checkList.len():
-                    checkPoint:PathNode = checkList.GetWithIndex(i)
-                    if checkPoint.cost > cost:
-                        break
-                    i = i + 1
+                    checkList.SetWithIndex( i, PathNode(nextPos, newCost) )
+                    cameFrom[nextPos.Tuple()] = currentNode.position
 
-                checkList.SetWithIndex( i, PathNode(nextPos, cost) )
-                cameFrom[nextPosTuple] = currentNode
+                    # Investigate this node
+                    debugPathMatrix.SetPoint(nextPos, pathfindingArea.GetPoint(nextPos))
 
         # Find the path
         currentPos = endPositon
         result = []
-        if currentPos in cameFrom:
+        if cameFrom != None and currentPos.Tuple() in cameFrom:
             while currentPos != startPosition:
                 result.append(currentPos)
-                currentPos = cameFrom[currentPos]
+                currentPos = cameFrom[currentPos.Tuple()]
             if result:
+                result.append(startPosition)
                 result.reverse
+
+        debugPathMatrix.SetPoint(endPositon, "EE")
+#        debugPathMatrix.Print(0, bcolors.DARK_GREY, "00", "")
+
         return result
 
