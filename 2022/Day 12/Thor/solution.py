@@ -34,7 +34,6 @@ def solvePuzzle1(filename):
 
     startPos = getPosition(matrix,"S")
     endPos = getPosition(matrix,"E")
-    print("Try to path " + startPos.ToString() + " => " + endPos.ToString() )
 
     valueList = list()
     valueList.append(26)
@@ -53,20 +52,11 @@ def solvePuzzle1(filename):
                 number = int(ord(character) - ord("a"))
                 matrix.Set(x,y,number)
 
-#    matrix.PrintMultiple(valueList, bcolors.YELLOW, bcolors.DARK_GREY, "00"," ")
-
     pathfinding = Pathfinding()
     shortestPath = pathfinding.HeuristicAstarPathTo( matrix, startPos, endPos, pathfinding.oneStepPathRule )
-
-    # Print path in 
-    pathMatrix = matrix.EmptyCopy("ShowPath", ".")
-    for index in range(len(shortestPath)):
-        point = shortestPath[index]
-        pathMatrix.Set(point.x,point.y, "X")
-    pathMatrix.Print(".", bcolors.DARK_GREY, "0", "")
-
+    #pathfinding.DebugPrintPath(matrix,shortestPath)
     return len(shortestPath) - 1
 
 #unittest(solvePuzzle1, 31, "unittest.txt")
-#unittest(solvePuzzle1, 31, "puzzleinput.txt")
+unittest(solvePuzzle1, 423, "puzzleinput.txt")
 unittest(solvePuzzle1, 31, "puzzleinput_work.txt")
