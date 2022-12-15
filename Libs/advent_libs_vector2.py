@@ -51,6 +51,9 @@ class Vector2:
         if self.x == 0 and self.y == 0:
             print("BUG!" + self.ToString())
         return self
+    
+    def Tuple(self) :
+        return (self.x,self.y)
 
     # def __gt__
     # def __eq__

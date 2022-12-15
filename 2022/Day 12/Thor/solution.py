@@ -57,8 +57,9 @@ def solvePuzzle1(filename):
     matrix.PrintMultiple(valueList, bcolors.YELLOW, bcolors.DARK_GREY, "00","")
 
     pathfinding = Pathfinding()
-    shortestPath = pathfinding.AStarPathTo( matrix, startPos, endPos, 1 )
-#    shortestPath = pathfinding.HeuristicAstarPathTo( matrix, startPos, endPos, 1 )
+#    shortestPath = pathfinding.AStarPathTo( matrix, startPos, endPos, 1 )
+    shortestPath = pathfinding.HeuristicAstarPathTo( matrix, startPos, endPos, 1 )
+    print(shortestPath)
 
     # Print path in 
     pathMatrix = Matrix("Path", matrix.sizeX, matrix.sizeY, 0)

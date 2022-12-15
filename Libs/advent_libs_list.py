@@ -57,6 +57,9 @@ class Vector2List:
                 return pos
         return None
 
+    def SetWithIndex(self, index:int, value):
+        self.data.insert(index, value)
+
     def First(self) -> Vector2:
         if len(self.data) > 0:
             return self.data[0]
