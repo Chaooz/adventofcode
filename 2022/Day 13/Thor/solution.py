@@ -107,10 +107,9 @@ def solvePuzzle2(filename):
         sorted_pairs.index(extraPairs[1]) + 1
     )
 
-    
-
-
-
+print("")
+print_color("Day 13: Distress Signal", bcolors.OKGREEN)
+print("")
 
 #unittest(testPuzzle1, RIGHT_ORDER, "[1,1,3,1,1] [1,1,5,1,1]")
 #unittest(testPuzzle1, RIGHT_ORDER, "[[1],[2,3,4]] [[1],4]")
