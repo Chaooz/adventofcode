@@ -3,6 +3,7 @@
 # https://adventofcode.com/
 #
 import time
+import traceback
 
 # print("\033[0;37;40m Normal text\n")
 # print("\033[2;37;40m Underlined text\033[0;37;40m \n")
@@ -31,8 +32,10 @@ class bcolors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
     DARK_GREY = '\033[1;30;40m'
+    LIGHT_GREY = '\033[1;37;40m'
     WHITE = '\033[1;37;40m'
     YELLOW = '\033[1;33;40m'
+    RED = '\033[91m'
 
 
 def loadfile(filename):
@@ -81,7 +84,7 @@ def unittest( func, expected, filename ):
     if code_result == expected:
         print_ok("Unittest " + func.__name__ + " with " + str(code_result) + " is OK! input:" + str(filename) + strTime)
     else:
-        print_error("Unittest " + func.__name__ + " with " + str(code_result) + " is NOT OK!  Expected:" + str(expected) + " input:" + str(filename) + strTime)
+        print_warning("Unittest " + func.__name__ + " with " + str(code_result) + " is NOT OK!  Expected:" + str(expected) + " input:" + str(filename) + strTime)
 
 def unittest_input( func, input, expected, filename ):
 
@@ -93,7 +96,7 @@ def unittest_input( func, input, expected, filename ):
     if code_result == expected:
         print_ok("Unittest " + func.__name__ + "(" + str(input) + ") with " + str(code_result) + " is OK! input:" + str(filename) + strTime)
     else:
-        print_error("Unittest " + func.__name__ + "(" + str(input) + ") with " + str(code_result) + " is NOT OK! Got:" + str(code_result) + " Expected:" + str(expected) + " input:" + str(filename) + strTime)
+        print_warning("Unittest " + func.__name__ + "(" + str(input) + ") with " + str(code_result) + " is NOT OK! Got:" + str(code_result) + " Expected:" + str(expected) + " input:" + str(filename) + strTime)
 
 def print_assert(value,text):
     if not value:
@@ -102,6 +105,7 @@ def print_assert(value,text):
 
 def print_error(text):
     print(bcolors.WARNING + "[ERROR]   " + text + bcolors.RESET)
+    traceback.print_stack()
 
 def print_warning(text):
     print(bcolors.WARNING + "[WARNING] " + text + bcolors.RESET)
