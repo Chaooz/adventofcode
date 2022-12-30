@@ -18,16 +18,14 @@ class SensorData:
     width : int
 
     def intersect(self, lineY:int) -> bool:
-        if ( lineY >= self.sensor.y - self.width and lineY <= self.sensor.y + self.width ):
+        if ( lineY > self.sensor.y - self.width and lineY < self.sensor.y + self.width ):
             return True
         return False
 
-    def GetSectorWidth(self, lineY:int) -> Vector2:
+    def GetSectorWidth(self, lineY:int) -> Vector2:        
         diffY = self.sensor.y - lineY if self.sensor.y > lineY else lineY - self.sensor.y
-        v = Vector2( self.sensor.x - self.width + diffY, self.sensor.x + self.width - diffY)
-        print("width:" + str(lineY) + " => " + self.sensor.ToString() + " v:" + v.ToString())
+        v = Vector2( self.sensor.x - self.width + diffY + 1, self.sensor.x + self.width - diffY - 1)
         return v
-
     
 def readInput(lines):
     beaconList = []
@@ -47,116 +45,199 @@ def readInput(lines):
 
     return beaconList
 
+#
+# calcNumPoints
+# Find the number of points needed to make a square
+#
 def calcNumPoints(sensor:Vector2, beacon:Vector2):
     pointX = sensor.x - beacon.x if beacon.x < sensor.x else beacon.x - sensor.x
     pointY = sensor.y - beacon.y if beacon.y < sensor.y else beacon.y - sensor.y
     return pointX + pointY + 1
 
-def calcLine(matrix:Matrix, line):
-    num = 0
-    for x in range(0,matrix.sizeX):
-        c = matrix.Get(x,line)
-        if c == "#":
-            num += 1
-    return num
+def generateRange(beaconList, intersectLine:int):
+    selectedBeaconList = Vector2List()
 
-def debugDrawSensorPoint(matrix:Matrix,x,y):
+    # Find the range for each beacon on a specific line
+    for data in beaconList:
+        if data.intersect(intersectLine):
+            sectorWidth = data.GetSectorWidth(intersectLine)
+            selectedBeaconList.append(sectorWidth)            
+
+    # Sort ranges with smallest start first
+    selectedBeaconList.Sort()
+    print("generateRange:" + selectedBeaconList.ToString())
+
+    # Merge list
+    combinedList = Vector2List()
+    combinedSize = Vector2(999999999,0)
+    for data in selectedBeaconList.data:
+        # Expand ranges
+        didFind = False
+        for index in range(0, combinedList.len()):
+            combinedData = combinedList.Get(index)
+
+            # First is inside range
+            if data.x >= combinedData.x and data.x <= combinedData.y:
+                didFind = True
+                # If second is larger, expand the range
+                if data.y > combinedData.y: 
+                    combinedData.y = data.y
+                    combinedList.SetWithIndex(index,combinedData)
+#                    print("Expand:" + combinedData.ToString() + " y:" + str(combinedData.y) + " < " + str(data.y))
+            # Second is inside range
+            if data.y >= combinedData.x and data.y <= combinedData.y:
+                didFind = True
+                # If first is smaller, shrink the range
+                if data.x < combinedData.x: 
+ #                   print("Shrink:" + combinedData.ToString() + " x:" + str(combinedData.x) + " < " + str(data.x))
+                    combinedData.x = data.x
+                    combinedList.SetWithIndex(index,combinedData)
+ 
+        if not didFind:
+#            print("could not find : " + data.ToString() + " => " + combinedList.ToString())
+            combinedList.append(data)
+
+    print("combinedList " + combinedList.ToString())
+    return combinedList
+
+def debugDrawSensorPoint(matrix:Matrix,x,y, character:str):
     c = matrix.Get(x,y)
-    if c == ".":
-        matrix.Set( x,y, "#")
+    if c == "." or c == "o":
+      matrix.Set( x,y, character)
 
-def showDebugMatrix(sensorData:SensorData, offset:Vector2, countXLine:Vector2, countYLine:int):
+def showDebugMatrix(sensorData:SensorData, rangeList:Vector2List, countYLine:int, printIndex:int):
 
     # Calucate max/min value
     minPoint = Vector2(0,0)
     maxPoint = Vector2(0,0)
 
     for data in sensorData:
+        w = data.width
 
-        if data.sensor.x < minPoint.x: minPoint.x = data.sensor.x
-        if data.sensor.y < minPoint.y: minPoint.y = data.sensor.y
-        if data.beacon.x < minPoint.x: minPoint.x = data.beacon.x
-        if data.beacon.y < minPoint.y: minPoint.y = data.beacon.y
+        if data.sensor.x - w < minPoint.x: minPoint.x = data.sensor.x - w
+        if data.sensor.y - w < minPoint.y: minPoint.y = data.sensor.y - w
+        if data.beacon.x - w < minPoint.x: minPoint.x = data.beacon.x - w
+        if data.beacon.y - w < minPoint.y: minPoint.y = data.beacon.y - w
 
-        if data.sensor.x > maxPoint.x: maxPoint.x = data.sensor.x
-        if data.sensor.y > maxPoint.y: maxPoint.y = data.sensor.y
-        if data.beacon.x > maxPoint.x: maxPoint.x = data.beacon.x
-        if data.beacon.y > maxPoint.y: maxPoint.y = data.beacon.y
+        if data.sensor.x + w > maxPoint.x: maxPoint.x = data.sensor.x + w
+        if data.sensor.y + w > maxPoint.y: maxPoint.y = data.sensor.y + w
+        if data.beacon.x + w > maxPoint.x: maxPoint.x = data.beacon.x + w
+        if data.beacon.y + w > maxPoint.y: maxPoint.y = data.beacon.y + w
 
-    matrixSize = Vector2(maxPoint.x - minPoint.x + (offset.x*2), maxPoint.y - minPoint.y + (offset.y*2))
-
-    # Offset all points ( for printing of matrix )
-    for data in sensorData:
-        data.beacon.x -= minPoint.x - offset.x
-        data.beacon.y -= minPoint.y - offset.y
-        data.sensor.x -= minPoint.x - offset.x
-        data.sensor.y -= minPoint.y - offset.y
-
+    matrixSize = Vector2(maxPoint.x - minPoint.x, maxPoint.y - minPoint.y)
     matrix = Matrix("Test", matrixSize.x, matrixSize.y, ".")
 
     colorList = list()
     colorList.append(("B", bcolors.YELLOW))
-    colorList.append(("S", bcolors.RED))
-    colorList.append(("s", bcolors.OKGREEN))
-    colorList.append(("@", bcolors.WHITE))
+    colorList.append(("b", bcolors.YELLOW))
+    colorList.append(("s", bcolors.RED))
+    colorList.append(("S", bcolors.OKGREEN))
+    colorList.append(("@", bcolors.YELLOW))
+    colorList.append(("o", bcolors.DARK_GREY))
+    colorList.append(("#", bcolors.LIGHT_GREY))
+    colorList.append(("0", bcolors.OKGREEN))
 
+    printNum = 0
     for data in sensorData:
-        matrix.SetPoint(data.beacon, "B")
+        printNum += 1
+        bPoint = matrix.GetPoint(data.beacon)
+        sPoint = matrix.GetPoint(data.sensor)
 
+        c = "o"
         if data.intersect(countYLine):
-            matrix.SetPoint(data.sensor, "s")
-        else:
             matrix.SetPoint(data.sensor, "S")
+            matrix.SetPoint(data.beacon, "B")
+            c = "#"
+        elif bPoint != "B" :
+            matrix.SetPoint(data.beacon, "b")
+        elif sPoint != "S" :
+            matrix.SetPoint(data.sensor, "s")
 
-        for p in range( countXLine.x, countXLine.y):
-            c = matrix.Get(p + offset.x, countYLine + offset.y)
-            if c == ".":
-                matrix.Set( p + offset.x, countYLine + offset.y, "@")
+        if printIndex == printNum or printIndex == -1:
+            for y in range(0, data.width ):
+                for x in range( 0, data.width - y - 1):
+                    debugDrawSensorPoint(matrix, data.sensor.x + x, data.sensor.y + y, "o")
+                    debugDrawSensorPoint(matrix, data.sensor.x + x, data.sensor.y - y, "o")
+                    debugDrawSensorPoint(matrix, data.sensor.x - x, data.sensor.y + y, "o")
+                    debugDrawSensorPoint(matrix, data.sensor.x - x, data.sensor.y - y, "o")
 
-        for y in range(0, data.width ):
-            for x in range( 0, data.width - y ):
-                debugDrawSensorPoint(matrix, data.sensor.x + x, data.sensor.y + y)
-                debugDrawSensorPoint(matrix, data.sensor.x + x, data.sensor.y - y)
-                debugDrawSensorPoint(matrix, data.sensor.x - x, data.sensor.y + y)
-                debugDrawSensorPoint(matrix, data.sensor.x - x, data.sensor.y - y)
+                # Draw outline of the area with "#" for areas included in the calculation
+                debugDrawSensorPoint(matrix, data.sensor.x + data.width - y - 1, data.sensor.y + y, c)
+                debugDrawSensorPoint(matrix, data.sensor.x - data.width + y + 1, data.sensor.y - y, c)
+                debugDrawSensorPoint(matrix, data.sensor.x + data.width - y - 1, data.sensor.y - y, c)
+                debugDrawSensorPoint(matrix, data.sensor.x - data.width + y + 1, data.sensor.y + y, c)
+
+        # Print the Y line
+        for dataRange in rangeList:
+            for p in range( dataRange.x, dataRange.y + 1):
+                c = matrix.Get(p, countYLine)
+                if c == ".":
+                    matrix.Set(p, countYLine, "@")
+
+#    matrix.SetPoint(Vector2(24,21), "0")
 
     matrix.PrintWithColor(colorList, bcolors.DARK_GREY, ""," ")
 
 
-def solvePuzzle(filename:str, offset:Vector2, countLine:int, debug:bool):
+def offsetDataPoints(beaconList:list, offset:Vector2):
+    # Offset the beaconlist
+    for data in beaconList:
+        data.sensor.x += offset.x
+        data.sensor.y += offset.y
+        data.beacon.x += offset.x
+        data.beacon.y += offset.y
+    return beaconList
+
+def updateWidth(beaconList:list):
+    for data in beaconList:
+        data.width = calcNumPoints(data.sensor, data.beacon)
+    return beaconList
+
+def solveInternalPuzzle1(filename:str, offset:Vector2, countLine:int, debug:bool, showBox:int):
     lines = loadfile(filename)
     beaconList = readInput(lines)
 
-    # Calculate max width for each sensor
-    combinedSize = Vector2(0,0)
-    for data in beaconList:
-        data.width = calcNumPoints(data.sensor, data.beacon)
-        if data.intersect(countLine):
-            sectorWidth = data.GetSectorWidth(countLine)
-            if sectorWidth.x < combinedSize.x: combinedSize.x = sectorWidth.x
-            if sectorWidth.y > combinedSize.y: combinedSize.y = sectorWidth.y
+    beaconList = offsetDataPoints(beaconList, offset)
+    countLine += offset.y
 
-    num = combinedSize.y - combinedSize.x
-    print(combinedSize.ToString())
-    print(num)
+    beaconList = updateWidth(beaconList)
+    rangeList = generateRange(beaconList,countLine)
 
     # Draw matrix with Sensors, Beacons and coverage area
     if debug:
-        showDebugMatrix(beaconList, offset, combinedSize, countLine)
+        showDebugMatrix(beaconList, rangeList, countLine, showBox)
 
-    return num
+    selectedRange = rangeList.First()
+    return selectedRange.y - selectedRange.x
+
+def solveInternalPuzzle2(filename:str, offset:Vector2, countLine:int, debug:bool, showBox:int):
+    lines = loadfile(filename)
+    beaconList = readInput(lines)
+    
+    beaconList = offsetDataPoints(beaconList, offset)
+    countLine += offset.y
+
+    beaconList = updateWidth(beaconList)
+    rangeList = generateRange(beaconList,countLine)
+
+    # Draw matrix with Sensors, Beacons and coverage area
+    if debug:
+        showDebugMatrix(beaconList, rangeList, countLine, showBox)
+
+    # Find the points within range
+
+#    num = combinedSize.y - combinedSize.x
+    return -1
 
 def testPuzzle1(filename):
-    return solvePuzzle(filename, Vector2(10,10), 10, True)
+    return solveInternalPuzzle1(filename, Vector2(10,10), 10, True, -1)
 
 def solvePuzzle1(filename):
-    return solvePuzzle(filename, Vector2(10,5), 10, True)
+    return solveInternalPuzzle1(filename, Vector2(0,0), 2000000, False, -1 )
 
-def solvePuzzle2(filename):
-    lines = loadfile(filename)
-    return 0
+def testPuzzle2(filename):
+    return solveInternalPuzzle2(filename, Vector2(10,10), 11, False, -1)
 
 unittest(testPuzzle1, 26, "unittest.txt")
-#unittest(solvePuzzle1, 1, "unittest.txt")
-#unittest(solvePuzzle1, 1, "puzzleinput.txt")
-#unittest(solvePuzzle2, 1, "puzzleinput.txt")
+unittest(solvePuzzle1, 4748135, "puzzleinput.txt")
+unittest(testPuzzle2, 1, "unittest.txt")
