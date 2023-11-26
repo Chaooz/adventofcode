@@ -169,6 +169,12 @@ def max_point_in_list(point_list):
             max_y = y
     return (max_x, max_y)
 
+def list_offset_points(list, x,y):
+    newList = []
+    for point in list:
+        newList.append( (point[0] + x, point[1] + y) )
+    return newList
+
 def print_list(text, list):
     print ("--- " + text + " ---")
     
