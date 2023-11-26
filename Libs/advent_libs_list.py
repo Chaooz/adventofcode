@@ -28,6 +28,9 @@ class Vector2List:
         
     def len(self):
         return len(self.data)
+    
+    def isEmpty(self):
+        return len(self.data) == 0
 
     def appendList(self, data:list) -> None:
         for entry in data:
@@ -58,6 +61,9 @@ class Vector2List:
         return None
 
     def SetWithIndex(self, index:int, value):
+        self.data[index] = value
+
+    def InsertWithIndex(self, index:int, value):
         self.data.insert(index, value)
 
     def RemoveFirst(self):
@@ -79,7 +85,7 @@ class Vector2List:
     def ToString(self, maxLines = 100) -> str:
         s = ""
         for line in self.data:
-            s += self.name + ": " + line.ToString() + "\n"
+            s += line.ToString() + " "
             maxLines -= 1
             if maxLines <= 0:
                 return s
@@ -103,6 +109,11 @@ class Vector2List:
            if vec.y < y: y = vec.y
         return Vector2(x,y) 
 
+    def sortHelper(self,vector):
+        return vector.x
+
+    def Sort(self):
+        self.data.sort(key=self.sortHelper)
 
 
 #

@@ -44,19 +44,17 @@ class Matrix:
         if self.IsInside(x,y):
             self.data[x][y] = character
         else:
-            print_warning("Matrix.Set : " + str(x) + "x" + str(y) + " is outsde of matrix")
+            print_error("Matrix.Set : " + str(x) + "x" + str(y) + " is outside of matrix")
 
     def SetPoint(self, point, character ):
         if self.IsPointInside(point):
             self.data[point.x][point.y] = character
         else:
-            print_warning("Matrix.Set : " + str(x) + "x" + str(y) + " is outsde of matrix")
+            print_error("Matrix.Set : " + point.ToString() + " is outside of matrix")
 
-    def Get(self, input1, input2 = None):
-        if isinstance(input1,int) and isinstance(input2,int) and self.IsInside(input1,input2):
-            return self.data[input1][input2]
-        elif ( isinstance(input1), Vector2) and self.IsPointInside(input1):
-            return self.data[input1.x, input1.y]
+    def Get(self, x, y):
+        if self.IsInside(x,y):
+            return self.data[x][y]
         print_warning("Matrix.Get : " + str(x) + "x" + str(y) + " is outsde of matrix")
 
     def GetPoint(self, point:Vector2):
@@ -68,7 +66,10 @@ class Matrix:
         # TODO:Move function here and depricateother function
         print_matrix_color(self.name, self.data,value_highlight,color, pad,space)
 
-    def PrintMultiple(self,valueList, color, defaultColor =bcolors.DARK_GREY, pad = "00", space = " "):
+    def PrintWithColor(self,valueList, defaultColor = bcolors.DARK_GREY, pad = "00", space = " "):
+        print_matrix_colorlist(self.name,self.data,valueList, bcolors.DARK_GREY, defaultColor, pad, space)
+
+    def PrintMultiple(self,valueList, color, defaultColor = bcolors.DARK_GREY, pad = "00", space = " "):
         print_matrix_colorlist(self.name,self.data,valueList, color, defaultColor, pad, space)
 
     def CreateFromFile(textfile:str, defaultValue:str):
@@ -231,7 +232,7 @@ def print_matrix_color(text,matrix,value_highlight,color, pad = "00", space = " 
     valueList.append(value_highlight)
     print_matrix_colorlist(text,matrix,valueList, color, bcolors.WHITE, pad, space)
 
-def print_matrix_colorlist(text,matrix,valueList, color, defaultColor, pad = "00", space = " "):
+def print_matrix_colorlist(text,matrix, valueList, color, defaultColor, pad = "00", space = " "):
     size = get_matrix_size(matrix)
 
     size_x = size[0]
@@ -304,6 +305,11 @@ def print_matrix_colorlist(text,matrix,valueList, color, defaultColor, pad = "00
                         highlight_color = bcolors.BOLD + color
                     elif isinstance(highlight_value,str) and highlight_value in v:
                         highlight_color = bcolors.BOLD + color
+                    elif isinstance(highlight_value,tuple):
+                        tupleValue = highlight_value[0]
+                        tupleColor = highlight_value[1]
+                        if tupleValue in v: 
+                            highlight_color = bcolors.BOLD + tupleColor
 
             line = line + highlight_color
             line += pad_number( value , pad )

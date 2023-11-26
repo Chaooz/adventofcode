@@ -55,6 +55,12 @@ class Vector2:
     def Tuple(self) :
         return (self.x,self.y)
 
+    def IsZero(self):
+        return self.x == 0 and self.y == 0
+
+    def sortHelper(vector):
+        return vector.x
+
     # def __gt__
     # def __eq__
 

@@ -111,7 +111,7 @@ class Pathfinding:
                             break
                         i = i + 1
 
-                    checkList.SetWithIndex( i, PathNode(nextPos, newCost) )
+                    checkList.InsertWithIndex( i, PathNode(nextPos, newCost) )
                     cameFrom[nextPos.Tuple()] = currentNode.position
 
                     # Investigate this node
