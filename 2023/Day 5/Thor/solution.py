@@ -13,53 +13,73 @@ print("")
 print_color("Day 5: If You Give A Seed A Fertilizer", bcolors.OKGREEN)
 print("")
 
+class ConversionRuleSet:
+
+    rules : list
+
+    def __init__(self):
+        self.rules = list()
+
+    def addRule(self, line:str):
+        dest,source,range = line.split(" ")
+        self.rules.append((int(dest),int(source),int(range)))
+
+    def convertOne(self,material_list) -> list:
+        new_material_list = list()
+        for material in material_list:
+            new_material = material
+            for dest,source,range in self.rules:
+                # If the material is within the range of the conversion rule, convert it
+                if material >= source and material < source + range:
+                    new_material = (material - source) + dest             
+            new_material_list.append(new_material)
+        return new_material_list
+    
+    def convertRange(self, material_range) -> list:
+
+        converted_material_range = []
+
+        # Go through all rules in this group
+        for dest,source_start,range in self.rules:
+            source_end = source_start + range
+            new_material_range = []
+
+#            print(material_range, " rule : ", str(source_start) + "-" + str(source_end), " -> ", str(dest) + "-" + str(dest+range))
+
+            for material_start, material_end in material_range:
+
+                # Outside range -> lower (try it on next rule)
+                before_rule = (material_start,min(material_end,source_start))
+                if before_rule[1] > before_rule[0]:
+                    new_material_range.append(before_rule)
+
+                # Inside range -> convert (skip remaining rules to only convert data once)
+                match_rule = (max(material_start, source_start), min(source_end, material_end))
+                if match_rule[1] > match_rule[0]:
+                    diff = dest - source_start
+                    converted_material = ((match_rule[0]+diff, match_rule[1]+diff))
+                    converted_material_range.append(converted_material)
+
+                # Outside range -> higher (try it on next rule)
+                after_rule = (max(source_end, material_start), material_end)
+                if after_rule[1] > after_rule[0]:
+                    new_material_range.append(after_rule)
+
+            # Set the material range to the outside range materials
+            material_range = new_material_range
+
+        # Add remailing outside ranges
+        return converted_material_range + material_range
+                   
 #
-# Convert the material numbers according to the map
+# Read all data
 #
-def convertData(name, source_material_list:list,conversion_list:list):
-
-    destination_material_list = list()
-
-    # If the map is empty, just return the seeds
-    if len(conversion_list) == 0:
-        return source_material_list
-
-    # Convert all materials
-    for material in source_material_list:
-        if material == "":
-            continue
-
-        material = int(material)
-        num = material
-
-        # Go through the conversion list and see if we can convert the material
-        for conversion_rule in conversion_list:
-            m = conversion_rule.split(" ")
-            d = int(m[0])
-            s = int(m[1])
-            r = int(m[2])
-
-            # If the material is within the range of the conversion rule, convert it
-            if material >= s and material < s + r:
-                num = (material - s) + d 
-
-        # Add the converted material to the list
-        destination_material_list.append(num)
-
-        #print("Seed number ", seed, " corresponds to ",name," number", num)
-
-    return destination_material_list
-       
-
-def solvePuzzle1(filename:str):
+def readData(filename:str) -> list:
     lines = loadfile(filename)
 
-    # List of all materials that needs to be converted
     material_list = list()
-    # Table on how to convert materials
     conversion_list = list()
-    # Debug, name of the material we are currently reading
-    name = ""
+    conversion_rule = ConversionRuleSet()
 
     for line in lines:
         line = line.strip("\n")
@@ -71,31 +91,52 @@ def solvePuzzle1(filename:str):
         # Read line with seeds
         if line.startswith("seeds:"):
             d = line.split(":")
-            material_list = d[1].split(" ")
+            material_list: list = [int(x) for x in d[1].split()]
 
         # If the line contains numbers, these are material A -> B conversion
         # Just add them to the conversion list
         elif line[0].isnumeric():
-            conversion_list.append(line)
+            conversion_rule.addRule(line)
+
         # If the line does NOT contain numbers, it is a header.
         # When we start a new header, go through the converson_list we have made
         # and put the materials through to get the new material number
-        else:
-            material_list = convertData(name,material_list,conversion_list)
-            conversion_list.clear()
-            name = line
+        elif len(conversion_rule.rules) > 0:
+            conversion_list.append(conversion_rule)
+            conversion_rule = ConversionRuleSet()
 
-    # Make sure to read the last line
-    material_list = convertData(name,material_list,conversion_list)
+    conversion_list.append(conversion_rule)
+    return material_list,conversion_list
 
-    # Get the maeerial with the lowest number
+
+def solvePuzzle1(filename:str):
+
+    material_list, conversion_list = readData(filename)
+
+    # Convert data
+    for conversion_rule in conversion_list:
+        material_list = conversion_rule.convertOne(material_list)
+
+    # Get the material with the lowest number
     material = min(material_list)
-
     return material
 
 def solvePuzzle2(filename:str):
-    lines = loadfile(filename)
-    sum = 0
+    material_list, conversion_list = readData(filename)
+
+    # Convert material list to a key/value pair with start and end
+    material_range = []
+    for index in range(0,int(len(material_list) / 2)):
+        mat_start = material_list[index*2]
+        mat_range = material_list[index*2+1]
+        material_range.append((mat_start,mat_start+mat_range))
+
+    # Convert data
+    for conversion_rule in conversion_list:
+        material_range = conversion_rule.convertRange(material_range)
+
+    # Get the material with the lowest number
+    sum = min([x for x,y in material_range])
     return sum
 
 unittest(solvePuzzle1, 35, "unittest1.txt")
