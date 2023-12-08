@@ -9,101 +9,89 @@ from advent_libs import *
 from advent_libs_vector2 import *
 from advent_libs_matrix import *
 
-sys.setrecursionlimit(1500)
-
 print("")
 print_color("Day 5: If You Give A Seed A Fertilizer", bcolors.OKGREEN)
 print("")
 
-class Map:
-    map : list
-    def __init__(self) -> None:
-        self.map = list()
+#
+# Convert the material numbers according to the map
+#
+def convertData(name, source_material_list:list,conversion_list:list):
 
-    def Add(self,mat:list):
-        self.map.append(mat)
+    destination_material_list = list()
 
-    def Get(self,x:int,y:int) -> int:
-        return self.map[y][x]
+    # If the map is empty, just return the seeds
+    if len(conversion_list) == 0:
+        return source_material_list
 
-    def GetList(self):
-        return self.map
-    
-    def Print(self):
-        for mat in self.map:
-            print(mat)
-
-
-def convertData(name, seeds,map:Map):
-
-
-    # Seed : 79 14 55 13
-    # Soil : 50<-98 2
-    # Soil : 52 50 48
-
-    newData = list()
-
-    if len(map) == 0:
-        return seeds
-
-#    print("---")
-#    print(map)
-
-    for seed in seeds:
-        if seed == "":
+    # Convert all materials
+    for material in source_material_list:
+        if material == "":
             continue
 
-        seed = int(seed)
-        num = seed
-        for mat in map:
-            m = mat.split(" ")
+        material = int(material)
+        num = material
+
+        # Go through the conversion list and see if we can convert the material
+        for conversion_rule in conversion_list:
+            m = conversion_rule.split(" ")
             d = int(m[0])
             s = int(m[1])
             r = int(m[2])
-            if seed >= s and seed < s + r:
-                num = (seed - s) + d 
 
-        newData.append(num)
+            # If the material is within the range of the conversion rule, convert it
+            if material >= s and material < s + r:
+                num = (material - s) + d 
+
+        # Add the converted material to the list
+        destination_material_list.append(num)
+
         #print("Seed number ", seed, " corresponds to ",name," number", num)
 
-    return newData
+    return destination_material_list
        
 
 def solvePuzzle1(filename:str):
     lines = loadfile(filename)
 
-    sum = 0
-    seeds = list()
-
-    mat = list()
+    # List of all materials that needs to be converted
+    material_list = list()
+    # Table on how to convert materials
+    conversion_list = list()
+    # Debug, name of the material we are currently reading
     name = ""
 
     for line in lines:
         line = line.strip("\n")
 
+        # Skip empty lines
         if len(line) == 0:
             continue
 
+        # Read line with seeds
         if line.startswith("seeds:"):
             d = line.split(":")
-            seeds = d[1].split(" ")
+            material_list = d[1].split(" ")
 
-        elif line.find(":") >-1:
-            seeds = convertData(name,seeds,mat)
-            mat.clear()
+        # If the line contains numbers, these are material A -> B conversion
+        # Just add them to the conversion list
+        elif line[0].isnumeric():
+            conversion_list.append(line)
+        # If the line does NOT contain numbers, it is a header.
+        # When we start a new header, go through the converson_list we have made
+        # and put the materials through to get the new material number
+        else:
+            material_list = convertData(name,material_list,conversion_list)
+            conversion_list.clear()
             name = line
 
-        elif line[0].isnumeric():
-            mat.append(line)
+    # Make sure to read the last line
+    material_list = convertData(name,material_list,conversion_list)
 
-    seeds = convertData(name,seeds,mat)
+    # Get the maeerial with the lowest number
+    material = min(material_list)
 
-    low = -1
-    for seed in seeds:
-        if seed < low or low == -1:
-            low = seed
-
-    return low
+    return material
 
 def solvePuzzle2(filename:str):
     lines = loadfile(filename)
