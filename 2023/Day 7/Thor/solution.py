@@ -10,15 +10,14 @@ from advent_libs_vector2 import *
 from advent_libs_matrix import *
 from enum import Enum
 
-sys.setrecursionlimit(1500)
-
 print("")
 print_color("Day 7: Camel Cards", bcolors.OKGREEN)
 print("")
 
 CARD_LIST = "123456789ABCDE"
+CARD_MAP = { "T":"A", "J":".", "Q":"C", "K":"D", "A":"E" }
 JOKER_CARD = "1"
-
+            
 class RESULT(Enum):
     NONE = 0
     ONE_PAIR = 1
@@ -165,33 +164,6 @@ def solvePuzzle1(filename:str):
 
     return sum
 
-def solvePuzzle2(filename:str):
-    lines = loadfile(filename)
-
-    sortedCardList = list()
-
-    for line in lines:
-        line = line.replace("\n", "")
-        (cards,strength) = line.split(" ")
-
-        cards = replaceValue(cards, JOKER_CARD)
-        cardRule = getCardRuleWithJoker(cards, JOKER_CARD)
-        sortedCardList = insertRanked(sortedCardList, cards, cardRule, int(strength), JOKER_CARD )
-
-    sum = 0
-    power = len(sortedCardList)
-    for card in sortedCardList:
-        (cards,cardRule,strength) = card
-        sum += power * strength
-        if cardRule != RESULT.NONE:  
-            if cards.count(JOKER_CARD) > 0 and cardRule == RESULT.ONE_PAIR:
-                print("Card:", cards, "Rule:", cardRule, "Strength:", strength, "Power:", power, "Sum:", sum, " J:")
-#            else:
-#                print("Card:", cards, "Rule:", cardRule, "Strength:", strength, "Power:", power, "Sum:", sum)
-        power -= 1
-
-    return sum
-
 def score(hand):
     counts = [hand.count(card) for card in hand]
     if 5 in counts:
@@ -206,7 +178,66 @@ def score(hand):
         return RESULT.ONE_PAIR
     return RESULT.NONE
 
+#
+# Part TWO
+# 
+def score(hand):
+    counts = [hand.count(card) for card in hand]
+    # FIVE_OF_A_KIND
+    if 5 in counts:
+        return 6            
+    # FOUR_OF_A_KIND
+    elif 4 in counts:       
+        return 5
+    # THREE_OF_A_KIND
+    elif 3 in counts:
+        # ONE_PAIR
+        if 2 in counts:
+            # FULL_HOUSE
+            return 4
+        return 3
+    # TWO_PAIRS
+    elif counts.count(2) == 4:
+        return 2
+    # ONE_PAIR
+    elif 2 in counts:
+        return 1
+    return 0
 
+# Classify
+def bestHand(hand):
+    return max(map(score,replacements(hand)))
+
+def strength(hand):
+    return (bestHand(hand), [CARD_MAP.get(card,card) for card in hand])
+
+def replacements(hand):
+    if hand == "":
+        return [""]
+    
+    return [
+        x + y
+        for x in ("23456789TQKA" if hand[0] == "J" else hand[0])
+        for y in replacements(hand[1:])
+    ]
+
+
+def solvePuzzle2(filename:str):
+    lines = loadfile(filename)
+    cardList = []
+    for line in lines:
+        hand,bid = line.split()
+        s = bestHand(hand)
+        cardList.append( (hand,s, int(bid)))
+
+    cardList.sort( key=lambda play: strength(play[0]))
+
+#    print(cardList)
+
+    total = 0
+    for rank, (hand,s,bid) in enumerate(cardList, 1):
+        total += rank * bid
+    return total
 
 
 unittest(getCardRule, RESULT.ONE_PAIR, "22345")
@@ -222,14 +253,4 @@ unittest(solvePuzzle1, 250951660, "input.txt")
 unittest_input(getCardRuleWithJoker, JOKER_CARD, RESULT.THREE_OF_A_KIND, "22"+JOKER_CARD+"45")
 
 unittest(solvePuzzle2, 5905, "unittest1.txt")
-unittest(solvePuzzle2, 251432266, "input.txt")
-
-# LOW : 251361338
-# NO  : 251388895
-#       251432266
-#       251361338
-#       251516664
-#       251282208
-# HIGH: 251795473
-  
-
+unittest(solvePuzzle2, 251481660, "input.txt")
