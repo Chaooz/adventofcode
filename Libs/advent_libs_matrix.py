@@ -86,6 +86,13 @@ class Matrix:
                 matrix.data[x][y] = line[x]
         return matrix
 
+    def FindFirst(self, character:str):
+        for y in range(self.sizeY):
+            for x in range(self.sizeX):
+                if self.data[x][y] == character:
+                    return Vector2(x,y)
+        return None
+
 #
 # Depricated
 #
