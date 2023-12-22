@@ -43,7 +43,7 @@ def loadfile(filename):
     lines = file.readlines()
     newLines = []
     for line in lines:
-        line.strip()
+        line = line.replace("\n", "")
         newLines.append(line)
     file.close()
     return newLines
