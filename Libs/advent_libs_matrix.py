@@ -72,12 +72,10 @@ class Matrix:
     def PrintMultiple(self,valueList, color, defaultColor = bcolors.DARK_GREY, pad = "00", space = " "):
         print_matrix_colorlist(self.name,self.data,valueList, color, defaultColor, pad, space)
 
-    def CreateFromFile(textfile:str, defaultValue:str):
-        file_lines = loadfile(textfile)
-
+    def CreateFromList(name:str,file_lines:list, defaultValue:str):
         sizeY = len(file_lines)
         sizeX = len(file_lines[0].strip())
-        matrix = Matrix(textfile,sizeX, sizeY, defaultValue)
+        matrix = Matrix(name,sizeX, sizeY, defaultValue)
 
         for y in range(0,len(file_lines)):
             line = file_lines[y]
@@ -85,6 +83,10 @@ class Matrix:
             for x in range(len(line)):
                 matrix.data[x][y] = line[x]
         return matrix
+
+    def CreateFromFile(textfile:str, defaultValue:str):
+        file_lines = loadfile(textfile)
+        return CreateFromList(textfile, file_lines, defaultValue)
 
     def FindFirst(self, character:str):
         for y in range(self.sizeY):
