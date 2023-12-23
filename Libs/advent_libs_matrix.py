@@ -33,12 +33,22 @@ class Matrix:
         newMatrix = Matrix(newTitle, self.sizeX, self.sizeY, defaultValue)
         return newMatrix
 
+    def Duplicate(self, newTitle:str):
+        newMatrix = Matrix(newTitle, self.sizeX, self.sizeY, "")
+        for y in range(self.sizeY):
+            for x in range(self.sizeX):
+                newMatrix.data[x][y] = self.data[x][y]
+        return newMatrix
+
     # If point is inside the matrix
     def IsInside(self,x,y) -> bool:
         return x >= 0 and x < self.sizeX and y >= 0 and y < self.sizeY
 
     def IsPointInside(self, point:Vector2 ) -> bool:
         return point.x >= 0 and point.x < self.sizeX and point.y >= 0 and point.y < self.sizeY
+
+    def IsOutOfBounds(self, point:Vector2 ) -> bool:
+        return self.IsPointInside(point) == False
 
     def Set(self,x, y, character ):
         if self.IsInside(x,y):
@@ -86,7 +96,7 @@ class Matrix:
 
     def CreateFromFile(textfile:str, defaultValue:str):
         file_lines = loadfile(textfile)
-        return CreateFromList(textfile, file_lines, defaultValue)
+        return Matrix.CreateFromList(textfile, file_lines, defaultValue)
 
     def FindFirst(self, character:str):
         for y in range(self.sizeY):

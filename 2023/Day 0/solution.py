@@ -22,6 +22,12 @@ def solvePuzzle1(filename):
 def solvePuzzle2(filename):
     sum = 0
     matrix  = Matrix.CreateFromFile(filename, ".")
+
+    colorList = list()
+    colorList.append(("O", bcolors.WHITE))
+    colorList.append(("#", bcolors.DARK_GREY))
+    matrix.PrintWithColor(colorList, bcolors.DARK_GREY , " ", "")
+
     return sum
 
 unittest(solvePuzzle1, 0, "unittest1.txt")     
