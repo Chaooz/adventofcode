@@ -6,6 +6,9 @@ import math
 
 # Import custom libraries
 sys.path.insert(1, '../../../Libs')
+sys.path.insert(1, '/Users/thorh/Develop/DarkFactor/adventofcode/Libs')
+
+#from ...Libs.advent_libs import *
 from advent_libs import *
 from advent_libs_vector2 import *
 from advent_libs_matrix import *
@@ -13,6 +16,8 @@ from advent_libs_matrix import *
 print("")
 print_color("Day 0: Template", bcolors.OKGREEN)
 print("")
+
+#sys.setrecursionlimit(2500)
 
 def solvePuzzle1(filename):
     sum = 0

@@ -7,6 +7,8 @@ import math
 
 # Import custom libraries
 sys.path.insert(1, '../../../Libs')
+sys.path.insert(1, '/Users/thorh/Develop/DarkFactor/adventofcode/Libs')
+
 from advent_libs import *
 from advent_libs_vector2 import *
 from advent_libs_matrix import *
@@ -76,11 +78,13 @@ def placeConnector(matrix:Matrix, x:int, y:int, connector):
 #
 # Pathfindingrule : Follow the pipe based on exit-entry on the pieces
 #
-def pipePathfindingRule(pathfindingArea:Matrix, startPosition:Vector2, endPositon:Vector2):
+def pipePathfindingRule(pathfinding:Pathfinding, startPosition:Vector2, endPositon:Vector2):
 
     if endPositon != None:
+        pathfindingArea = pathfinding.pathfindingMatrix
 
         # Outside of matrix?
+
         if not pathfindingArea.IsPointInside(endPositon):
             return None
 
@@ -119,9 +123,11 @@ def pipePathfindingRule(pathfindingArea:Matrix, startPosition:Vector2, endPosito
 # Pathfindingrule: Can walk on "." and " "
 #                  When we can walk, place an "O" on the area to mark it as OK
 #
-def closedLoopPathfindingRule(pathfindingArea:Matrix, startPosition:Vector2, endPositon:Vector2):
+def closedLoopPathfindingRule(pathfinding:Pathfinding, startPosition:Vector2, endPositon:Vector2):
 
     if endPositon != None:
+        pathfindingArea = pathfinding.pathfindingMatrix
+
         # Outside of matrix?
         if not pathfindingArea.IsPointInside(endPositon):
             return None
@@ -147,7 +153,7 @@ def closedLoopPathfindingRule(pathfindingArea:Matrix, startPosition:Vector2, end
 
 
 
-def solvePuzzle1(filename:str):
+def internalSolvePuzzle1(filename:str, debug):
 
     symbolMatrix  = Matrix.CreateFromFile(filename, ".")
 
@@ -156,7 +162,7 @@ def solvePuzzle1(filename:str):
 
     # Path using the pipePathfindingRule
     pathfinding = Pathfinding()
-    pathfinding.HeuristicAstarPathTo( symbolMatrix, startPoint, endPoint, pipePathfindingRule )
+    pathfinding.HeuristicAstarPathTo( symbolMatrix, startPoint, endPoint, pipePathfindingRule, Pathfinding.heatmapOneCostRule )
 
     # Find the point with the highest cost
     maxCost = 0
@@ -167,7 +173,16 @@ def solvePuzzle1(filename:str):
             if cost > maxCost:
                 maxCost = cost
 
+    if debug:
+        symbolMatrix.Print()
+        pathfinding.costMatrix.Print()
+
     return maxCost
+
+def solvePuzzle1(filename:str):
+    return internalSolvePuzzle1(filename, False)
+def debugPuzzle1(filename:str):
+    return internalSolvePuzzle1(filename, True)
 
 def internalPuzzle2(filename:str, showDebug:bool):
     symbolMatrix  = Matrix.CreateFromFile(filename, ".")
@@ -223,8 +238,10 @@ def internalPuzzle2(filename:str, showDebug:bool):
 def solvePuzzle2(filename:str):
     return internalPuzzle2(filename, False)
 
-def solvePuzzle2WithDebug(filename:str):
+def debugPuzzle2(filename:str):
     return internalPuzzle2(filename, True)
+
+#unittest(debugPuzzle1, 4, "2023/Day 10/Thor/unittest1.txt")
 
 unittest(solvePuzzle1, 4, "unittest1.txt")
 unittest(solvePuzzle1, 8, "unittest2.txt")
@@ -234,7 +251,7 @@ unittest(solvePuzzle2, 1, "unittest1.txt")
 unittest(solvePuzzle2, 1, "unittest2.txt")
 unittest(solvePuzzle2, 4, "unittest3.txt")
 unittest(solvePuzzle2, 4, "unittest4.txt")
-unittest(solvePuzzle2WithDebug, 8, "unittest5.txt")
+unittest(solvePuzzle2, 8, "unittest5.txt")
 unittest(solvePuzzle2, 10, "unittest6.txt")
 
 unittest(solvePuzzle2, 273, "input.txt")

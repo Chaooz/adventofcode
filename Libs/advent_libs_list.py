@@ -116,7 +116,18 @@ class Vector2List:
     def Sort(self):
         self.data.sort(key=self.sortHelper)
 
+    def Duplicate(self):
+        newList = Vector2List(self.name + "_copy")
+        for vec in self.data:
+            newList.append(vec)
+        return newList
+
     def Reverse(self):
+        copy = self.Duplicate()
+        copy.ReverseSelf()
+        return copy
+
+    def ReverseSelf(self):
         self.data.reverse()
 
 
