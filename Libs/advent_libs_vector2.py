@@ -37,13 +37,15 @@ class Vector2:
         return Vector2(x,y)
 
     def Normalize(self) :
-        if self.x > 0: self.x = 1
-        if self.x < 0: self.x = -1
-        if self.y > 0: self.y = 1
-        if self.y < 0: self.y = -1
-        if self.x == 0 and self.y == 0:
+        x = self.x
+        y = self.y
+        if x > 0: x = 1
+        if x < 0: x = -1
+        if y > 0: y = 1
+        if y < 0: y = -1
+        if x == 0 and y == 0:
             print("BUG!" + self.ToString())
-        return self
+        return Vector2(x,y)
     
     def Tuple(self) :
         return (self.x,self.y)
