@@ -211,7 +211,7 @@ class Matrix:
         compressed_size_x = int(self.sizeX / rate)
         compressed_size_y = int(self.sizeY / rate)
 
-        print("Compress matrix " + str(self.sizeX) + "x" + str(self.sizeY) + " => " + str(compressed_size_x) + "x" + str(compressed_size_y))
+#        print("Compress matrix " + str(self.sizeX) + "x" + str(self.sizeY) + " => " + str(compressed_size_x) + "x" + str(compressed_size_y))
         compressed_matrix = Matrix(self.name, compressed_size_x, compressed_size_y, defaultValue)
 
         for y in range(self.sizeY):

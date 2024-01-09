@@ -2,6 +2,7 @@
 # Library for Advent of Code solutions
 # https://adventofcode.com/
 #
+import sys
 import time
 import traceback
 
@@ -39,7 +40,12 @@ class bcolors:
 
 
 def loadfile(filename):
-    file = open(filename)
+
+    path = ""
+    if len(sys.argv ) > 1:
+        path = sys.argv[1] + "/"
+
+    file = open(path + filename)
     lines = file.readlines()
     newLines = []
     for line in lines:

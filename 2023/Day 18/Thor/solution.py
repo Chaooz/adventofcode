@@ -61,7 +61,7 @@ def solvePuzzle1(filename, args):
     colorList = list()
     colorList.append(("O", bcolors.WHITE))
     colorList.append(("#", bcolors.DARK_GREY))
-    smallMatrix.PrintWithColor(colorList, bcolors.DARK_GREY , " ", "")
+#    smallMatrix.PrintWithColor(colorList, bcolors.DARK_GREY , " ", "")
 
     sum = matrix.Count("#")
     sum += matrix.Count(".")
