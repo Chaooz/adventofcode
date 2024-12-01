@@ -3,19 +3,24 @@ import sys
 sys.path.insert(1, '../../../Libs')
 from advent_libs import loadfile
 
-raw_array = loadfile("input.txt")
+# Load the data from the input file
+raw_list = loadfile("input.txt")
 
+# Create 2 empty lists to store the numbers
 first_num = []
 second_num = []
 
-for line in raw_array:
+# Add the 2 numbers to its respective list
+for line in raw_list:
     new_line = line.split("   ")
     first_num.append(int(new_line[0]))
     second_num.append(int(new_line[1]))
 
+# Sort the lists
 first_num.sort()
 second_num.sort()
 
+# Initialize variables
 distance = 0
 iteration = 0
 
@@ -28,8 +33,11 @@ for number in first_num:
     distance += diff
     iteration += 1
 
+# Print the distance score
 print("Total distance is " + str(distance))
 
+
+# Initialize variables
 similarity_score = 0
 
 # Find similarity score
@@ -37,4 +45,5 @@ for num in first_num:
     number_of_instances = second_num.count(num)
     similarity_score += number_of_instances * num
 
+# Print the similarity score
 print("Similarity score is " + str(similarity_score))
