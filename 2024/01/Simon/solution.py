@@ -32,6 +32,7 @@ print("Total distance is " + str(distance))
 
 similarity_score = 0
 
+# Find similarity score
 for num in first_num:
     number_of_instances = second_num.count(num)
     similarity_score += number_of_instances * num
