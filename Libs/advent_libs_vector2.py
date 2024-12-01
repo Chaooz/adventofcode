@@ -1,19 +1,12 @@
 
+import dataclasses as dc
+@dc.dataclass(frozen=True)
 class Vector2:
     x:int
     y:int
 
-    def __init__(self, input1 = None, input2 = None ):
-        if isinstance(input1, Vector2):
-            self.x = input1.x
-            self.y = input1.y
-        elif isinstance(input1,int) and isinstance(input2,int):
-            self.x = input1
-            self.y = input2
-        else:
-            self.x = 0
-            self.y = 0
-       
+    def Duplicate(self):
+        return Vector2(self.x,self.y)       
 
     def __eq__(self, other):
         if isinstance(other, Vector2):
@@ -44,13 +37,15 @@ class Vector2:
         return Vector2(x,y)
 
     def Normalize(self) :
-        if self.x > 0: self.x = 1
-        if self.x < 0: self.x = -1
-        if self.y > 0: self.y = 1
-        if self.y < 0: self.y = -1
-        if self.x == 0 and self.y == 0:
+        x = self.x
+        y = self.y
+        if x > 0: x = 1
+        if x < 0: x = -1
+        if y > 0: y = 1
+        if y < 0: y = -1
+        if x == 0 and y == 0:
             print("BUG!" + self.ToString())
-        return self
+        return Vector2(x,y)
     
     def Tuple(self) :
         return (self.x,self.y)
@@ -60,6 +55,11 @@ class Vector2:
 
     def sortHelper(vector):
         return vector.x
+
+    def rot(self, facing:int):
+        x = self.y * facing
+        y = self.x * facing
+        return Vector2(x,y)
 
     # def __gt__
     # def __eq__

@@ -33,12 +33,22 @@ class Matrix:
         newMatrix = Matrix(newTitle, self.sizeX, self.sizeY, defaultValue)
         return newMatrix
 
+    def Duplicate(self, newTitle:str):
+        newMatrix = Matrix(newTitle, self.sizeX, self.sizeY, "")
+        for y in range(self.sizeY):
+            for x in range(self.sizeX):
+                newMatrix.data[x][y] = self.data[x][y]
+        return newMatrix
+
     # If point is inside the matrix
     def IsInside(self,x,y) -> bool:
         return x >= 0 and x < self.sizeX and y >= 0 and y < self.sizeY
 
     def IsPointInside(self, point:Vector2 ) -> bool:
         return point.x >= 0 and point.x < self.sizeX and point.y >= 0 and point.y < self.sizeY
+
+    def IsOutOfBounds(self, point:Vector2 ) -> bool:
+        return self.IsPointInside(point) == False
 
     def Set(self,x, y, character ):
         if self.IsInside(x,y):
@@ -51,6 +61,11 @@ class Matrix:
             self.data[point.x][point.y] = character
         else:
             print_error("Matrix.Set : " + point.ToString() + " is outside of matrix")
+
+    def SetMatrix(self,matrix):
+        for y in range(matrix.sizeY):
+            for x in range(matrix.sizeX):
+                self.data[x][y] = matrix.data[x][y]
 
     def Get(self, x, y):
         if self.IsInside(x,y):
@@ -86,7 +101,7 @@ class Matrix:
 
     def CreateFromFile(textfile:str, defaultValue:str):
         file_lines = loadfile(textfile)
-        return CreateFromList(textfile, file_lines, defaultValue)
+        return Matrix.CreateFromList(textfile, file_lines, defaultValue)
 
     def FindFirst(self, character:str):
         for y in range(self.sizeY):
@@ -94,6 +109,121 @@ class Matrix:
                 if self.data[x][y] == character:
                     return Vector2(x,y)
         return None
+
+    # Count the number of occurances of a character
+    def Count(self, character:str):
+        sum = 0
+        for y in range(self.sizeY):
+            for x in range(self.sizeX):
+                if self.data[x][y] == character:
+                    sum += 1
+        return sum
+
+    def RotateLeft(self):
+        newMatrix = Matrix(self.name, self.sizeY, self.sizeX, "." )
+        for y in range(0, self.sizeY):
+            for x in range(0, self.sizeX):
+                newMatrix.Set(y, self.sizeX - x - 1, self.Get(x, y))
+        self.SetMatrix(newMatrix)
+
+    def RotateRight(self):
+        newMatrix = Matrix(self.name, self.sizeY, self.sizeX, "." )
+        for y in range(0, self.sizeY):
+            for x in range(0, self.sizeX):
+                newMatrix.Set(self.sizeY - y - 1, x, self.Get(x, y))
+        self.SetMatrix(newMatrix)
+
+
+    def Raytrace(self, start:Vector2, direction:Vector2, openSpace:str):
+        position = start
+        while True:
+            if self.IsOutOfBounds(position):
+                return None
+
+            char = self.Get(position.x, position.y)
+            if char != openSpace:
+                return position
+        
+            position = position + direction
+
+    def FillAreaOuterInternal(self, visit:list, position, wall:str, fill:str):
+
+        path_list = list()
+        path_list.append(position)
+
+        while True:
+
+            if len(path_list) == 0:
+                return
+
+            position = path_list.pop()
+
+            if self.IsOutOfBounds(position):
+                continue
+
+            char = self.GetPoint(position)
+            if char == wall:
+                continue
+
+            if char == fill:
+                continue
+            
+            self.SetPoint(position, fill)
+
+            path_list.append(position + Vector2(1,0))
+            path_list.append(position + Vector2(-1,0))
+            path_list.append(position + Vector2(0,1))
+            path_list.append(position + Vector2(0,-1))
+
+
+    def FillAreaOuter(self, position, wall:str, character:str):
+
+        visited = list()
+        size = self.sizeX
+        for x in range(size):
+            self.FillAreaOuterInternal(visited, Vector2(x,0), wall, character)
+            self.FillAreaOuterInternal(visited, Vector2(x,size-1), wall, character)
+            self.FillAreaOuterInternal(visited, Vector2(0,x), wall, character)
+            self.FillAreaOuterInternal(visited, Vector2(size-1,x), wall, character)
+
+
+    def FillArea(self, position:Vector2, openSpace:str, character:str):
+        for y in range(self.sizeY):
+            isInside = False
+            lastIsWall = False
+            for x in range(self.sizeX):
+                char = self.data[x][y]
+                if isInside == False and char == openSpace and lastIsWall == True:
+                    # Check if we have a wall after this openSpace
+                    if self.Raytrace(Vector2(x,y), Vector2(1,0), openSpace) != None:
+                        isInside = True
+                elif isInside == True and char == openSpace and lastIsWall == True:
+                    isInside = False
+
+                if isInside and char == openSpace:
+                    self.data[x][y] = character
+
+                lastIsWall = char != openSpace
+
+    # Create a new Matrix with scaledown version
+    def GetScaledMatrix(self, rate, defaultValue):
+
+        compressed_size_x = int(self.sizeX / rate)
+        compressed_size_y = int(self.sizeY / rate)
+
+#        print("Compress matrix " + str(self.sizeX) + "x" + str(self.sizeY) + " => " + str(compressed_size_x) + "x" + str(compressed_size_y))
+        compressed_matrix = Matrix(self.name, compressed_size_x, compressed_size_y, defaultValue)
+
+        for y in range(self.sizeY):
+            for x in range(self.sizeX):
+                xx = int(x/rate)
+                yy = int(y/rate)
+
+                val = self.data[x][y]
+                if compressed_matrix.data[xx][yy] == defaultValue:
+                    compressed_matrix.data[xx][yy] = val
+
+        return compressed_matrix
 
 #
 # Depricated
@@ -266,7 +396,7 @@ def print_matrix_colorlist(text,matrix, valueList, color, defaultColor, pad = "0
     if len(pad)>1:
         for i in range(pad_size):
             pad_header_x += "0"
-        pad_header_x = pad[0] + pad_header_x[0] + pad_header_x[1]
+#        pad_header_x = pad[0] + pad_header_x[0] + pad_header_x[1]
 
     for x in range(size_x):
         xx = x % 10
@@ -275,9 +405,9 @@ def print_matrix_colorlist(text,matrix, valueList, color, defaultColor, pad = "0
 
         xxPad = pad_number( xx , pad_header_x )
 
-        if xx == 0:
-            xxPad = bcolors.BOLD + bcolors.WHITE + xxPad
-        xxPad = xxPad + bcolors.BOLD + bcolors.DARK_GREY
+#        if xx == 0:
+#            xxPad = bcolors.BOLD + bcolors.WHITE + xxPad
+        xxPad = bcolors.WHITE + xxPad + bcolors.DARK_GREY
 
         header2 += xxPad
         for i in range(pad_size):
@@ -285,7 +415,7 @@ def print_matrix_colorlist(text,matrix, valueList, color, defaultColor, pad = "0
         header2 = header2 + space
         header = header + space
 
-    print(bcolors.BOLD + color + header2)
+    print(bcolors.BOLD + color +  header2)
     print(bcolors.BOLD + defaultColor + header)
 
     pady = ""
@@ -294,7 +424,7 @@ def print_matrix_colorlist(text,matrix, valueList, color, defaultColor, pad = "0
 
     for y in range(size_y):
         line = ""
-        line = line + bcolors.BOLD + color
+        line = line + bcolors.BOLD + bcolors.WHITE
         line = line + pad_number(y,pady)
         line = line + defaultColor
         line = line + " | "

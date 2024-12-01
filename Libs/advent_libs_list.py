@@ -34,10 +34,11 @@ class Vector2List:
 
     def appendList(self, data:list) -> None:
         for entry in data:
-            if ( len( entry > 2 ) ):
-                self.data.append( Vector2( entry[0], entry[1] ), entry[3])
-            else:
-                self.data.append( Vector2( entry[0], entry[1] ))
+            self.data.append(entry)
+#            if ( len( entry > 2 ) ):
+#                self.data.append( Vector2( entry[0], entry[1] ), entry[3])
+#            else:
+#                self.data.append( Vector2( entry[0], entry[1] ))
 
     def append(self,data:Vector2):
         self.data.append(data)
@@ -114,6 +115,20 @@ class Vector2List:
 
     def Sort(self):
         self.data.sort(key=self.sortHelper)
+
+    def Duplicate(self):
+        newList = Vector2List(self.name + "_copy")
+        for vec in self.data:
+            newList.append(vec)
+        return newList
+
+    def Reverse(self):
+        copy = self.Duplicate()
+        copy.ReverseSelf()
+        return copy
+
+    def ReverseSelf(self):
+        self.data.reverse()
 
 
 #

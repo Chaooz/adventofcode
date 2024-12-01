@@ -1,5 +1,5 @@
 #!/usr/local/bin/python3
-# https://adventofcode.com/2023/day/2
+# https://adventofcode.com/2023/day/13
 
 import sys
 import math
@@ -15,7 +15,12 @@ print_color("Day 13: Point of Incidence", bcolors.OKGREEN)
 print("")
 
 def SetBit(number, bit):
+#    print ("SetBit:", number, bit)
     return number | ( 1 << bit )
+
+def IsBitSet(number, bit):
+#    print ("IsBitSet:", number, bit)
+    return number & ( 1 << bit )
 
 # function to check if x is power of 2
 def isPowerOfTwo( x ):
@@ -29,138 +34,240 @@ def isPowerOfTwo( x ):
 def differAtOneBitPos( a , b ):
     return isPowerOfTwo(a ^ b)
 
+def getBitDiff(a,b):
+    # 0b100000
+    diff = a^b
+    # 5 (the first position (backwards) which differs, 0 if a==b )
+    return diff.bit_length() - 1
+
 def is_mirror(mirror_list:list, line:int, check_bit:bool):
 
     mirror_once = True
+    mirror_line = 0
     for i in range(1,line):
 
         aa = line - i-1
         bb = line + i
 
         if aa < 0 or bb >= len(mirror_list):
-            return True
+            return True,line
 
         a = mirror_list[line - i - 1]
         b = mirror_list[line + i]
         if check_bit == False and a != b:
-            return False
+            return False,0
         elif check_bit == True and a != b:
             if mirror_once and differAtOneBitPos(a,b):
                 mirror_once = False
+                mirror_line = i
             else:
-                print("IsMirror false [2]:", line, a,b, i, mirror_list)
-                return False
+#                print("IsMirror false [2]:", line, a,b, i, mirror_list)
+                return False,0
 
-    return check_bit != mirror_once
-
-def mirror_value(mirror_list:list, check_bit:bool) -> int:
-#    print("Find mirror value")
-    line = 0
-    for i in range(1,len(mirror_list)):
-        a = mirror_list[i-1]
-        b = mirror_list[i]
-        if check_bit == False and a == b and is_mirror(mirror_list,i, False):
-            line = i
-            return i
-        elif check_bit == True and a!=b and differAtOneBitPos(a,b):
-            if is_mirror(mirror_list,i, False):
-                line = i
-                return i
-        elif check_bit == True and a==b:
-            if is_mirror(mirror_list,i, True):
-                line = i
-                return i
-    return line
-#    return abs(len(mirror_list) - line * 2)
-
-def mirror_rows(matrix:Matrix, check_bit:bool) -> int:
-    number_list = list()
-    for y in range(0,matrix.sizeY):
-        number = 0
-        for x in range(0,matrix.sizeX):
-            if ( matrix.Get(x,y) == "#"):
-                number = SetBit(number, x)
-        number_list.append(number)
-    return mirror_value(number_list, check_bit)
-
-def mirror_columns(matrix:Matrix, check_bit:bool) -> int:
-    number_list = list()
-    for x in range(0,matrix.sizeX):
-        number = 0
-        for y in range(0,matrix.sizeY):
-            if ( matrix.Get(x,y) == "#"):
-                number = SetBit(number, y)
-        number_list.append(number)
-    return mirror_value(number_list, check_bit)
-
-def mirror_matrix(matrix:Matrix, check_bit:bool) -> int:
-    number_list = list()
-    for x in range(0,matrix.sizeX):
-        number = 0
-        for y in range(0,matrix.sizeY):
-            if ( matrix.Get(x,y) == "#"):
-                number = SetBit(number, y)
-        number_list.append(number)
-    sum1,check_bit = mirror_value(number_list, check_bit)
-
-    number_list.clear()
-    for y in range(0,matrix.sizeY):
-        number = 0
-        for x in range(0,matrix.sizeX):
-            if ( matrix.Get(x,y) == "#"):
-                number = SetBit(number, x)
-        number_list.append(number)
-    sum2, check_bit = mirror_value(number_list, check_bit)
-
-    return sum1 + sum2 * 100
+    return check_bit != mirror_once, mirror_line
 
 
-def solveInternal(filename:str, check_bit:bool):
-    sum = 0
-
+#
+# Read all mirrors into a list of matrices
+#
+def read_mirrors(filename):
     lines = loadfile(filename)
 
     # Group lines
+    mirror_list = list()
     mirror = list()
     for line in lines:
         if line == "":
             matrix = Matrix.CreateFromList(filename, mirror, ".")
-#            sum += mirror_matrix(matrix, check_bit)
-            col = mirror_columns(matrix, check_bit)
-            sum += col
-#            if col == 0:
-            row = mirror_rows(matrix, check_bit)
-            sum += row * 100
-#                if row == 0:
-#                    print("FOUND NO MIRROR")
+            mirror_list.append(matrix)
             mirror.clear()
         else:
             mirror.append(line)
 
-    matrix = Matrix.CreateFromList(filename, mirror, ".")
-    col = mirror_columns(matrix, check_bit)
-    sum += col
-#    if col == 0:
-    row = mirror_rows(matrix, check_bit)
-    sum += row * 100
-#        if row == 0:
-#            print("FOUND NO MIRROR")
-#    sum += mirror_matrix(matrix, check_bit)
+    if len(mirror) > 0:
+        matrix = Matrix.CreateFromList(filename, mirror, ".")
+        mirror_list.append(matrix)
+    
+    return mirror_list
+
+#
+# Convert each row in the matrix to a number based on # and . (bitwise)
+#
+def get_rows_from_matrix(matrix:Matrix):
+    number_list = list()
+    for x in range(0,matrix.sizeX):
+        number = 0
+        for y in range(0,matrix.sizeY):
+            if ( matrix.Get(x,y) == "#"):
+                number = SetBit(number, y)
+        number_list.append(number)
+    return number_list
+
+#
+# Convert each column in the matrix to a number based on # and . (bitwise)
+#
+def get_columns_from_matrix(matrix:Matrix):
+    number_list = list()
+    for y in range(0,matrix.sizeY):
+        number = 0
+        for x in range(0,matrix.sizeX):
+            if ( matrix.Get(x,y) == "#"):
+                number = SetBit(number, x)
+        number_list.append(number)
+    return number_list
+
+
+def mirror_matrix(matrix:Matrix) -> int:
+    number_list = get_rows_from_matrix(matrix)
+    mirror_row, changed_row = mirror_value(number_list, check_bit)
+
+    # If we have flipped a bit, set it in the matrix
+    # Cannot change the column bit
+    print("row:",mirror_row,changed_row)
+    if check_bit and changed_row > 0:
+        numberA = number_list[changed_row]
+        numberB = number_list[changed_row - 1]
+        print("Flip bit for line :", changed_row, "A:",numberA, "B:", numberB, " list:", number_list)
+        check_bit = False
+        
+    number_list = get_columns_from_matrix(matrix)
+    mirrow_col, change_col = mirror_value(number_list, check_bit)
+
+    return mirror_row + mirrow_col * 100
+
+#
+# Check if all the lines around the line are equal
+# 
+def all_lines_around_are_equal(mirror_list:list, line:int) -> bool:
+    for j in range(1, len(mirror_list)):
+        indexA = line - j - 1
+        indexB = line + j
+        if indexA < 0 or indexB >= len(mirror_list):
+            return True
+        
+        aa = mirror_list[indexA]
+        bb = mirror_list[indexB]
+        if aa != bb:
+            return False
+    return True
+
+def smudge_in_mirror(mirror_list:list, line:int) -> bool:    
+    smudgeLine = 0
+    for j in range(1, len(mirror_list)):
+        indexA = line - j - 1
+        indexB = line + j
+        if indexA < 0 or indexB >= len(mirror_list):
+            return smudgeLine
+        
+        aa = mirror_list[indexA]
+        bb = mirror_list[indexB]
+
+        if differAtOneBitPos(aa,bb) and smudgeLine == 0:
+            smudgeLine = j
+        elif differAtOneBitPos(aa,bb):
+            return 0
+    return smudgeLine
+
+#
+# Return the line number where the mirror is equal
+#
+def mirror_equal(mirror_list) -> bool:
+    for i in range(1,len(mirror_list)):
+        a = mirror_list[i-1]
+        b = mirror_list[i]
+        if a == b and all_lines_around_are_equal(mirror_list, i):
+            return i        
+    return 0
+
+#
+# Return the line number where the mirror is equal, but the line is flipped
+#
+def mirror_equal_flipped(mirror_list) -> bool:
+    for i in range(1,len(mirror_list)):
+        a = mirror_list[i-1]
+        b = mirror_list[i]
+        if differAtOneBitPos(a,b) and all_lines_around_are_equal(mirror_list, i):
+            return i        
+    return 0
+
+def mirror_equal_other_flipped(mirror_list) -> bool:
+    smudge_line = 0
+    for i in range(1,len(mirror_list)):
+        a = mirror_list[i-1]
+        b = mirror_list[i]
+        if a==b:
+            smudge_line = smudge_in_mirror(mirror_list, i)
+            if smudge_line > 0:
+                return i,smudge_line
+    return 0,0
+
+def solvePuzzle1(filename):
+    sum = 0
+    mirror_list = read_mirrors(filename)
+    for mirror in mirror_list:
+        rows = get_rows_from_matrix(mirror)
+        cols = get_columns_from_matrix(mirror)
+        mirror_row = mirror_equal(rows)        
+        mirrow_col = mirror_equal(cols)
+        sum += mirror_row + mirrow_col * 100
+    return sum
+
+# Line is 3, bit is 5
+def flip_bit_in_line(line1:int, line2:int, source_list:list, dest_list:list):
+    a = source_list[line1]
+    b = source_list[line2]
+    c = getBitDiff(a,b)
+
+    if c < 0:
+        print("WOA", line1, line2, a,b,c, source_list)
+
+    if line1 == 0:
+        print("WOA2", a,b,c)
+
+    if IsBitSet(a,c):
+        dest_list[c] = SetBit(dest_list[c], line2)
+    else:
+        dest_list[c] = SetBit(dest_list[c], line1)
+
+    return dest_list
+
+def solvePuzzle2(filename):
+    sum = 0
+    mirror_list = read_mirrors(filename)
+    for mirror in mirror_list:
+        rows = get_rows_from_matrix(mirror)
+        cols = get_columns_from_matrix(mirror)
+
+        # Check if the line is flipped
+        mirror_row = mirror_equal_flipped(rows)
+        if mirror_row > 0:
+            cols = flip_bit_in_line(mirror_row,mirror_row-1, rows, cols)
+
+        mirror_col = mirror_equal_flipped(cols)
+        if mirror_col > 0:
+            rows = flip_bit_in_line(mirror_col,mirror_col-1, cols, rows)
+
+        # Check if the smudge is somewhere else
+        if mirror_row == 0 and mirror_col == 0:
+            mirror_row, smudge_line = mirror_equal_other_flipped(rows)
+            if smudge_line > 0:
+                mirror.Print()
+                offset = mirror_row - smudge_line
+                print("smudge", mirror_row, smudge_line, offset,len(rows),len(cols))
+                cols = flip_bit_in_line(smudge_line, mirror_row + offset, rows, cols)
+
+            mirror_col, smudge_line = mirror_equal_other_flipped(cols)
+
+        sum += mirror_row + mirror_col * 100
 
     return sum
 
-def solvePuzzle1(filename):
-    return solveInternal(filename, False)
+#unittest(solvePuzzle1, 5 , "unittest1.txt")
+#unittest(solvePuzzle1, 400 , "unittest2.txt")
+#unittest(solvePuzzle1, 405 , "unittest3.txt")
+#unittest(solvePuzzle1, 33780 , "input.txt")
 
-def solvePuzzle2(filename):
-    return solveInternal(filename, True)
-
-unittest(solvePuzzle1, 5 , "unittest1.txt")
-unittest(solvePuzzle1, 400 , "unittest2.txt")
-unittest(solvePuzzle1, 405 , "unittest3.txt")
-unittest(solvePuzzle1, 33780 , "input.txt")
-
-unittest(solvePuzzle2, 300 , "unittest1.txt")
-unittest(solvePuzzle2, 100 , "unittest2.txt")
+unittest(solvePuzzle2, 300 , "unittest1.txt")   # Top left corner is flipped
+unittest(solvePuzzle2, 100 , "unittest2.txt")   # Mirror line is flipped
 unittest(solvePuzzle2, 400 , "unittest4.txt")
 unittest(solvePuzzle2, 23479 , "input.txt")
