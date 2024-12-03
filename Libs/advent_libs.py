@@ -54,6 +54,21 @@ def loadfile(filename):
     file.close()
     return newLines
 
+def loadfile_as_string(filename) -> str:
+
+    path = ""
+    if len(sys.argv ) > 1:
+        path = sys.argv[1] + "/"
+
+    file = open(path + filename)
+    lines = file.readlines()
+    newLines = ""
+    for line in lines:
+        line = line.replace("\n", "")
+        newLines += line
+    file.close()
+    return newLines
+
 def point_to_str(text,point):
     return text + str(point[0]) + "x" + str(point[1])
 
