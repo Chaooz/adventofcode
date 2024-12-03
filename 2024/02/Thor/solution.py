@@ -5,13 +5,12 @@ import sys
 
 # Import custom libraries
 sys.path.insert(1, '../../../Libs')
-sys.path.insert(1, '/Users/thorh/Develop/DarkFactor/adventofcode/Libs')
+sys.path.insert(1, '../Libs')
+#sys.path.insert(1, '/Users/thorh/Develop/DarkFactor/adventofcode/Libs')
 
 from advent_libs import *
 
-print("")
-print_color("Day 2: Red-Nosed Reports", bcolors.OKGREEN)
-print("")
+setupCode("Day 2: Red-Nosed Reports")
 
 def diffLine(siffer):
     # Convert to int array
@@ -65,8 +64,8 @@ def testunit(line,b):
 unittest_input(testunit, False, 1, "11 9 7 4 2")
 
 unittest(solvePuzzle1, 2, "unittest1.txt")     
-unittest(solvePuzzle1, 486, "input.txt")
-
 unittest(solvePuzzle2, 4, "unittest1.txt")
-unittest(solvePuzzle2, 540, "input.txt")
+
+runCode(2,solvePuzzle1, 486, "input.txt")
+runCode(2,solvePuzzle2, 540, "input.txt")
 

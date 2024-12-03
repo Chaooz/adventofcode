@@ -5,13 +5,12 @@ import sys
 
 # Import custom libraries
 sys.path.insert(1, '../../../Libs')
-sys.path.insert(1, '/Users/thorh/Develop/DarkFactor/adventofcode/Libs')
+sys.path.insert(1, '../Libs')
+#sys.path.insert(1, '/Users/thorh/Develop/DarkFactor/adventofcode/Libs')
 
 from advent_libs import *
 
-print("")
-print_color("Day 1: Historian Hysteria", bcolors.OKGREEN)
-print("")
+setupCode("Day 1: Historian Hysteria")
 
 def solvePuzzle1(filename):
     sum = 0
@@ -63,8 +62,8 @@ def solvePuzzle2(filename):
     return sum
 
 unittest(solvePuzzle1, 11, "unittest1.txt")     
-unittest(solvePuzzle1, 2285373, "input.txt")     
-
 unittest(solvePuzzle2, 31, "unittest1.txt")
-unittest(solvePuzzle2, 21142653, "input.txt")     
+
+runCode(1,solvePuzzle1, 2285373, "input.txt")     
+runCode(1,solvePuzzle2, 21142653, "input.txt")     
 

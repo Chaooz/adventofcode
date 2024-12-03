@@ -6,6 +6,9 @@ import sys
 import time
 import traceback
 
+class UNITTEST:
+    UNITTESTS_ENABLED = True
+
 # print("\033[0;37;40m Normal text\n")
 # print("\033[2;37;40m Underlined text\033[0;37;40m \n")
 # print("\033[1;37;40m Bright Colour\033[0;37;40m \n")
@@ -38,12 +41,20 @@ class bcolors:
     YELLOW = '\033[1;33;40m'
     RED = '\033[91m'
 
+def getSafeArg(name):
+    for arg in sys.argv:
+        p = arg.split("=")
+        if len(p) > 1:
+            if p[0] == name:
+                return p[1]
+    return ""
 
 def loadfile(filename):
 
     path = ""
-    if len(sys.argv ) > 1:
-        path = sys.argv[1] + "/"
+    arg = getSafeArg("PATH")
+    if arg != "":
+        path = path + arg + "/"
 
     file = open(path + filename)
     lines = file.readlines()
@@ -57,8 +68,9 @@ def loadfile(filename):
 def loadfile_as_string(filename) -> str:
 
     path = ""
-    if len(sys.argv ) > 1:
-        path = sys.argv[1] + "/"
+    arg = getSafeArg("PATH")
+    if arg != "":
+        path = path + arg + "/"
 
     file = open(path + filename)
     lines = file.readlines()
@@ -100,14 +112,35 @@ def pad_number(number,pad):
             num_str = pad[l2-i-1] + num_str
     return num_str
 
-def unittest( func, expected, filename ):
+def setupCode(header):
+    for arg in sys.argv:
+        if arg == "COMPACT":
+            UNITTEST.UNITTESTS_ENABLED = False
+    if UNITTEST.UNITTESTS_ENABLED:
+        print("")
+        print_color(header, bcolors.OKGREEN)
+        print("")
+
+def runCode( day, func, expected, filename ):
     st = time.time()
     code_result = func(filename)
     et = time.time()
     strTime = " (execution time:" + str(round(et-st,2)) + ")"
 
     if code_result == expected:
-        print_ok("Unittest " + func.__name__ + " with " + str(code_result) + " is OK! input:" + str(filename) + strTime)
+        print_ok("[Day " +  str(day) + "] Running " + func.__name__ + " with " + str(code_result) + " is OK! input:" + str(filename) + strTime)
+    else:
+        print_warning("[Day " + str(day) + "] Running " + func.__name__ + " with " + str(code_result) + " is NOT OK!  Expected:" + str(expected) + " input:" + str(filename) + strTime)
+
+def unittest( func, expected, filename ):    
+    st = time.time()
+    code_result = func(filename)
+    et = time.time()
+    strTime = " (execution time:" + str(round(et-st,2)) + ")"
+
+    if code_result == expected:
+        if UNITTEST.UNITTESTS_ENABLED:
+            print_ok("Unittest " + func.__name__ + " with " + str(code_result) + " is OK! input:" + str(filename) + strTime)
     else:
         print_warning("Unittest " + func.__name__ + " with " + str(code_result) + " is NOT OK!  Expected:" + str(expected) + " input:" + str(filename) + strTime)
 
@@ -119,7 +152,8 @@ def unittest_input( func, input, expected, filename ):
     strTime = " (execution time:" + str(round(et-st,2)) + ")"
 
     if code_result == expected:
-        print_ok("Unittest " + func.__name__ + "(" + str(input) + ") with " + str(code_result) + " is OK! input:" + str(filename) + strTime)
+        if UNITTEST.UNITTESTS_ENABLED:
+            print_ok("Unittest " + func.__name__ + "(" + str(input) + ") with " + str(code_result) + " is OK! input:" + str(filename) + strTime)
     else:
         print_warning("Unittest " + func.__name__ + "(" + str(input) + ") with " + str(code_result) + " is NOT OK! Got:" + str(code_result) + " Expected:" + str(expected) + " input:" + str(filename) + strTime)
 

@@ -6,13 +6,12 @@ import re
 
 # Import custom libraries
 sys.path.insert(1, '../../../Libs')
-sys.path.insert(1, '/Users/thorh/Develop/DarkFactor/adventofcode/Libs')
+sys.path.insert(1, '../Libs')
+#sys.path.insert(1, '/Users/thorh/Develop/DarkFactor/adventofcode/Libs')
 
 from advent_libs import *
 
-print("")
-print_color("Day 3: Mull It Over", bcolors.OKGREEN)
-print("")
+setupCode("Day 3: Mull It Over")
 
 #
 # Generate a proper list of numbers
@@ -77,6 +76,6 @@ unittest(solvePuzzleLine, 161, "xmul(2,4)%&mul[3,7]!@^do_not_mul(5,5)+mul(32,64]
 # 48 (2*4 + 8*5)
 unittest(solvePuzzleLine2, 48, "xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))")
 
-unittest(solvePuzzle1, 157621318, "input.txt")
-unittest(solvePuzzle2, 79845780, "input.txt")
+runCode(3,solvePuzzle1, 157621318, "input.txt")
+runCode(3,solvePuzzle2, 79845780, "input.txt")
 
