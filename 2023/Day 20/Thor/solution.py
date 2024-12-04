@@ -10,9 +10,7 @@ sys.path.insert(1, '../../../Libs')
 #from ...Libs.advent_libs import *
 from advent_libs import *
 
-print("")
-print_color("Day 20: Pulse Propagation", bcolors.OKGREEN)
-print("")
+setupCode("Day 20: Pulse Propagation")
 
 class Module:
     OPERAND_NONE = 0
