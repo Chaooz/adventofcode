@@ -3,12 +3,15 @@
 #
 
 #!/usr/lib/python3
+# https://adventofcode.com/2022/day/6
 
 import sys
 
 # Import custom libraries
 sys.path.insert(1, '../../../Libs')
 from advent_libs import *
+
+setupCode("Day 6: Tuning Trouble")
 
 # start of packet marker ( 4 characters that are all different )
 
@@ -42,19 +45,12 @@ def decodeLargeMessage(message):
     return decodeMessage(message,14)
 
 def solvePuzzle1(filename):
-    file = open(filename)
-    message = file.read()
+    message = loadfile_as_string(filename)
     return decodeSmallMessage(message)
 
 def solvePuzzle2(filename):
-    file = open(filename)
-    message = file.read()
+    message = loadfile_as_string(filename)
     return decodeLargeMessage(message)
-
-
-print("")
-print_color("Day 6: Tuning Trouble", bcolors.OKGREEN)
-print("")
 
 unittest(decodeSmallMessage, 7, "mjqjpqmgbljsphdztnvjfqwrcgsmlb")
 unittest(decodeSmallMessage, 5, "bvwbjplbgvbhsrlpgdmjqwftvncz")
@@ -68,7 +64,7 @@ unittest(decodeLargeMessage, 23, "nppdvjthqldpwncqszvftbrmjlhg")
 unittest(decodeLargeMessage, 29, "nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg")
 unittest(decodeLargeMessage, 26, "zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw")
 
-unittest(solvePuzzle1, 1794, "puzzleinput.txt")
-unittest(solvePuzzle2, 2851, "puzzleinput.txt")
-unittest(solvePuzzle1, 1766, "puzzleinput_work.txt")
-unittest(solvePuzzle2, 2383, "puzzleinput_work.txt")
+runCode(6,solvePuzzle1, 1794, "puzzleinput.txt")
+runCode(6,solvePuzzle2, 2851, "puzzleinput.txt")
+#runCode(6,solvePuzzle1, 1766, "puzzleinput_work.txt")
+#runCode(6,solvePuzzle2, 2383, "puzzleinput_work.txt")

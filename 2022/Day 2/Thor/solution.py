@@ -1,10 +1,13 @@
 #!/usr/lib/python3
+# https://adventofcode.com/2022/day/2
 
 import sys
 
 # Import custom libraries
 sys.path.insert(1, '../../../Libs')
 from advent_libs import *
+
+setupCode("Day 2: Rock Paper Scissors")
 
 _Rock = "A"
 _Paper = "B"
@@ -200,5 +203,5 @@ unittest_input(calculateFullScore, "Y", 8, "A" )
 unittest( useStrategyGuide, 15, ["A Y","B X", "C Z"])
 unittest( useRulesFromGuide, 12, ["A Y","B X", "C Z"])
 
-unittest( solvePuzzle1, 11906, "puzzleinput.txt")
-unittest( solvePuzzle2, 11186, "puzzleinput.txt")
+runCode( 2, solvePuzzle1, 11906, "puzzleinput.txt")
+runCode( 2, solvePuzzle2, 11186, "puzzleinput.txt")

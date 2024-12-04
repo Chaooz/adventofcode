@@ -4,6 +4,7 @@
 #
 
 #!/usr/lib/python3
+# https://adventofcode.com/2022/day/5
 
 import sys
 
@@ -11,8 +12,12 @@ import sys
 sys.path.insert(1, '../../../Libs')
 from advent_libs import *
 
+setupCode("Day 5: Supply Stacks")
 
 def debugPrintPile(pile):
+
+    if UNITTEST.DEBUG_ENABLED == False:
+        return
 
     # Get max height
     maxHeight = 0
@@ -81,9 +86,7 @@ def solvePuzzle1(filename):
     debugPrintPile(pile)
     return 0
 
-print("")
-print_color("Day 5: Supply Stacks", bcolors.OKGREEN)
-print("")
+unittest(solvePuzzle1, "CMZ", "unittest1.txt")
 
-#unittest(solvePuzzle1, 1, "unittest1.txt")
-unittest(solvePuzzle1, 1, "puzzleinput.txt")
+runCode(5,solvePuzzle1, "VQZNJMWTR", "puzzleinput.txt")
+runCode(5,solvePuzzle1, "NLCDCLVMQ", "puzzleinput.txt")

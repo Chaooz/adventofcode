@@ -1,10 +1,15 @@
 #!/usr/lib/python3
+# https://adventofcode.com/2022/day/4
 
 import sys
 
 # Import custom libraries
 sys.path.insert(1, '../../../Libs')
+sys.path.insert(1, '../Libs')
+
 from advent_libs import *
+
+setupCode("Day 1: Calorie Counting")
 
 #
 # Return all elfs and their calories count
