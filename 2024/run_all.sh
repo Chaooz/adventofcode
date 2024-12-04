@@ -1,6 +1,6 @@
 export PYTHONPATH=/Users/thorh/Develop/DarkFactor/adventofcode/Libs
 
-for i in {1..3}
+for i in {1..4}
 do
-   python3 "$i/Thor/solution.py" "PATH=$i/Thor" "COMPACT"
+   python3 "0$i/Thor/solution.py" "PATH=0$i/Thor" "COMPACT"
 done

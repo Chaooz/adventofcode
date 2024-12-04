@@ -1,5 +1,5 @@
 #!/usr/local/bin/python3
-# https://adventofcode.com/2023/day/2
+# https://adventofcode.com/2023/day/20
 
 import sys
 import math
@@ -52,7 +52,7 @@ class Module:
         return "high"
 
     def HandlePulse(self, pulseFrom:str, pulse:int):
-        print("Handle pulse", pulseFrom, "-", Module.GetPulseName(self.pulse), "- => ", self.name, " op:", Module.GetOpName(self.op) )
+        #print("Handle pulse", pulseFrom, "-", Module.GetPulseName(self.pulse), "- => ", self.name, " op:", Module.GetOpName(self.op) )
 
         # The pulse is just passed on
         if self.op == Module.OPERAND_BROADCASTER:
@@ -106,7 +106,8 @@ def runIteration(module_list:int, max_iter:int):
         i = i + 1
         if i > max_iter:
             print("Max iterations : ", i)
-            exit(0)
+            return
+#            exit(0)
 
         module = module_list[key]
 
@@ -123,7 +124,7 @@ def runIteration(module_list:int, max_iter:int):
 def solvePuzzle1(filename):
     module_list = readInput(filename)
 
-    runIteration(module_list, 10)
+    runIteration(module_list, 1000)
 
     low_pulses = 0
     high_pulses = 0
