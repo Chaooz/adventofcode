@@ -8,6 +8,7 @@ import traceback
 
 class UNITTEST:
     UNITTESTS_ENABLED = True
+    DEBUG_ENABLED = False
 
 # print("\033[0;37;40m Normal text\n")
 # print("\033[2;37;40m Underlined text\033[0;37;40m \n")
@@ -116,6 +117,7 @@ def setupCode(header):
     for arg in sys.argv:
         if arg == "COMPACT":
             UNITTEST.UNITTESTS_ENABLED = False
+            UNITTEST.DEBUG_ENABLED = False
     if UNITTEST.UNITTESTS_ENABLED:
         print("")
         print_color(header, bcolors.OKGREEN)
@@ -125,9 +127,16 @@ def runCode( day, func, expected, filename ):
     st = time.time()
     code_result = func(filename)
     et = time.time()
-    strTime = " (execution time:" + str(round(et-st,2)) + ")"
+    exeTime = round(et-st,2)
+    strTime = " (execution time:" + str(exeTime) + ")"
 
     if code_result == expected:
+
+        if exeTime >= 10:
+            strTime = " (execution time:" + bcolors.RED + str(exeTime) + bcolors.OKGREEN + ")"
+        elif exeTime >= 1:
+            strTime = " (execution time:" + bcolors.WARNING + str(exeTime) + bcolors.OKGREEN + ")"
+
         print_ok("[Day " +  str(day) + "] Running " + func.__name__ + " with " + str(code_result) + " is OK! input:" + str(filename) + strTime)
     else:
         print_warning("[Day " + str(day) + "] Running " + func.__name__ + " with " + str(code_result) + " is NOT OK!  Expected:" + str(expected) + " input:" + str(filename) + strTime)
@@ -163,7 +172,7 @@ def print_assert(value,text):
         assert False
 
 def print_error(text):
-    print(bcolors.WARNING + "[ERROR]   " + text + bcolors.RESET)
+    print(bcolors.RED + "[ERROR]   " + text + bcolors.RESET)
     traceback.print_stack()
 
 def print_warning(text):
@@ -175,7 +184,17 @@ def print_ok(text):
 def print_color(text,color):
     print(color + "          " + text + bcolors.RESET)
 
-def print_debug(text):
-    print(text)
-    pass
+def print_debug(text,a=None,b=None,c=None,d=None,e=None):
+    if UNITTEST.DEBUG_ENABLED:
+        if a is not None:
+            text += " " + str(a)
+        if b is not None:  
+            text += " " + str(b)
+        if c is not None:
+            text += " " + str(c)
+        if d is not None:
+            text += " " + str(d)
+        if e is not None:
+            text += " " + str(e)
+        print(bcolors.DARK_GREY + "[DEBUG]   " + text + bcolors.RESET)
 

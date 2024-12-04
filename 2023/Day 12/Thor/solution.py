@@ -1,5 +1,5 @@
 #!/usr/local/bin/python3
-# https://adventofcode.com/2023/day/2
+# https://adventofcode.com/2023/day/12
 
 import sys
 import math
@@ -10,9 +10,7 @@ from advent_libs import *
 from advent_libs_vector2 import *
 from advent_libs_matrix import *
 
-print("")
-print_color("Day 12: Hot Springs", bcolors.OKGREEN)
-print("")
+setupCode("Day 12: Hot Springs")
 
 SYMBOL_LIST = ".#?"
 
@@ -179,8 +177,7 @@ unittest(solveLine2, 1 , "???.### 1,1,3")
 unittest(solveLine2, 16384 , ".??..??...?##. 1,1,3")
 unittest(solveLine2, 506250 , "?###???????? 3,2,1")
 
-unittest(solvePuzzle1, 7307, "input.txt")     
-
 unittest(solvePuzzle2, 525152, "unittest2.txt")
-unittest(solvePuzzle2, 3415570893842, "input.txt")     
 
+runCode(12,solvePuzzle1, 7307, "input.txt")     
+runCode(12,solvePuzzle2, 3415570893842, "input.txt")     

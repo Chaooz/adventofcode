@@ -9,9 +9,7 @@ from advent_libs import *
 from advent_libs_vector2 import *
 from advent_libs_matrix import *
 
-print("")
-print_color("Day 3: Gear Ratios", bcolors.OKGREEN)
-print("")
+setupCode("Day 3: Gear Ratios")
 
 class Gear:
     x:int
@@ -139,6 +137,7 @@ def solvePuzzle2(filename:str):
 
 
 unittest(solvePuzzle1, 4361, "unittest1.txt")
-unittest(solvePuzzle1, 528799, "input.txt")     
 unittest(solvePuzzle2, 467835, "unittest2.txt")  
-unittest(solvePuzzle2, 84907174, "input.txt")
+
+runCode(3,solvePuzzle1, 528799, "input.txt")     
+runCode(3,solvePuzzle2, 84907174, "input.txt")

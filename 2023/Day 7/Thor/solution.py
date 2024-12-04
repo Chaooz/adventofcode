@@ -10,9 +10,7 @@ from advent_libs_vector2 import *
 from advent_libs_matrix import *
 from enum import Enum
 
-print("")
-print_color("Day 7: Camel Cards", bcolors.OKGREEN)
-print("")
+setupCode("Day 7: Camel Cards")
 
 CARD_LIST = "123456789ABCDE"
 CARD_MAP = { "T":"A", "J":".", "Q":"C", "K":"D", "A":"E" }
@@ -178,7 +176,7 @@ unittest(getCardRule, RESULT.FOUR_OF_A_KIND, "22232")
 unittest(getCardRule, RESULT.FIVE_OF_A_KIND, "22222")
 
 unittest(solvePuzzle1, 6440, "unittest1.txt")
-unittest(solvePuzzle1, 250951660, "input.txt")     
-
 unittest(solvePuzzle2, 5905, "unittest1.txt")
-unittest(solvePuzzle2, 251481660, "input.txt")
+
+runCode(7,solvePuzzle1, 250951660, "input.txt")     
+runCode(7,solvePuzzle2, 251481660, "input.txt")

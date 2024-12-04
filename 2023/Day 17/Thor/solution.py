@@ -12,9 +12,7 @@ from advent_libs_vector2 import *
 from advent_libs_matrix import *
 from advent_libs_pathfinding import *
 
-print("")
-print_color("Day 17: Clumsy Crucible", bcolors.OKGREEN)
-print("")
+setupCode("Day 17: Clumsy Crucible")
 
 class CustomPathfindingRule():
 
@@ -99,8 +97,7 @@ def solvePuzzle2(filename):
 
 #unittest(solvePuzzle1, 102, "2023/Day 17/Thor/unittest1.txt")     
 unittest(solvePuzzle1, 102, "unittest1.txt")     
-unittest(solvePuzzle1, 665, "input.txt")     
-
 unittest(solvePuzzle2, 110, "unittest1.txt")
-unittest(solvePuzzle2, 809, "input.txt")     
 
+runCode(17,solvePuzzle1, 665, "input.txt")     
+runCode(17,solvePuzzle2, 809, "input.txt")     

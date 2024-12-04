@@ -10,9 +10,7 @@ sys.path.insert(1, '../../../Libs')
 #from ...Libs.advent_libs import *
 from advent_libs import *
 
-print("")
-print_color("Day 20: Pulse Propagation", bcolors.OKGREEN)
-print("")
+setupCode("Day 20: Pulse Propagation")
 
 class Module:
     OPERAND_NONE = 0
@@ -105,7 +103,7 @@ def runIteration(module_list:int, max_iter:int):
     while True:
         i = i + 1
         if i > max_iter:
-            print("Max iterations : ", i)
+            print_debug("Max iterations : ", i)
             return
 #            exit(0)
 
@@ -136,7 +134,7 @@ def solvePuzzle1(filename):
             high_pulses += 1
 
     sum = low_pulses * high_pulses
-    print("Sum:", low_pulses, " x ", high_pulses , " => ", sum )
+    print_debug("Sum:", low_pulses, " x ", high_pulses , " => ", sum )
     return sum
 
 def solvePuzzle2(filename):

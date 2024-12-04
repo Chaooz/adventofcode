@@ -10,9 +10,7 @@ from advent_libs import *
 from advent_libs_vector2 import *
 from advent_libs_matrix import *
 
-print("")
-print_color("Day 16: The Floor Will Be Lava", bcolors.OKGREEN)
-print("")
+setupCode("Day 16: The Floor Will Be Lava")
 
 #
 # Raytrace from position in direction until we hit a wall
@@ -151,8 +149,7 @@ def solvePuzzle2(filename):
     return max_sum
 
 unittest(solvePuzzle1, 46, "unittest1.txt")     
-unittest(solvePuzzle1, 7067, "input.txt")
-
 unittest(solvePuzzle2, 51, "unittest1.txt")
-unittest(solvePuzzle2, 7324, "input.txt")     
 
+runCode(16,solvePuzzle1, 7067, "input.txt")
+runCode(16,solvePuzzle2, 7324, "input.txt")     

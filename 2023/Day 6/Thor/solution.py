@@ -11,9 +11,7 @@ from advent_libs_matrix import *
 
 sys.setrecursionlimit(1500)
 
-print("")
-print_color("Day 6: Wait For It", bcolors.OKGREEN)
-print("")
+setupCode("Day 6: Wait For It")
 
 def runRace(raceTime:int, distance:int):
     numWays = 0
@@ -83,7 +81,7 @@ def solvePuzzle2(filename:str):
     return sum
 
 unittest(solvePuzzle1, 288, "unittest1.txt")
-unittest(solvePuzzle1, 170000, "input.txt")     
-
 unittest(solvePuzzle2, 71503, "unittest1.txt")
-unittest(solvePuzzle2, 20537782, "input.txt")
+
+runCode(6,solvePuzzle1, 170000, "input.txt")     
+runCode(6,solvePuzzle2, 20537782, "input.txt")

@@ -11,9 +11,7 @@ from advent_libs import *
 from advent_libs_vector2 import *
 from advent_libs_matrix import *
 
-print("")
-print_color("Day 19: Aplenty", bcolors.OKGREEN)
-print("")
+setupCode("Day 19: Aplenty")
 
 class Rule:
     char:str
@@ -196,7 +194,7 @@ def solvePuzzle2(filename):
     return sum
 
 unittest(solvePuzzle1, 19114, "unittest1.txt")     
-unittest(solvePuzzle1, 421983, "input.txt")     
-
 unittest(solvePuzzle2, 167409079868000, "unittest1.txt")
-unittest(solvePuzzle2, 129249871135292, "input.txt")     
+
+runCode(19,solvePuzzle1, 421983, "input.txt")     
+runCode(19,solvePuzzle2, 129249871135292, "input.txt")     

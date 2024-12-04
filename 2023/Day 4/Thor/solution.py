@@ -11,9 +11,7 @@ from advent_libs_matrix import *
 
 sys.setrecursionlimit(1500)
 
-print("")
-print_color("Day 4: Scratchcards", bcolors.OKGREEN)
-print("")
+setupCode("Day 4: Scratchcards")
 
 class Card:
     id:int
@@ -127,7 +125,7 @@ unittest(checkCardScore, 0, "Card 5: 87 83 26 28 32 | 88 30 70 12 93 22 82 36")
 unittest(checkCardScore, 0, "Card 6: 31 18 13 56 72 | 74 77 10 23 35 67 36 11")
 
 unittest(solvePuzzle1, 13, "unittest1.txt")
-unittest(solvePuzzle1, 23028, "input.txt")     
-
 unittest(solvePuzzle2, 30, "unittest1.txt")
-unittest(solvePuzzle2, 9236992, "input.txt")
+
+runCode(4,solvePuzzle1, 23028, "input.txt")     
+runCode(4,solvePuzzle2, 9236992, "input.txt")

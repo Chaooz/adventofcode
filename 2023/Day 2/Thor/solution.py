@@ -9,9 +9,7 @@ from advent_libs import *
 from advent_libs_vector2 import *
 from advent_libs_matrix import *
 
-print("")
-print_color("Day 2: Cube Conundrum", bcolors.OKGREEN)
-print("")
+setupCode("Day 2: Cube Conundrum")
 
 class Game:
     id:int
@@ -111,7 +109,7 @@ def solvePuzzle2(filename:str):
     return sum
 
 unittest(solvePuzzle1, 8, "unittest1.txt")
-unittest(solvePuzzle1, 2545, "input.txt")
-
 unittest(solvePuzzle2, 2286, "unittest1.txt")
-unittest(solvePuzzle2, 78111, "input.txt")
+
+runCode(2, solvePuzzle1, 2545, "input.txt")
+runCode(2, solvePuzzle2, 78111, "input.txt")
