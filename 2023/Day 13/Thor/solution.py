@@ -10,16 +10,14 @@ from advent_libs import *
 from advent_libs_vector2 import *
 from advent_libs_matrix import *
 
-print("")
-print_color("Day 13: Point of Incidence", bcolors.OKGREEN)
-print("")
+setupCode("Day 13: Point of Incidence")
 
 def SetBit(number, bit):
-#    print ("SetBit:", number, bit)
+    print_debug ("SetBit:", number, bit)
     return number | ( 1 << bit )
 
 def IsBitSet(number, bit):
-#    print ("IsBitSet:", number, bit)
+    print_debug ("IsBitSet:", number, bit)
     return number & ( 1 << bit )
 
 # function to check if x is power of 2
@@ -123,11 +121,11 @@ def mirror_matrix(matrix:Matrix) -> int:
 
     # If we have flipped a bit, set it in the matrix
     # Cannot change the column bit
-    print("row:",mirror_row,changed_row)
+    print_debug("row:",mirror_row,changed_row)
     if check_bit and changed_row > 0:
         numberA = number_list[changed_row]
         numberB = number_list[changed_row - 1]
-        print("Flip bit for line :", changed_row, "A:",numberA, "B:", numberB, " list:", number_list)
+        print_debug("Flip bit for line :", changed_row, "A:",numberA, "B:", numberB, " list:", number_list)
         check_bit = False
         
     number_list = get_columns_from_matrix(matrix)
@@ -214,15 +212,18 @@ def solvePuzzle1(filename):
 
 # Line is 3, bit is 5
 def flip_bit_in_line(line1:int, line2:int, source_list:list, dest_list:list):
+    if line1 >= len(source_list) or line2 >= len(source_list):
+        return dest_list
+
     a = source_list[line1]
     b = source_list[line2]
     c = getBitDiff(a,b)
 
     if c < 0:
-        print("WOA", line1, line2, a,b,c, source_list)
+        print_debug("WOA", line1, line2, a,b,c, source_list)
 
     if line1 == 0:
-        print("WOA2", a,b,c)
+        print_debug("WOA2", a,b,c)
 
     if IsBitSet(a,c):
         dest_list[c] = SetBit(dest_list[c], line2)
@@ -251,9 +252,10 @@ def solvePuzzle2(filename):
         if mirror_row == 0 and mirror_col == 0:
             mirror_row, smudge_line = mirror_equal_other_flipped(rows)
             if smudge_line > 0:
-                mirror.Print()
+                if UNITTEST.DEBUG_ENABLED:
+                    mirror.Print()
                 offset = mirror_row - smudge_line
-                print("smudge", mirror_row, smudge_line, offset,len(rows),len(cols))
+                print_debug("smudge", mirror_row, smudge_line, offset,len(rows),len(cols))
                 cols = flip_bit_in_line(smudge_line, mirror_row + offset, rows, cols)
 
             mirror_col, smudge_line = mirror_equal_other_flipped(cols)
@@ -262,12 +264,13 @@ def solvePuzzle2(filename):
 
     return sum
 
-#unittest(solvePuzzle1, 5 , "unittest1.txt")
-#unittest(solvePuzzle1, 400 , "unittest2.txt")
-#unittest(solvePuzzle1, 405 , "unittest3.txt")
-#unittest(solvePuzzle1, 33780 , "input.txt")
+unittest(solvePuzzle1, 5 , "unittest1.txt")
+unittest(solvePuzzle1, 400 , "unittest2.txt")
+unittest(solvePuzzle1, 405 , "unittest3.txt")
 
 unittest(solvePuzzle2, 300 , "unittest1.txt")   # Top left corner is flipped
 unittest(solvePuzzle2, 100 , "unittest2.txt")   # Mirror line is flipped
 unittest(solvePuzzle2, 400 , "unittest4.txt")
-unittest(solvePuzzle2, 23479 , "input.txt")
+
+runCode(13, solvePuzzle1, 33780 , "input.txt")
+runCode(13, solvePuzzle2, 23479 , "input.txt")

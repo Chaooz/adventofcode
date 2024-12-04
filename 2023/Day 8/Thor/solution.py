@@ -1,5 +1,5 @@
 #!/usr/local/bin/python3
-# https://adventofcode.com/2023/day/2
+# https://adventofcode.com/2023/day/8
 
 import sys
 import math
@@ -10,9 +10,7 @@ from advent_libs import *
 from advent_libs_vector2 import *
 from advent_libs_matrix import *
 
-print("")
-print_color("Day 8: Haunted Wasteland", bcolors.OKGREEN)
-print("")
+setupCode("Day 8: Haunted Wasteland")
 
 def read_input(filename:str) -> list:
     lines = loadfile(filename)
@@ -101,7 +99,7 @@ def solvePuzzle2(filename:str):
 
 unittest(solvePuzzle1, 2, "unittest1.txt")
 unittest(solvePuzzle1, 6, "unittest2.txt")
-unittest(solvePuzzle1, 17621, "input.txt")     
-
 unittest(solvePuzzle2, 6, "unittest3.txt")
-unittest(solvePuzzle2, 20685524831999, "input.txt")
+
+runCode(8,solvePuzzle1, 17621, "input.txt")     
+runCode(8,solvePuzzle2, 20685524831999, "input.txt")

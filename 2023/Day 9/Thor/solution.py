@@ -1,5 +1,5 @@
 #!/usr/local/bin/python3
-# https://adventofcode.com/2023/day/2
+# https://adventofcode.com/2023/day/9
 
 import sys
 import math
@@ -10,9 +10,7 @@ from advent_libs import *
 from advent_libs_vector2 import *
 from advent_libs_matrix import *
 
-print("")
-print_color("Day 9: Mirage Maintenance", bcolors.OKGREEN)
-print("")
+setupCode("Day 9: Mirage Maintenance")
 
 def are_all_equal(list:list) -> bool:
     # All numbers are the same ?
@@ -81,9 +79,8 @@ def solvePuzzle2(filename:str):
     return sum
 
 unittest(find_extrapolated_line, 18, "0 3 6 9 12 15")
-
 unittest(solvePuzzle1, 114, "unittest1.txt")
-unittest(solvePuzzle1, 1853145119, "input.txt")     
-
 unittest(find_extrapolated_line_reverse, 5, "10 13 16 21 30 45")
-unittest(solvePuzzle2, 923, "input.txt")
+
+runCode(9, solvePuzzle1, 1853145119, "input.txt")     
+runCode(9, solvePuzzle2, 923, "input.txt")

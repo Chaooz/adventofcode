@@ -10,9 +10,7 @@ from advent_libs import *
 from advent_libs_vector2 import *
 from advent_libs_matrix import *
 
-print("")
-print_color("Day 14: Parabolic Reflector Dish", bcolors.OKGREEN)
-print("")
+setupCode("Day 14: Parabolic Reflector Dish")
 
 def next_free_up(matrix:Matrix, x, y):
     while y > 0:
@@ -128,9 +126,9 @@ def solvePuzzle2(filename):
     return 0
 
 unittest(solvePuzzle1, 136, "unittest1.txt")     
-unittest(solvePuzzle1, 110128, "input.txt")     
+unittest(solvePuzzle2, 64, "unittest1.txt")
 
 #unittest(showRotate, 64, "unittest1.txt")
 
-unittest(solvePuzzle2, 64, "unittest1.txt")
-unittest(solvePuzzle2, 103861, "input.txt")
+runCode(14, solvePuzzle1, 110128, "input.txt")     
+runCode(14, solvePuzzle2, 103861, "input.txt")

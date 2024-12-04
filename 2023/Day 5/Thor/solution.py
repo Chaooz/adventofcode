@@ -9,9 +9,7 @@ from advent_libs import *
 from advent_libs_vector2 import *
 from advent_libs_matrix import *
 
-print("")
-print_color("Day 5: If You Give A Seed A Fertilizer", bcolors.OKGREEN)
-print("")
+setupCode("Day 5: If You Give A Seed A Fertilizer")
 
 class ConversionRuleSet:
 
@@ -142,5 +140,5 @@ def solvePuzzle2(filename:str):
 unittest(solvePuzzle1, 35, "unittest1.txt")
 unittest(solvePuzzle1, 318728750, "input.txt")     
 
-unittest(solvePuzzle2, 46, "unittest1.txt")
-unittest(solvePuzzle2, 37384986, "input.txt")     
+runCode(5,solvePuzzle2, 46, "unittest1.txt")
+runCode(5,solvePuzzle2, 37384986, "input.txt")     

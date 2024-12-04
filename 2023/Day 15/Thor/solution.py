@@ -10,9 +10,7 @@ from advent_libs import *
 from advent_libs_vector2 import *
 from advent_libs_matrix import *
 
-print("")
-print_color("Day 15: Lens Library", bcolors.OKGREEN)
-print("")
+setupCode("Day 15: Lens Library")
 
 def get_hash_value(string) -> int:
     value = 0
@@ -90,8 +88,8 @@ def solvePuzzle2(filename):
     return sum
 
 unittest(solvePuzzle1, 1320, "unittest1.txt")     
-unittest(solvePuzzle1, 517315, "input.txt")     
-
 unittest(solvePuzzle2, 145, "unittest1.txt")
-unittest(solvePuzzle2, 247763, "input.txt")     
+
+runCode(15, solvePuzzle1, 517315, "input.txt")     
+runCode(15, solvePuzzle2, 247763, "input.txt")     
 

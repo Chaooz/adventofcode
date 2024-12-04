@@ -18,9 +18,7 @@ MAX_COST = 2450
 
 sys.setrecursionlimit(2500)
 
-print("")
-print_color("Day 10: Pipe Maze", bcolors.OKGREEN)
-print("")
+setupCode("Day 10: Pipe Maze")
 
 class DIRECTION:
     NONE = 0
@@ -245,7 +243,6 @@ def debugPuzzle2(filename:str):
 
 unittest(solvePuzzle1, 4, "unittest1.txt")
 unittest(solvePuzzle1, 8, "unittest2.txt")
-unittest(solvePuzzle1, 6947, "input.txt")
 
 unittest(solvePuzzle2, 1, "unittest1.txt")
 unittest(solvePuzzle2, 1, "unittest2.txt")
@@ -254,4 +251,5 @@ unittest(solvePuzzle2, 4, "unittest4.txt")
 unittest(solvePuzzle2, 8, "unittest5.txt")
 unittest(solvePuzzle2, 10, "unittest6.txt")
 
-unittest(solvePuzzle2, 273, "input.txt")
+runCode(10, solvePuzzle1, 6947, "input.txt")
+runCode(10,solvePuzzle2, 273, "input.txt")

@@ -1,5 +1,5 @@
 #!/usr/local/bin/python3
-# https://adventofcode.com/2023/day/2
+# https://adventofcode.com/2023/day/18
 
 import sys
 import math
@@ -11,11 +11,9 @@ from advent_libs_vector2 import *
 from advent_libs_matrix import *
 from advent_libs_pathfinding import *
 
-sys.setrecursionlimit(2500)
+#sys.setrecursionlimit(2500)
 
-print("")
-print_color("Day 18: Lavaduct Lagoon", bcolors.OKGREEN)
-print("")
+setupCode("Day 18: Lavaduct Lagoon")
 
 def matrix_draw(matrix:Matrix, position:Vector2, direction:Vector2, steps:int, character:str):
     for i in range(int(steps)):
@@ -140,8 +138,8 @@ unittest_input(solvePuzzle1, (20,20,0,0,1), 62, "unittest1.txt")
 unittest_input(solvePuzzle1, (520,350,120,220,5),67891, "input.txt")     # 66513 too low
 
 unittest(solvePuzzle1b, 62, "unittest1.txt")
-unittest(solvePuzzle1b, 67891, "input.txt")
-
 unittest(solvePuzzle2, 952408144115, "unittest1.txt")
-unittest(solvePuzzle2, 94116351948493, "input.txt")     
+
+runCode(18,solvePuzzle1b, 67891, "input.txt")
+runCode(18,solvePuzzle2, 94116351948493, "input.txt")     
 

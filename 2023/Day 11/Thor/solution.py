@@ -10,9 +10,7 @@ from advent_libs import *
 from advent_libs_vector2 import *
 from advent_libs_matrix import *
 
-print("")
-print_color("Day 11: Cosmic Expansion", bcolors.OKGREEN)
-print("")
+setupCode("Day 11: Cosmic Expansion")
 
 class Star:
     id:int
@@ -104,8 +102,9 @@ def solvePuzzle2(filename:str):
     return internalSolve(filename, 999999)
 
 unittest(solvePuzzle1, 374, "unittest2.txt")
-unittest(solvePuzzle1, 9965032, "input.txt")     
 
 unittest_input(internalSolve, 9, 1030, "unittest2.txt")
 unittest_input(internalSolve, 99, 8410, "unittest2.txt")
-unittest(solvePuzzle2, 550358864332, "input.txt")  # Too high
+
+runCode(11,solvePuzzle1, 9965032, "input.txt")     
+runCode(11, solvePuzzle2, 550358864332, "input.txt")

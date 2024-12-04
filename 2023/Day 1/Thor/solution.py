@@ -8,9 +8,7 @@ from advent_libs import *
 from advent_libs_vector2 import *
 from advent_libs_matrix import *
 
-print("")
-print_color("Day 1: Trebuchet?!", bcolors.OKGREEN)
-print("")
+setupCode("Day 1: Trebuchet?!")
 
 def replaceWords(line:str):
     line2 = ""
@@ -78,5 +76,5 @@ unittest(solvePuzzle1, 142, "unittest1.txt")
 unittest(solvePuzzle2, 281, "unittest2.txt")
 
 # Solution
-unittest(solvePuzzle1, 55477, "input.txt")
-unittest(solvePuzzle2, 54431, "input.txt")
+runCode(1, solvePuzzle1, 55477, "input.txt")
+runCode(1, solvePuzzle2, 54431, "input.txt")

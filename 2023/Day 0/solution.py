@@ -13,9 +13,7 @@ from advent_libs import *
 from advent_libs_vector2 import *
 from advent_libs_matrix import *
 
-print("")
-print_color("Day 0: Template", bcolors.OKGREEN)
-print("")
+setupCode("Day 0: Template")
 
 #sys.setrecursionlimit(2500)
 
@@ -38,6 +36,6 @@ def solvePuzzle2(filename):
 unittest(solvePuzzle1, 0, "unittest1.txt")     
 unittest(solvePuzzle1, 0, "input.txt")     
 
-unittest(solvePuzzle2, 0, "unittest2.txt")
-unittest(solvePuzzle2, 0, "input.txt")     
+runCode(0,solvePuzzle2, 0, "unittest2.txt")
+runCode(0,solvePuzzle2, 0, "input.txt")     
 
