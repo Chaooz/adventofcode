@@ -1,4 +1,5 @@
 #!/usr/local/bin/python3
+# https://adventofcode.com/2022/day/10
 
 import sys
 
@@ -9,6 +10,7 @@ from advent_libs_matrix import *
 from advent_libs_list import *
 from advent_libs_vector2 import *
 
+setupCode("Day 10: Cathode-Ray Tube")
 
 def checkCycle(cycle:int, checkPointList:list, signalStrength:int):
     if cycle in checkPointList:
@@ -82,15 +84,11 @@ def solvePuzzle2(filename):
     return 0
 
 
-
-print("")
-print_color("Day 10: Cathode-Ray Tube", bcolors.OKGREEN)
-print("")
-
 unittest(solvePuzzle1, 13140, "unittest.txt")
-unittest(solvePuzzle1, 15020, "puzzleinput.txt")
-unittest(solvePuzzle1, 17180, "puzzleinput_work.txt")
+unittest(solvePuzzle2, 15020, "unittest.txt")
 
-#unittest(solvePuzzle2, 15020, "unittest.txt")
-unittest(solvePuzzle2, 0, "puzzleinput.txt")
-unittest(solvePuzzle2, 0, "puzzleinput_work.txt")
+runCode(10,solvePuzzle1, 15020, "puzzleinput.txt")
+runCode(10,solvePuzzle2, 0, "puzzleinput.txt")
+
+#unittest(solvePuzzle1, 17180, "puzzleinput_work.txt")
+#unittest(solvePuzzle2, 0, "puzzleinput_work.txt")

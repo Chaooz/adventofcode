@@ -3,12 +3,15 @@
 #
 
 #!/usr/lib/python3
+# https://adventofcode.com/2022/day/3
 
 import sys
 
 # Import custom libraries
 sys.path.insert(1, '../../../Libs')
 from advent_libs import *
+
+setupCode("Day 3: Rucksack Reorganization")
 
 #
 # Split a packet in half and check each half for equal characters
@@ -79,10 +82,6 @@ def solvePuzzle2(filename):
         score += getCharacterScore(character)
     return score
     
-print("")
-print_color("Day 3: Rucksack Reorganization", bcolors.OKGREEN)
-print("")
-
 unittest(getSimilarPacket, "p", "vJrwpWtwJgWrhcsFMMfFFhFp")
 unittest(getSimilarPacket, "L","jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL")
 unittest(getSimilarPacket, "P", "PmmdzqPrVvPwwTWBwg")
@@ -100,7 +99,7 @@ unittest(getCharacterScore,19,"s")
 unittest(solvePuzzle1, 157, "unittest1.txt")
 unittest(solvePuzzle2, 70, "unittest2.txt")
 
-unittest(solvePuzzle1, 7428, "puzzleinput.txt")
-unittest(solvePuzzle2, 2650, "puzzleinput.txt")
-unittest(solvePuzzle1, 8240, "puzzleinput_work.txt")
-unittest(solvePuzzle2, 2587, "puzzleinput_work.txt")
+runCode(3,solvePuzzle1, 7428, "puzzleinput.txt")
+runCode(3,solvePuzzle2, 2650, "puzzleinput.txt")
+runCode(3,solvePuzzle1, 8240, "puzzleinput_work.txt")
+runCode(3,solvePuzzle2, 2587, "puzzleinput_work.txt")

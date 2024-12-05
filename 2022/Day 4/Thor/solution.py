@@ -3,12 +3,15 @@
 #
 
 #!/usr/lib/python3
+# https://adventofcode.com/2022/day/4
 
 import sys
 
 # Import custom libraries
 sys.path.insert(1, '../../../Libs')
 from advent_libs import *
+
+setupCode("Day 4: Camp Cleanup")
 
 def createGroup(group):
     areas = []
@@ -64,10 +67,6 @@ def solvePuzzle2(filename):
         number += isAreaPartlyCovered(areas)
     return number
 
-print("")
-print_color("Day 4: Camp Cleanup", bcolors.OKGREEN)
-print("")
-
 unittest(isAreaCovered, 0, [(2,4),(6,8)])
 unittest(isAreaCovered, 0, [(2,3),(4,5)])
 unittest(isAreaCovered, 0, [(5,7),(7,9)])
@@ -83,7 +82,8 @@ unittest(isAreaPartlyCovered, 1, [(6,6),(4,6)])
 unittest(isAreaPartlyCovered, 1, [(2,6),(4,8)])
 
 unittest(solvePuzzle1, 2, "unittest1.txt")
-unittest(solvePuzzle1, 524, "puzzleinput.txt")
-unittest(solvePuzzle2, 798, "puzzleinput.txt")
-unittest(solvePuzzle1, 518, "puzzleinput_work.txt")
-unittest(solvePuzzle2, 909, "puzzleinput_work.txt")
+
+runCode(4,solvePuzzle1, 524, "puzzleinput.txt")
+runCode(4,solvePuzzle2, 798, "puzzleinput.txt")
+runCode(4,solvePuzzle1, 518, "puzzleinput_work.txt")
+runCode(4,solvePuzzle2, 909, "puzzleinput_work.txt")

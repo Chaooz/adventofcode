@@ -18,7 +18,7 @@ def organizeInput(inputfile):
         stacks.append( "........." )
 
     for line in input:
-        if line[0] == "m":
+        if len(line)>0 and line[0] == "m":
             # move 20 from 5 to 8
             (txt1,numberOfBoxes, txt2, moveFrom, txt3, moveTo ) = line.split(" ")
             moves.append( [ int(numberOfBoxes), int(moveFrom), int(moveTo) ] )
@@ -135,4 +135,5 @@ def moveMultiBoxes():
 #            print(" move " + str(numberOfBoxes) + " times " + str(moveFrom+1) + " => " + str(moveTo+1) + " Box:" + box + " check:" + check)
 #        debugPrintStacks()
 
-organizeInput("puzzleinput_work.txt")
+organizeInput("puzzleinput.txt")
+#organizeInput("puzzleinput_work.txt")

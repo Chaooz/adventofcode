@@ -2,18 +2,22 @@
 # 2022 Day 8: Treetop Tree House
 #
 
-# Rules
-# Must delete files
-# 70000000 is max space
-# Need at least 70000000
-
 #!/usr/lib/python3
+# https://adventofcode.com/2022/day/8
+
 import sys
 
 # Import custom libraries
 sys.path.insert(1, '../../../Libs')
 from advent_libs import *
 from advent_libs_matrix import *
+
+setupCode("Day 8: Treetop Tree House")
+
+# Rules
+# Must delete files
+# 70000000 is max space
+# Need at least 70000000
 
 #
 # LineOfSight
@@ -135,11 +139,11 @@ def countVisibleTrees(matrix):
         trees += LineOfSight( matrix, (size[0]-1,y), (-1, 0),"L" ) 
     return trees + 4
 
-def solvePuzzle1(filename, showDebug):
+def solvePuzzle1(filename):
     matrix = create_matrix_from_file(filename)
     numTrees = countVisibleTrees(matrix)
 
-    if showDebug:
+    if UNITTEST.DEBUG_ENABLED:
         highlight_values = ["D", "U", "L", "R", "X"]
         print_matrix_colorlist("solvePuzzle1",matrix, highlight_values, bcolors.WHITE, bcolors.DARK_GREY, "   ", "")
 
@@ -151,12 +155,12 @@ def debugMarkPath(matrix, pos, character):
     GetMaxLineOfSight(matrix, pos, (-1, 0), character)
     GetMaxLineOfSight(matrix, pos, (1, 0), character)
 
-def solvePuzzle2(filename, showDebug):
+def solvePuzzle2(filename):
     matrix = create_matrix_from_file(filename)
     pos, maxScore = findBestTreeHousePlace(matrix)
 
     # Create a path in the matrix to visually see i
-    if showDebug:
+    if UNITTEST.DEBUG_ENABLED:
         debugMarkPath(matrix, pos, "*")
         matrix[pos[0]][pos[1]] = "X" + matrix[pos[0]][pos[1]]
         highlight_values = ["X", "*"]
@@ -166,15 +170,13 @@ def solvePuzzle2(filename, showDebug):
 
 ################################################################
 
-showDebug = False
+UNITTEST.DEBUG_ENABLED = False
 
-print("")
-print_color("Day 8: Treetop Tree House", bcolors.OKGREEN)
-print("")
+unittest(solvePuzzle1,21, "unittest.txt")
+unittest(solvePuzzle2, 8, "unittest.txt")
 
-unittest_input(solvePuzzle1, showDebug,21, "unittest.txt")
-unittest_input(solvePuzzle2, showDebug, 8, "unittest.txt")
-unittest_input(solvePuzzle1, showDebug, 1546, "puzzleinput_work.txt")
-unittest_input(solvePuzzle2, showDebug, 519064, "puzzleinput_work.txt")
-unittest_input(solvePuzzle1, showDebug, 1700, "puzzleinput.txt")
-unittest_input(solvePuzzle2, showDebug, 470596, "puzzleinput.txt")
+#unittest_input(solvePuzzle1, showDebug, 1546, "puzzleinput_work.txt")
+#unittest_input(solvePuzzle2, showDebug, 519064, "puzzleinput_work.txt")
+
+runCode(8,solvePuzzle1, 1700, "puzzleinput.txt")
+runCode(8,solvePuzzle2, 470596, "puzzleinput.txt")

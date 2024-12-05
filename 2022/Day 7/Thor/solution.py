@@ -14,10 +14,7 @@ import sys
 sys.path.insert(1, '../../../Libs')
 from advent_libs import *
 
-
-print("")
-print_color("Day 7: No Space Left On Device", bcolors.OKGREEN)
-print("")
+setupCode("Day 7: No Space Left On Device")
 
 class FileFolder:
     name = ""
@@ -155,9 +152,9 @@ def solvePuzzle2(filename):
 unittest(solvePuzzle1, 95437 , "unittest.txt")
 unittest(solvePuzzle2, 24933642 , "unittest.txt")
 
-unittest(solvePuzzle1, 1141028 , "puzzleinput.txt")
-unittest(solvePuzzle2, 8278005 , "puzzleinput.txt")
+runCode(7,solvePuzzle1, 1141028 , "puzzleinput.txt")
+runCode(7,solvePuzzle2, 8278005 , "puzzleinput.txt")
 
-unittest(solvePuzzle1, 1667443 , "puzzleinput_work.txt")
-unittest(solvePuzzle2, 8998590 , "puzzleinput_work.txt")
+#unittest(solvePuzzle1, 1667443 , "puzzleinput_work.txt")
+#unittest(solvePuzzle2, 8998590 , "puzzleinput_work.txt")
 
