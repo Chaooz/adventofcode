@@ -15,8 +15,8 @@ expected_result_2 = 6
 
 vector_list = [ 
     Vector2(0,-1),
-    Vector2(0,1),
     Vector2(1,0),
+    Vector2(0,1),
     Vector2(-1,0)
 ]
 
@@ -63,6 +63,45 @@ def findPath(matrix:Matrix, current_position:Vector2):
             else:
                 # LOOOOP
                 return None
+
+    return visited_points    
+
+#
+# See if we can path 
+#
+def checkPath(matrix:Matrix, current_position:Vector2):
+    directions = ["N", "E", "S", "W"]
+    current_direction_index = 0
+    current_direction_value = directions[current_direction_index]
+    out_of_bounds = False
+    visited_points = []
+
+    while not out_of_bounds:
+        direction_vector = movement_in_direction(current_direction_value)
+        #direction_vector = vector_list[current_direction_index]
+        new_position = current_position + direction_vector
+
+        # Check if we are outside of matrix                       
+        if matrix.IsOutOfBounds(new_position):
+            out_of_bounds = True
+            break
+
+        data = matrix.GetPoint(new_position)
+        if data == "#":
+            # Turn and stuff
+            current_direction_index = (current_direction_index + 1) % 4
+            current_direction_value = directions[current_direction_index]
+
+            # Add newPositon into list
+            position_and_direction = (current_position, current_direction_value)
+            if position_and_direction not in visited_points:
+                visited_points.append(position_and_direction)
+            else:
+                # LOOOOP
+                return None
+
+        else:
+            current_position = new_position
 
     return visited_points    
 
