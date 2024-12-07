@@ -1,6 +1,6 @@
 #!/usr/lib/python3
 """
-    Description: Script to solve the Advent of Code 2024 Day 4 puzzle
+    Description: Script to solve the Advent of Code 2024 Day 5 puzzle
 
     Returns:
         str: The solution to the puzzle
