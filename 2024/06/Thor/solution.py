@@ -49,6 +49,7 @@ def findMapPathToExit(map:Matrix, currentPosition:Vector2):
         else:
             # Rotate character
             direction = (direction + 1) % 4
+            path.append((currentPosition,direction))
 
 def canPathToExit(map:Matrix, currentPosition:Vector2):
 
@@ -67,13 +68,12 @@ def canPathToExit(map:Matrix, currentPosition:Vector2):
 
         if map.GetPoint(newPosition) != "#":
             currentPosition = newPosition
-
-            if newPosition not in path:
-                path.append((newPosition,direction))
+            path.append((newPosition,direction))
 
         else:
             # Rotate character
             direction = (direction + 1) % 4
+            path.append((newPosition,direction))
 
 
 #
@@ -126,9 +126,11 @@ def solvePuzzle1(filename):
     return len(uniquePath)
 
 #
-# 
+# Bruteforce solution to the problem. We will follow the path of the guard
+# and place obstacles on the path. If the guard can still reach the exit
+# it is not a loop
 #
-def solvePuzzle2(filename):
+def solvePuzzle2Brute(filename):
     map = Matrix.CreateFromFile(filename,".")
 
     # Path from the start positon of the guard to the exit of the map
@@ -136,33 +138,77 @@ def solvePuzzle2(filename):
     path = findMapPathToExit(map, startPosition)
 
     startDirection = 0
-
     obsticleList = []
-    startPath = []
-    oldDirection = startDirection
-    for i in range(1, len(path)):
-#        position = path[i-1]
-        obsticle = path[i][0]
 
-        # Do not add the guard position
-        if map.GetPoint(obsticle) == "^":
+    for position, _ in path:
+        if map.GetPoint(position) == "^":
             continue
 
-        map.SetPoint(obsticle, "#")
+        map.SetPoint(position, "#")
         isLoop = isPathLoop(map, startPosition, startDirection, [])
         if isLoop:
-            if obsticle not in obsticleList:
-                obsticleList.append(obsticle)
-        map.SetPoint(obsticle, ".")
+            if position not in obsticleList:
+                obsticleList.append(position)
+        map.SetPoint(position, ".")
 
-#        if oldDirection != direction:
-#            startPath.append((position, direction))
-#        oldDirection = direction
+    return len(obsticleList)
+
+#
+# Seperate function to solve the puzzle in a smarter way
+#
+def solvePuzzle2Smart(filename):
+    map = Matrix.CreateFromFile(filename,".")
+
+    # Path from the start positon of the guard to the exit of the map
+    startPosition = map.FindFirst("^")
+    path = findMapPathToExit(map, startPosition)
+
+    # Optimization 2
+    # Make sure that the path is unique since we are starting
+    # at different startpoints. Remove all points where we would
+    # start at the same location later on because that would already
+    # be blocked if the guard started on the start position
+    uniquePath = []
+    for position, direction in path:
+        isInUnique = False
+        for p2, v2 in uniquePath:
+            if p2 == position:
+                isInUnique = True
+                break
+        if isInUnique == False:      
+            uniquePath.append((position,direction))
+
+    startDirection = 0
+    obsticleList = []
+    corners = []
+
+    for position, direction in uniquePath:
+
+        # Do not add the guard position
+        if map.GetPoint(position) == "^":
+            continue
+
+        map.SetPoint(position, "#")
+        isLoop = isPathLoop(map, startPosition, startDirection, corners.copy())
+        if isLoop:
+            if position not in obsticleList:
+                obsticleList.append(position)
+        map.SetPoint(position, ".")
+
+        # Optimization 1
+        # Whenever we turn, we can start from there instead of starting
+        # from the guard start position. This will save us a lot of time
+        # to not have to start from the startposition on the path every time
+        if startDirection != direction and startPosition != position:
+            startPosition = position
+            startDirection = direction
+            corners.append((position,direction))
 
     return len(obsticleList)
 
 unittest(solvePuzzle1, 41, "unittest1.txt")
-unittest(solvePuzzle2, 6, "unittest1.txt")
+unittest(solvePuzzle2Smart, 6, "unittest1.txt")
 
 runCode(6,solvePuzzle1, 4711, "input.txt")
-runCode(6,solvePuzzle2, 1562, "input.txt")
+runCode(6,solvePuzzle2Smart, 1562, "input.txt")
+runCode(6,solvePuzzle2Brute, 1562, "input.txt")
