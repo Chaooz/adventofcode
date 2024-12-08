@@ -56,8 +56,11 @@ class Matrix:
         else:
             print_error("Matrix.Set : " + str(x) + "x" + str(y) + " is outside of matrix")
 
-    def SetPoint(self, point, character ):
+    def SetPoint(self, point, character, exclude = None ):
         if self.IsPointInside(point):
+            if exclude != None:
+                if self.data[point.x][point.y] in exclude:
+                    return
             self.data[point.x][point.y] = character
         else:
             print_error("Matrix.Set : " + point.ToString() + " is outside of matrix")
@@ -103,12 +106,28 @@ class Matrix:
         file_lines = loadfile(textfile)
         return Matrix.CreateFromList(textfile, file_lines, defaultValue)
 
-    def FindFirst(self, character:str):
+    def FindFirst(self, character:str) -> Vector2:
         for y in range(self.sizeY):
             for x in range(self.sizeX):
                 if self.data[x][y] == character:
                     return Vector2(x,y)
         return None
+
+    def FindFirst(self, listOfChars:list) -> Vector2:
+        for y in range(self.sizeY):
+            for x in range(self.sizeX):
+                for character in listOfChars:
+                    if self.data[x][y] == character:
+                        return Vector2(x,y)
+        return None
+
+    def FindAll(self, character:str) -> list:
+        pointList = list()
+        for y in range(self.sizeY):
+            for x in range(self.sizeX):
+                if self.data[x][y] == character:
+                    pointList.append(Vector2(x,y))
+        return pointList
 
     # Count the number of occurances of a character
     def Count(self, character:str):

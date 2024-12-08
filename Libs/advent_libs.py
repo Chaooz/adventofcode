@@ -184,7 +184,7 @@ def print_ok(text):
 def print_color(text,color):
     print(color + "          " + text + bcolors.RESET)
 
-def print_debug(text,a=None,b=None,c=None,d=None,e=None):
+def print_debug(text,a=None,b=None,c=None,d=None,e=None,f=None,g=None,h=None,i=None,j=None):
     if UNITTEST.DEBUG_ENABLED:
         if a is not None:
             text += " " + str(a)
@@ -196,5 +196,15 @@ def print_debug(text,a=None,b=None,c=None,d=None,e=None):
             text += " " + str(d)
         if e is not None:
             text += " " + str(e)
+        if f is not None:
+            text += " " + str(f)
+        if g is not None:
+            text += " " + str(g)
+        if h is not None:
+            text += " " + str(h)
+        if i is not None:
+            text += " " + str(i)
+        if j is not None:
+            text += " " + str(j)
         print(bcolors.DARK_GREY + "[DEBUG]   " + text + bcolors.RESET)
 
