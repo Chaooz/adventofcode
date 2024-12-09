@@ -11,10 +11,16 @@ class Matrix:
     sizeX:int
     sizeY:int
 
+    # Replace with this
+    width:int
+    height:int
+
     def __init__(self, name:str, sizeX:int, sizeY:int, value) -> None:
         self.name = name
         self.sizeX = sizeX
         self.sizeY = sizeY
+        self.width = sizeX
+        self.height = sizeY 
         if sizeX > 0 and sizeY > 0:
             self.data = [[value for col in range(sizeY)] for row in range(sizeX)]
 
@@ -93,6 +99,8 @@ class Matrix:
     def CreateFromList(name:str,file_lines:list, defaultValue:str):
         sizeY = len(file_lines)
         sizeX = len(file_lines[0].strip())
+        width = sizeX
+        height = sizeY
         matrix = Matrix(name,sizeX, sizeY, defaultValue)
 
         for y in range(0,len(file_lines)):
@@ -102,7 +110,7 @@ class Matrix:
                 matrix.data[x][y] = line[x]
         return matrix
 
-    def CreateFromFile(textfile:str, defaultValue:str):
+    def CreateFromFile(textfile:str, defaultValue:str = "."):
         file_lines = loadfile(textfile)
         return Matrix.CreateFromList(textfile, file_lines, defaultValue)
 

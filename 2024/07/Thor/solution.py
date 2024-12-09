@@ -10,7 +10,7 @@ sys.path.insert(1, '../Libs')
 
 from advent_libs import *
 
-setupCode("Day 0: Template")
+setupCode("Day 7: Bridge Repair")
 
 modList1 = ["+", "*"]
 modList2 = ["+", "*", "||"]
