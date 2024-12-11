@@ -1,3 +1,9 @@
+#####################################################################
+#
+# This is a new pathfinding library that is more flexible
+# and can be used in more situations
+#
+#####################################################################
 
 import math
 import dataclasses as dc
@@ -6,9 +12,6 @@ import heapq as heap
 from advent_libs import *
 from advent_libs_matrix import *
 from advent_libs_vector2 import *
-
-# Used in assignments
-# 2023: Day 17
 
 @dc.dataclass(frozen=True)
 class Node:
@@ -50,37 +53,30 @@ class PathNode:
     def ToString(self):
         return str(self.position.x) + "x" + str(self.position.y)
 
+# 
+# Path between two points in a matrix
 #
-# The directions the pathfinding can move
-#
-class DefaultPathfindingRule:
-
-    # All four directions
+class DefaultPathfindingRuleSet:
     default_directions:list = [ Vector2(-1,0), Vector2(1,0), Vector2(0,-1), Vector2(0,1) ]
 
-    def GetTileCost(self,pathfinding, position:Vector2):
-        return 1
+    def SetParent(self,pathfinding):
+        self.pathfinding = pathfinding
 
-    def GetDirections(self,pathfinding) -> list:
-        return DefaultPathfindingRule.default_directions
+    def GetDirections(self) -> list:
+        return DefaultPathfindingRuleSet.default_directions
 
-    def DidReachGoal(self,pathfinding, current:PathNode, endPosition:Vector2) -> bool:
-        return current.node.position == endPosition
+    def GetTileCost(self, startPosition:Vector2, endPosition:Vector2):
+        heuristicCost = math.sqrt((startPosition.x - endPosition.x) ** 2) + ((startPosition.y - endPosition.y) ** 2)
+        return heuristicCost
 
-    def CreateNewPathNode(self, pathfinding, current:PathNode, direction:Vector2) -> PathNode:
-        nextPos = current.node.position + direction
-        if not self.pathfindingMatrix.IsPointInside(nextPos):
+    def GotoPosition(self, startPosition:Vector2, endPositon:Vector2):
+        # Outside of matrix?
+        if not self.pathfinding.pathfindingMatrix.IsPointInside(endPositon):
             return None
+        return endPositon
 
-        tileCost = self.GetTileCost(pathfinding, nextPos)
-        newNode = Node(nextPos, direction, 1)
-        return PathNode(current.cost + tileCost, newNode, current.node)
-
-class HeuristicPathfindingRule(DefaultPathfindingRule):
-
-    def GetTileCost(self, pathfinding, position:Vector2) -> int:
-        return pathfinding.pathfindingMatrix.GetPoint(position)
-
+    def DidReachGoal(self, currentNode:PathNode, startPosition:Vector2, endPosition:Vector2, camFrom:list) -> bool:
+        return currentNode.node.position == endPosition
 
 class Pathfinding:
 
@@ -91,80 +87,21 @@ class Pathfinding:
     costMatrix : Matrix
     debugPathMatrix : Matrix
 
-    def __init__(self) -> None:
+    pathRuleset:DefaultPathfindingRuleSet
+
+    def __init__(self, pathRuleset:DefaultPathfindingRuleSet) -> None:
         global iterations
         iterations = 0
+        self.pathRuleset = pathRuleset
+        pathRuleset.SetParent(self) 
     
-    #
-    # Pathfinding rule:
-    # Default rule: Can move in all positions inside matrix
-    #
-    def defaultPathRule(self, pathfinding, startPosition:Vector2, endPositon:Vector2):
-        # Outside of matrix?
-        if not self.pathfindingMatrix.IsPointInside(endPositon):
-            return None
-        return endPositon
+    def PathTo(self, sourceMatrix:Matrix, startPosition:Vector2, endPositon:Vector2 ) -> list:
 
-    #
-    # Pathfinding rule:
-    # Can move max 1 step up ( can always move forward or down )
-    # Used in 2022-Day12
-    #
-    def oneStepPathRule(self, pathfinding, startPosition:Vector2, endPositon:Vector2):
-        pathfindingArea = pathfinding.pathfindingMatrix
-        endPositon = self.defaultPathRule(pathfinding,startPosition, endPositon)
-        if endPositon != None:
-            a = pathfindingArea.GetPoint(startPosition)
-            b = pathfindingArea.GetPoint(endPositon)
-
-            # Is something blocking the path?
-            if a.isnumeric() == False or b.isnumeric() == False:
-                return None
-            
-            a = int(a)
-            b = int(b)
-            if b > a + 1:
-                return None
-        return endPositon
-
-    #
-    # Return the cost of entering this tile
-    #
-    def tileNoCostRule(pathfinding, startPosition:Vector2, endPosition:Vector2):
-        heuristicCost = math.sqrt((startPosition.x - endPosition.x) ** 2) + ((startPosition.y - endPosition.y) ** 2)
-        return heuristicCost
-
-    #
-    # Normal heatmap cost rule (cost is 1 for each tile out)
-    #
-    def heatmapOneCostRule(pathfinding, startPosition:Vector2, endPosition:Vector2):
-        baseCost = 0 #Pathfinding.tileNoCostRule(pathfinding,startPosition,endPosition)
-        tileCost = 1
-        newCost = pathfinding.costMatrix.GetPoint(startPosition) + tileCost + baseCost
-        return newCost
-
-    #
-    # Normal heatmap cost rule (cost is the value of the tile)
-    #
-    def heatmapCostRule(pathfinding, startPosition:Vector2, endPosition:Vector2):
-        baseCost = Pathfinding.tileNoCostRule(pathfinding,startPosition,endPosition)
-        tileCost = pathfinding.pathfindingMatrix.GetPoint(endPosition)
-        newCost = pathfinding.costMatrix.GetPoint(startPosition) + int(tileCost) + baseCost
-        return newCost
-
-    # 
-    # Path between two points in a matrix
-    #
-    def HeuristicAstarPathTo(self, sourceMatrix:Matrix, startPosition:Vector2, endPositon:Vector2, pathRuleFunction, tileCostFunction = tileNoCostRule ) -> list:
-
-        default_directions:list = [ Vector2(-1,0), Vector2(1,0), Vector2(0,-1), Vector2(0,1) ]
+        self.directionList:list = self.pathRuleset.GetDirections()
 
         self.pathfindingMatrix = sourceMatrix
-
         # Used for debug
         self.debugPathMatrix = self.pathfindingMatrix.EmptyCopy("debug path", 0)
-
-        # Which neighbours to check
 
         # Add the start node with 0 cost
         checkList = Vector2List()
@@ -187,15 +124,15 @@ class Pathfinding:
             checkList.RemoveWithIndex(0)
 
             # Success
-            if ( currentNode.node.position == endPositon ):
-                print_debug("Found path in " + str(iterations) + " iterations")
+            if self.pathRuleset.DidReachGoal(currentNode, startPosition, endPositon, cameFrom):
+#                print_debug("Found path in " + str(iterations) + " iterations")
                 break
 
             # Go through path
-            for neighbour in default_directions:
+            for neighbour in self.directionList:
 
                 # Pathfinding rule
-                nextPos = pathRuleFunction(self, currentNode.node.position, currentNode.node.position + neighbour)
+                nextPos = self.pathRuleset.GotoPosition(currentNode.node.position, currentNode.node.position + neighbour)
 
                 # Pathfinding rule is not allowing this move
                 if nextPos == None:
@@ -203,7 +140,7 @@ class Pathfinding:
 
                 # Calculate new cost to move into this tile
                 oldCost = self.costMatrix.GetPoint(nextPos)
-                newCost = tileCostFunction(self, currentNode.node.position, nextPos)
+                newCost = self.pathRuleset.GetTileCost(currentNode.node.position, nextPos)
 
                 if oldCost == -1 or newCost < oldCost:
                     self.costMatrix.SetPoint( nextPos, int(newCost) )
@@ -249,14 +186,15 @@ class Pathfinding:
 
         return result
 
-    #
+  #
     # Noprmal A-Star path
     #    
-    def AStarPathTo(self, grid:Matrix, startPos:Vector2, endPosition:Vector2, 
-                    ruleset = DefaultPathfindingRule()
-                    ) -> Vector2List:
+    def AStarPathTo(self, sourceMatrix:Matrix, startPos:Vector2, endPosition:Vector2 ):
 
-        self.pathfindingMatrix = grid
+        self.pathfindingMatrix = sourceMatrix
+
+#        self.costMatrix = self.pathfindingMatrix.EmptyCopy("CostMatrix", -1)
+#        self.costMatrix.SetPoint( startPos, 0 )
 
         done = dict[Node, Node]()
         startNode = Node(startPos, Vector2(0, 1), 0)
@@ -266,24 +204,40 @@ class Pathfinding:
 
             if current.node in done:
                 continue
+
             done[current.node] = current.parent
 
-            if ruleset.DidReachGoal(self, current, endPosition):
+            if self.pathRuleset.DidReachGoal(current, startPos, endPosition, done):
                 node = current.node
-                path = Vector2List()
+                path = []
                 path.append(node.position)
                 while True:
                     node = done[node]
                     if node is None:
                         break
                     path.append(node.position)
-                return path.Reverse()
 
-            nextDirections = ruleset.GetDirections(self, current)
-            for facing in nextDirections:
-                pathNode = ruleset.CreateNewPathNode(self, current, facing)
-                if pathNode == None or pathNode.node in done:
+                path.reverse()
+                return path
+
+            nextDirections = self.pathRuleset.GetDirections()
+            for direction in nextDirections:
+
+                pathNode = None
+                nextPos = current.node.position + direction
+
+                if self.pathRuleset.GotoPosition(current.node.position, nextPos):
+                    tileCost = self.pathRuleset.GetTileCost(current.node.position,nextPos)
+                    newNode = Node(nextPos, direction, 1)
+                    pathNode = PathNode(current.cost + tileCost, newNode, current.node)
+#                    self.costMatrix.SetPoint( nextPos, tileCost )
+
+                if pathNode == None:
                     continue
+
+#                if pathNode == None or pathNode.node in done:
+#                    continue
+
                 heap.heappush( frontier, pathNode )
 
     #
@@ -303,12 +257,4 @@ class Pathfinding:
     def PrintCostArea( self ):
         self.costMatrix.Print(".", bcolors.DARK_GREY, "000", " ")
 
-    def printDebugMatrix(self, pad:str = "00", space = " "):
 
-        colorList = list()
-        colorList.append(("S", bcolors.YELLOW))
-        colorList.append(("E", bcolors.YELLOW))
-        colorList.append(("P", bcolors.YELLOW))
-        colorList.append(("0", bcolors.DARK_GREY))
-
-        self.debugPathMatrix.PrintWithColor(colorList, bcolors.DARK_GREY , pad, space)
