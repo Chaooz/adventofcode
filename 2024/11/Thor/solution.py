@@ -1,7 +1,8 @@
 #!/usr/local/bin/python3
-# https://adventofcode.com/2024/day/0
+# https://adventofcode.com/2024/day/11
 
 import sys
+import math
 import re
 
 # Import custom libraries
@@ -25,63 +26,70 @@ setupCode("Day 11: Plutonian Pebbles")
 # 3. If none of the other rules apply, the stone is replaced by a new stone; 
 #    the old stone's number multiplied by 2024 is engraved on the new stone.
 #
-def blinkStone(stoneList:list) -> list:
 
-    newList = list()
+# Use dictionary as lookup table to avoid going trough all calculations
+cache = dict()
+
+def blinkStone(stone:int, level:int, maxLevel:int):
+    global cache
+
+    # Return 1 if we reached max level
+    if level >= maxLevel:
+        return 1
+
+    # Return cached value if it exists
+    if stone in cache:
+        fast_stone = cache[stone]
+        if level in fast_stone:
+            return cache[stone][level]
+    else:
+        cache[stone] = dict()
+
+    # Change from 0->1
+    if stone == 0:
+        cache[stone][level] = blinkStone(1, level+1, maxLevel)
+
+    # Split stone in two it is has equal number of digits
+    elif int(math.log10(stone)) % 2 == 1:
+
+        digits = int(math.log10(stone) / 2) + 1
+        a = int(stone / (10 ** digits))
+        b = stone % (10 ** digits)
+
+        retA = blinkStone(a, level+1,maxLevel)
+        retB = blinkStone(b, level+1,maxLevel)
+        cache[stone][level] = retA + retB
+
+    # Multiply stone
+    else:        
+        cache[stone][level] = blinkStone(stone * 2024, level+1,maxLevel)
+
+    return cache[stone][level]
+
+
+def solveLine(line, maxLevel):
+    global cache
+    stoneList = [ int(x) for x in line.split(" ") ]
+    sum = 0
+
+    cache = dict()
     for stone in stoneList:
-        strStone = str(stone)
-
-        # Change from 0->1
-        if stone == 0:
-            newList.append(1)
-#            print("Stone: change 0 to 1")
-        # Split stone in two
-        elif len(strStone) % 2 == 0:
-            i = int(len(strStone) / 2)
-            a = strStone[:i]
-            b = strStone[i:len(strStone)]
-            newList.append(int(a))
-            newList.append(int(b))
-#            print("Stone: split " + strStone + " into " + a + " and " + b)
-            pass
-        # Multiply stone
-        else:
-            a = stone * 2024
-            newList.append(a)
-#            print("Stone: Multiply " + str(stone) + " x 2024 = " + str(a))
-
-    return newList
-
-def blinkStoneTest(input:str):
-    stoneList = [ int(x) for x in input.split(" ") ]
-    retList = blinkStone(stoneList)
-    retList = [ str(x) for x in retList ]
-    return " ".join(retList)
+        sum += blinkStone(stone, 0, maxLevel)
+    return sum  
 
 def solvePuzzle1(filename):
     line = loadfile_as_string(filename)
-
-    stoneList = [ int(x) for x in line.split(" ") ]
-    for i in range(0,25):
-        stoneList = blinkStone(stoneList)
-    retList = [ str(x) for x in stoneList ]
-    return len(retList)
+    return solveLine(line, 25)
 
 def solvePuzzle2(filename):
     line = loadfile_as_string(filename)
+    return solveLine(line, 75)
 
-    stoneList = [ int(x) for x in line.split(" ") ]
-    for i in range(0,75):
-        stoneList = blinkStone(stoneList)
-        if i % 5 == 0:
-            print("running...", i)
-    retList = [ str(x) for x in stoneList ]
-    return len(retList)
-
-unittest(blinkStoneTest, "1 2024 1 0 9 9 2021976", "0 1 10 99 999")
+unittest_input(solveLine, 1, 3, "125 17")
+unittest_input(solveLine, 25, 55312, "125 17")
 
 unittest(solvePuzzle1, 55312, "unittest1.txt")
-#unittest(solvePuzzle2, -1, "unittest1.txt")
+unittest(solvePuzzle2, 65601038650482, "unittest1.txt")
 
 runCode(11,solvePuzzle1, 183484, "input.txt")
-runCode(11,solvePuzzle2, -1, "input.txt")
+runCode(11,solvePuzzle2, 218817038947400, "input.txt")
