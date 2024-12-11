@@ -1,5 +1,5 @@
 #!/usr/local/bin/python3
-# https://adventofcode.com/2024/day/0
+# https://adventofcode.com/2024/day/08
 
 import sys
 import re
