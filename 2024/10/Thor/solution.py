@@ -45,7 +45,7 @@ class OneStepUpOnlyPathRule(DefaultPathfindingRuleSet):
             b = pathfindingArea.GetPoint(endPosition)
 
             # Is something blocking the path?
-            if a.isnumeric() == False or b.isnumeric() == False:
+            if b.isnumeric() == False:
                 return None
             
             a = int(a)
@@ -154,30 +154,15 @@ def solvePuzzle2(filename):
     for startPos in startPosList:
         t = 0
         for endPos in endPosList:
+
             diff = endPos - startPos
             if ( abs(diff.x) + abs(diff.y) > 9 ):
 #                print("Skip this one", startPos, endPos)
                 continue
 
-            pathRuleset.ClearExcludeList()
-
-            iterations = 0
-            while iterations < 1000:
-                iterations += 1
-                pathList = pathfinding.AStarPathTo( matrix, startPos, endPos )
-#                print("start", startPos, " => ", endPos, pathList)
-
-                if pathList != None and len(pathList) > 0:
-                    t += 1
-                    pathRuleset.ExcludePath(pathList)
-                else:
-                    break
-            if iterations == 1000:
-                print("Iterations: " + str(iterations))
-        sum += t
-#        print(t,sum)
-
-#            pathfinding.PrintCostArea()
+            pathList = pathfinding.AStarAllPathsTo( matrix, startPos, endPos )
+            if pathList != None and len(pathList) > 0:
+                sum += len(pathList)
 
     return sum
 
