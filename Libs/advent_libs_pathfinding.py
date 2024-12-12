@@ -99,7 +99,7 @@ class Pathfinding:
     # Pathfinding rule:
     # Default rule: Can move in all positions inside matrix
     #
-    def defaultPathRule(self, pathfinding, startPosition:Vector2, endPositon:Vector2, checkList:dict):
+    def defaultPathRule(self, pathfinding, startPosition:Vector2, endPositon:Vector2):
         # Outside of matrix?
         if not self.pathfindingMatrix.IsPointInside(endPositon):
             return None
@@ -110,12 +110,19 @@ class Pathfinding:
     # Can move max 1 step up ( can always move forward or down )
     # Used in 2022-Day12
     #
-    def oneStepPathRule(self, pathfinding, startPosition:Vector2, endPositon:Vector2, checkList:dict):
+    def oneStepPathRule(self, pathfinding, startPosition:Vector2, endPositon:Vector2):
         pathfindingArea = pathfinding.pathfindingMatrix
-        endPositon = self.defaultPathRule(startPosition, endPositon,checkList)
+        endPositon = self.defaultPathRule(pathfinding,startPosition, endPositon)
         if endPositon != None:
-            a = int(pathfindingArea.GetPoint(startPosition))
-            b = int(pathfindingArea.GetPoint(endPositon))
+            a = pathfindingArea.GetPoint(startPosition)
+            b = pathfindingArea.GetPoint(endPositon)
+
+            # Is something blocking the path?
+            if a.isnumeric() == False or b.isnumeric() == False:
+                return None
+            
+            a = int(a)
+            b = int(b)
             if b > a + 1:
                 return None
         return endPositon
@@ -181,7 +188,7 @@ class Pathfinding:
 
             # Success
             if ( currentNode.node.position == endPositon ):
-                print("Found path in " + str(iterations) + " iterations")
+                print_debug("Found path in " + str(iterations) + " iterations")
                 break
 
             # Go through path
@@ -305,4 +312,3 @@ class Pathfinding:
         colorList.append(("0", bcolors.DARK_GREY))
 
         self.debugPathMatrix.PrintWithColor(colorList, bcolors.DARK_GREY , pad, space)
-
