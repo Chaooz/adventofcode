@@ -35,26 +35,6 @@ def oneStepUpPathRule( pathfinding, startPosition:Vector2, endPositon:Vector2):
             return None
     return endPositon
 
-class OneStepUpOnlyPathRule(DefaultPathfindingRuleSet):
-
-    def GotoPosition(self, startPosition:Vector2, endPosition:Vector2):
-        pathfindingArea = self.pathfinding.pathfindingMatrix
-        endPosition = super().GotoPosition(startPosition, endPosition)
-        if endPosition != None:
-            a = pathfindingArea.GetPoint(startPosition)
-            b = pathfindingArea.GetPoint(endPosition)
-
-            # Is something blocking the path?
-            if b.isnumeric() == False:
-                return None
-            
-            a = int(a)
-            b = int(b)
-            if b - a != 1:
-                return None
-#            print("GotoPosition: " + str (startPosition) + " => " + str(endPosition) + " (" + str(a) + " => " + str(b) + ")")
-        return endPosition
-
 
 class OneStepUpOnlyMultiPathRule(OneStepUpOnlyPathRule):
     excludeList : list
