@@ -72,17 +72,22 @@ def getAreaPerimiter(matrix,area):
 
     return perimiter
 
-def deactivateFence(perimiter, deactivated, pos, dir):
-    for j in range(0,len(perimiter)):
-        fence = perimiter[j]
-        if fence[0] == pos and fence[1] == dir:
-
-            deactivated.append( fence )
-
-#            perimiter[j] = (fence[0], fence[1], False)
-#            print("deactivate", j)
-
-            return True
+# 
+# Find same fence pices on the same line and deactivate them
+#
+def deactivateFence(perimiter, deactivated, pos, searchDir, dir):
+    n = 0
+    continueToLoop = True
+    while continueToLoop:
+        n += 1
+        pos2 = Vector2(pos.x + (searchDir.x * n), pos.y + (searchDir.y * n))
+        continueToLoop = False
+        for j in range(0,len(perimiter)):
+            fence = perimiter[j]
+            if fence[0] == pos2 and fence[1] == dir:
+                deactivated.append( fence )
+                continueToLoop = True
+                break
     return False
 
 
@@ -93,48 +98,29 @@ def getStraightLinePerimiter(perimiter):
     # 1. Does the point below have the same side perimiter?
     # 2. Does the point above have the same side perimiter?
     # if so, remove the point from the perimiter
-
-    startSum = len(perimiter)
-
     deactivated = []
 
     sum = 0
     for i in range(0,len(perimiter)):
         fence = perimiter[i]
-
-        pos = fence[0]
-        dir = fence[1]
-
-#        print(fence)
-
         if fence in deactivated:
- #           print("PASS")
             continue
 
         sum += 1
 
+        pos = fence[0]
+        dir = fence[1]
+
         # Scan up and down
         if dir.y == 0:
-            travelUp = True
-            travelDown = True
-            for n in range(1,100):
-                if travelUp:
-                    travelUp = deactivateFence(perimiter, deactivated, Vector2(pos.x, pos.y - n ), dir)
-                if travelDown:
-                    travelDown = deactivateFence(perimiter, deactivated, Vector2(pos.x, pos.y + n ), dir)
+            deactivateFence(perimiter, deactivated, pos, Vector2(0,-1), dir)
+            deactivateFence(perimiter, deactivated, pos, Vector2(0,1), dir)
         # Scan up and down
         elif dir.x == 0:
-            travelUp = True
-            travelDown = True
+            deactivateFence(perimiter, deactivated, pos, Vector2(-1,0), dir)
+            deactivateFence(perimiter, deactivated, pos, Vector2(1,0), dir)
 
-            for n in range(1,100):
-                if travelUp:
-                    travelUp = deactivateFence(perimiter, deactivated, Vector2(pos.x - n, pos.y ), dir)
-                if travelDown:
-                    travelDown = deactivateFence(perimiter, deactivated, Vector2(pos.x + n, pos.y ), dir)
-
-#    print(startSum,sum)
-    return sum, deactivated
+    return sum
 
 # Scan matrix and generate unique fields
 def createFields(matrix):
@@ -196,11 +182,8 @@ def solvePuzzle2(filename):
     fields  = createFields(matrix)
 
     for key, area, perimiter in fields:
-        linePerimiter, deactivated = getStraightLinePerimiter(perimiter)
+        linePerimiter = getStraightLinePerimiter(perimiter)
         sum += len(area) * linePerimiter
-
-#        break
-
 #    drawMap(matrix,fields,deactivated)
 
     return sum
@@ -210,4 +193,4 @@ unittest(solvePuzzle1, 1930, "unittest1_2.txt")
 unittest(solvePuzzle2, 1206, "unittest1_2.txt")
 
 runCode(12,solvePuzzle1, 1396562, "input.txt")
-runCode(12,solvePuzzle2, 844132, "input.txt")   # Too high
+runCode(12,solvePuzzle2, 844132, "input.txt")
