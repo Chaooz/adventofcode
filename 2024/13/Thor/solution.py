@@ -57,7 +57,7 @@ def calcButton(buttonA, buttonB, startPrize, offset ):
     # Example input
     # buttonA (94,34) and buttonB (22,67) and prize (8400,5400)
 
-    # We need to sole this equation
+    # We need to solve this equation
     # ButtonA.x * a + ButtonB.y * b = prize.x
     # ButtonA.y * a + ButtonB.x * b = prize.y
 
