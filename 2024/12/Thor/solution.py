@@ -63,14 +63,28 @@ def getAreaPerimiter(matrix,area):
 
             # Outside of the matrix?
             if matrix.IsOutOfBounds(newPos):
-                perimiter.append(newPos)
+                perimiter.append((pos, direction))
                 continue
 
             neighborData = matrix.GetPoint(newPos)
             if neighborData != data:
-                perimiter.append(newPos)
+                perimiter.append((pos, direction))
 
     return perimiter
+
+def deactivateFence(perimiter, deactivated, pos, dir):
+    for j in range(0,len(perimiter)):
+        fence = perimiter[j]
+        if fence[0] == pos and fence[1] == dir:
+
+            deactivated.append( fence )
+
+#            perimiter[j] = (fence[0], fence[1], False)
+#            print("deactivate", j)
+
+            return True
+    return False
+
 
 def getStraightLinePerimiter(perimiter):
 
@@ -80,27 +94,47 @@ def getStraightLinePerimiter(perimiter):
     # 2. Does the point above have the same side perimiter?
     # if so, remove the point from the perimiter
 
-    sum = len(perimiter)
+    startSum = len(perimiter)
 
-    for pos in perimiter:
-        x = pos.x
-        y = pos.y
+    deactivated = []
 
-        # Check if the point below is in the perimiter
-        # TODO: Check if the perimiter is on the same side
-        below = Vector2(x, y+1)
-        if below in perimiter:
-            sum -= 1
+    sum = 0
+    for i in range(0,len(perimiter)):
+        fence = perimiter[i]
+
+        pos = fence[0]
+        dir = fence[1]
+
+#        print(fence)
+
+        if fence in deactivated:
+ #           print("PASS")
             continue
 
-        right = Vector2(x+1, y)
-        if right in perimiter:
-            sum -= 1
-            continue
+        sum += 1
 
+        # Scan up and down
+        if dir.y == 0:
+            travelUp = True
+            travelDown = True
+            for n in range(1,100):
+                if travelUp:
+                    travelUp = deactivateFence(perimiter, deactivated, Vector2(pos.x, pos.y - n ), dir)
+                if travelDown:
+                    travelDown = deactivateFence(perimiter, deactivated, Vector2(pos.x, pos.y + n ), dir)
+        # Scan up and down
+        elif dir.x == 0:
+            travelUp = True
+            travelDown = True
 
+            for n in range(1,100):
+                if travelUp:
+                    travelUp = deactivateFence(perimiter, deactivated, Vector2(pos.x - n, pos.y ), dir)
+                if travelDown:
+                    travelDown = deactivateFence(perimiter, deactivated, Vector2(pos.x + n, pos.y ), dir)
 
-    return sum
+#    print(startSum,sum)
+    return sum, deactivated
 
 # Scan matrix and generate unique fields
 def createFields(matrix):
@@ -122,6 +156,30 @@ def createFields(matrix):
 
     return fields
 
+# Overengineering 101
+def drawMap(matrix, fields, deactivated):
+    colorList = list()
+    colorList.append(("+", bcolors.YELLOW))
+    colorList.append(("#", bcolors.WHITE))
+
+    debugMap = Matrix("debug", matrix.sizeX * 3, matrix.sizeY * 3, ".")
+
+    for key, area, perimiter in fields:
+
+        for point in area:
+            debugMap.Set(point.x*2 + 1,point.y*2 + 1, key)
+        if key == "R":
+            for post, dir in perimiter:
+                print(post,dir)
+                debugMap.Set(post.x*2 + dir.x + 1, post.y*2+dir.y+1, "+")
+
+
+    for p,d in deactivated:
+        debugMap.Set(p.x*2+d.x+1, p.y*2+d.y+1, "#")
+
+
+    debugMap.PrintWithColor(colorList, bcolors.DARK_GREY,  " ", " ")
+
 def solvePuzzle1(filename):
     matrix = Matrix.CreateFromFile(filename)
 
@@ -136,9 +194,15 @@ def solvePuzzle2(filename):
 
     sum = 0
     fields  = createFields(matrix)
+
     for key, area, perimiter in fields:
-        linePerimiter = getStraightLinePerimiter(perimiter)
+        linePerimiter, deactivated = getStraightLinePerimiter(perimiter)
         sum += len(area) * linePerimiter
+
+#        break
+
+#    drawMap(matrix,fields,deactivated)
+
     return sum
 
 unittest(solvePuzzle1, 772, "unittest1_1.txt")
@@ -146,4 +210,4 @@ unittest(solvePuzzle1, 1930, "unittest1_2.txt")
 unittest(solvePuzzle2, 1206, "unittest1_2.txt")
 
 runCode(12,solvePuzzle1, 1396562, "input.txt")
-#runCode(12,solvePuzzle2, -1, "input.txt")
+runCode(12,solvePuzzle2, 844132, "input.txt")   # Too high
