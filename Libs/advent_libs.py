@@ -8,6 +8,7 @@ import traceback
 
 class UNITTEST:
     UNITTESTS_ENABLED = True
+    VISUAL_GRAPH_ENABLED = True
     DEBUG_ENABLED = False
 
 # print("\033[0;37;40m Normal text\n")
@@ -118,6 +119,7 @@ def setupCode(header):
         if arg == "COMPACT":
             UNITTEST.UNITTESTS_ENABLED = False
             UNITTEST.DEBUG_ENABLED = False
+            UNITTEST.VISUAL_GRAPH_ENABLED = False
     if UNITTEST.UNITTESTS_ENABLED:
         print("")
         print_color(header, bcolors.OKGREEN)
