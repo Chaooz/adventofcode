@@ -19,18 +19,12 @@ class Robot:
         self.vel = vel
         self.maxX = maxX
         self.maxY = maxY
-#        x = self.pos.x % maxX
-#        y = self.pos.y % maxY
- #       self.pos = Vector2(x,y)
                                                                                                                           
     def move(self):
         self.pos = self.pos + self.vel
         x = self.pos.x % self.maxX
         y = self.pos.y % self.maxY
         self.pos = Vector2(x,y)
-
-#    def moveBack(self):
-#        self.pos = self.pos - self.vel
 
     def print(self):
         print("Pos: " + self.pos.ToString() + " Vel: " + self.vel.ToString())
@@ -48,12 +42,13 @@ def printDebug(robots, maxX, maxY):
             map.SetPoint(robot.pos, 1)
         else:
             map.SetPoint(robot.pos, data+1)
-    map.PrintWithColor(colorList, bcolors.DARK_GREY, "  ", "  ")
+    map.PrintWithColor(colorList, bcolors.DARK_GREY, "", "")
 
-def solveLines(lines, maxX, maxY, numQuadrants, showDebug):
-
+#
+# Create a list of robots
+#
+def createRobots(lines, maxX, maxY):
     robots = list()
-
     for line in lines:
         lineList = line.split(" ")
 
@@ -68,6 +63,10 @@ def solveLines(lines, maxX, maxY, numQuadrants, showDebug):
 
         robot = Robot(pos, vel, maxX, maxY)
         robots.append(robot)
+    return robots
+
+def solveLines(lines, maxX, maxY, numQuadrants, showDebug):
+    robots = createRobots(lines, maxX, maxY)
 
     # Run for 100 seconds
     for rounds in range(0,100):
@@ -108,11 +107,61 @@ def solvePuzzle1(filename):
     lines = loadfile(filename)
     return solveLines(lines,101, 103, 4, False)
 
+# 
+# Just see if we have many numbers next to each other
+#
+def robotsFormATree(robots, maxX, maxY, groupNumber):
+    # IF the tree starts at the top with 1
+    # We check at least from the line with groupNumber / 2
+    startY = int(groupNumber / 2)
+    for y in range( startY, maxY):
+        mxRobots = 0
+        robotsOnLine = [ robot for robot in robots if robot.pos.y == y]
+
+        # Number of robots next to each other
+        robotsOnLine.sort(key=lambda x: x.pos.x)
+
+        for index in range(1, len(robotsOnLine)):
+            robotA = robotsOnLine[index-1]
+            robotB = robotsOnLine[index]
+
+            if robotA.pos.x + 1 == robotB.pos.x:    
+                mxRobots += 1
+            else:
+                mxRobots = 1
+
+            if mxRobots >= groupNumber:
+                return True
+
+    return False
+
+
 def solvePuzzle2(filename):
-    return 0
+
+    lines = loadfile(filename)
+    maxX = 101
+    maxY = 103
+
+    robots = createRobots(lines, maxX, maxY)
+
+    # Run for 100 seconds
+    round = 0
+    # Make sure we don't run forever
+    while round < 10000:
+        round += 1
+        for robot in robots:
+            robot.move()
+
+        if robotsFormATree(robots, maxX, maxY, 10):
+#            print("Found at round: " + str(round))
+            if UNITTEST.VISUAL_GRAPH_ENABLED:
+                printDebug(robots, maxX, maxY)
+            return round
+
+    return -1
 
 unittest(solvePuzzle1Unittest, 12, "unittest1.txt")
-#unittest(solvePuzzle2, -1, "unittest1.txt")
+unittest(solvePuzzle2, -1, "unittest1.txt")
 
-runCode(14,solvePuzzle1, 208437768, "input.txt") # Too low
-#runCode(14,solvePuzzle2, -1, "input.txt")
+runCode(14,solvePuzzle1, 208437768, "input.txt")
+runCode(14,solvePuzzle2, 7492, "input.txt")
