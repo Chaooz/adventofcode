@@ -110,12 +110,15 @@ def solvePuzzle1(filename):
 # 
 # Just see if we have many numbers next to each other
 #
-def robotsFormATree(robots, maxX, maxY, groupNumber):
+def robotsFormATree(robots, maxX, maxY, cache, groupNumber):
     # IF the tree starts at the top with 1
     # We check at least from the line with groupNumber / 2
     startY = int(groupNumber / 2)
     for y in range( startY, maxY):
         mxRobots = 0
+        if cache[y] < groupNumber:
+            continue
+
         robotsOnLine = [ robot for robot in robots if robot.pos.y == y]
 
         # Number of robots next to each other
@@ -147,12 +150,23 @@ def solvePuzzle2(filename):
     # Run for 100 seconds
     round = 0
     # Make sure we don't run forever
+    cache = dict()
+
+    for y in range(0, maxY):
+        cache[y] = 0
+
+    # Add to cache
+    for robot in robots:
+        cache[robot.pos.y] += 1
+
     while round < 10000:
         round += 1
         for robot in robots:
+            cache[robot.pos.y] -= 1
             robot.move()
+            cache[robot.pos.y] += 1
 
-        if robotsFormATree(robots, maxX, maxY, 10):
+        if robotsFormATree(robots, maxX, maxY, cache, 10):
 #            print("Found at round: " + str(round))
             if UNITTEST.VISUAL_GRAPH_ENABLED:
                 printDebug(robots, maxX, maxY)
