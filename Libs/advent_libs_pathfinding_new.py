@@ -65,7 +65,7 @@ class DefaultPathfindingRuleSet:
 
     # Return the different directions the pathfinding can go
     # Default is the 4 corners ( North/South and East/West )
-    def GetDirections(self) -> list:
+    def GetDirections(self, curretNode:PathNode = None) -> list:
         return DefaultPathfindingRuleSet.default_directions
 
     # Return how much it cost to go to this tile
@@ -75,11 +75,11 @@ class DefaultPathfindingRuleSet:
         return heuristicCost
 
     # Check if it is valid to go to the next/end position
-    def GotoPosition(self, startPosition:Vector2, endPositon:Vector2):
+    def GotoPosition(self, startPosition:Vector2, endPosition:Vector2):
         # Outside of matrix?
-        if not self.pathfinding.pathfindingMatrix.IsPointInside(endPositon):
+        if not self.pathfinding.pathfindingMatrix.IsPointInside(endPosition):
             return None
-        return endPositon
+        return endPosition
 
     # Return True if the goal position have been reached 
     def DidReachGoal(self, currentNode:PathNode, startPosition:Vector2, endPosition:Vector2, camFrom:list) -> bool:
@@ -262,7 +262,7 @@ class Pathfinding:
                 path.reverse()
                 return path
 
-            nextDirections = self.pathRuleset.GetDirections()
+            nextDirections = self.pathRuleset.GetDirections(current.node)
             for direction in nextDirections:
 
                 pathNode = None
@@ -309,7 +309,7 @@ class Pathfinding:
             # Safety block for deadlock
             iterations = iterations + 1
             if iterations > maxIterations:
-                print_assert("Max iterations reached for pathfinding!")
+                print_assert(False, "Max iterations reached for pathfinding!")
                 return allPaths
 
             done[current.node] = current.parent
