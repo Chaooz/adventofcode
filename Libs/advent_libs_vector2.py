@@ -61,6 +61,11 @@ class Vector2:
         y = self.x * facing
         return Vector2(x,y)
 
+    def rotateLeft(self):
+        return Vector2(self.y,-self.x)
+    def rotateRight(self):
+        return Vector2(-self.y,self.x)
+
     # def __gt__
     # def __eq__
 

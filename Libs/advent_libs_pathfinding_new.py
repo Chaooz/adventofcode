@@ -17,7 +17,7 @@ from advent_libs_vector2 import *
 class Node:
     position:Vector2
     facing:Vector2
-    count:int
+    cost:int
 
 class PathNode:
 
@@ -53,6 +53,14 @@ class PathNode:
     def ToString(self):
         return str(self.position.x) + "x" + str(self.position.y)
 
+    def getPath(self):
+        path = []
+        node = self
+        while node != None:
+            path.append(node.position)
+            node = node.parent
+        return path
+
 # 
 # Default rule to navigate a pathfind map
 #
@@ -70,7 +78,7 @@ class DefaultPathfindingRuleSet:
 
     # Return how much it cost to go to this tile
     # Heuristic is the default rule: It is more expensive the further you go from the position
-    def GetTileCost(self, startPosition:Vector2, endPosition:Vector2):
+    def GetTileCost(self, startPosition:Vector2, endPosition:Vector2, facing:Vector2 = None) -> int:
         heuristicCost = math.sqrt((startPosition.x - endPosition.x) ** 2) + ((startPosition.y - endPosition.y) ** 2)
         return heuristicCost
 
@@ -230,7 +238,7 @@ class Pathfinding:
     #
     # Noprmal A-Star path
     #    
-    def AStarPathTo(self, sourceMatrix:Matrix, startPos:Vector2, endPosition:Vector2 ):
+    def AStarPathTo(self, sourceMatrix:Matrix, startPos:Vector2, endPosition:Vector2, startFacing:Vector2 = Vector2(0,1) ):
 
         self.pathfindingMatrix = sourceMatrix
     
@@ -239,7 +247,7 @@ class Pathfinding:
             self.costMatrix.SetPoint( startPos, 0 )
 
         done = dict[Node, Node]()
-        startNode = Node(startPos, Vector2(0, 1), 0)
+        startNode = Node(startPos, startFacing, 0)
         frontier: list[PathNode] = [PathNode(0, startNode, None)]
         while frontier:
             current = heap.heappop(frontier)
@@ -269,36 +277,39 @@ class Pathfinding:
                 nextPos = current.node.position + direction
 
                 if self.pathRuleset.GotoPosition(current.node.position, nextPos):
-                    tileCost = self.pathRuleset.GetTileCost(current.node.position,nextPos)
-                    newNode = Node(nextPos, direction, 1)
+                    tileCost = self.pathRuleset.GetTileCost(current.node.position,nextPos, current.node.facing)
+
+                    newNode = Node(nextPos, direction, tileCost)
                     pathNode = PathNode(current.cost + tileCost, newNode, current.node)
 
                     if Pathfinding.DEBUG_PATH == True:
-                        self.costMatrix.SetPoint( nextPos, "X" + self.pathfindingMatrix.GetPoint(nextPos) )
-
-                if pathNode == None:
-                    continue
+                        self.costMatrix.SetPoint( nextPos, tileCost )
 
                 if pathNode == None or pathNode.node in done:
                     continue
 
                 heap.heappush( frontier, pathNode )
 
+        # Exhaused all possibilities
+        print("ERROR: No path found")
+        return None
+
     #
     # A-Star : Find all ways to the target
     #    
-    def AStarAllPathsTo(self, sourceMatrix:Matrix, startPos:Vector2, endPosition:Vector2, maxIterations:int = MAX_ITERATIONS ):
+    def AStarAllPathsTo(self, sourceMatrix:Matrix, startPos:Vector2, endPosition:Vector2, startFacing:Vector2 = Vector2(0,1) ):
+        maxIterations:int = Pathfinding.MAX_ITERATIONS
 
         self.pathfindingMatrix = sourceMatrix
 
         if Pathfinding.DEBUG_PATH == True:
             colorList = list()
             colorList.append(("X", bcolors.YELLOW))
-            self.costMatrix = self.pathfindingMatrix.EmptyCopy("CostMatrix", -1)
+            self.costMatrix = self.pathfindingMatrix.Duplicate("CostMatrix")
             self.costMatrix.SetPoint( startPos, 0 )
 
         done = dict[Node, Node]()
-        startNode = Node(startPos, Vector2(0, 1), 0)
+        startNode = Node(startPos, startFacing, 0)
         frontier: list[PathNode] = [PathNode(0, startNode, None)]
 
         allPaths = []
@@ -306,10 +317,14 @@ class Pathfinding:
         while frontier:
             current = heap.heappop(frontier)
 
+            if current.node in done:
+                continue
+
             # Safety block for deadlock
             iterations = iterations + 1
             if iterations > maxIterations:
-                print_assert(False, "Max iterations reached for pathfinding!")
+                #print_assert(False, "Max iterations reached for pathfinding!")
+                print_error( "Max iterations reached for pathfinding!")
                 return allPaths
 
             done[current.node] = current.parent
@@ -318,28 +333,31 @@ class Pathfinding:
                 node = current.node
                 path = []
                 path.append(node.position)
+                t = 0
                 while True:
                     node = done[node]
                     if node is None:
                         break
                     path.append(node.position)
+                    t = t + node.cost
 
                 path.reverse()
                 allPaths.append(path)
+                print("T:" + str(t))
 
-            nextDirections = self.pathRuleset.GetDirections()
+            nextDirections = self.pathRuleset.GetDirections(current.node)
             for direction in nextDirections:
 
                 pathNode = None
                 nextPos = current.node.position + direction
 
                 if self.pathRuleset.GotoPosition(current.node.position, nextPos):
-                    tileCost = self.pathRuleset.GetTileCost(current.node.position,nextPos)
-                    newNode = Node(nextPos, direction, 1)
+                    tileCost = self.pathRuleset.GetTileCost(current.node.position,nextPos,current.node.facing)
+                    newNode = Node(nextPos, direction, tileCost)
                     pathNode = PathNode(current.cost + tileCost, newNode, current.node)
 
                     if Pathfinding.DEBUG_PATH:
-                        self.costMatrix.SetPoint( nextPos, "X" + self.pathfindingMatrix.GetPoint(nextPos) )
+                        self.costMatrix.SetPoint( nextPos, tileCost )
 
                 if pathNode == None:
                     continue
