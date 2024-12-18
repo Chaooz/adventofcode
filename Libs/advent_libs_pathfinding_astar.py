@@ -68,7 +68,7 @@ class DefaultPathfindingRuleSet:
 
     # Return the different directions the pathfinding can go
     # Default is the 4 corners ( North/South and East/West )
-    def GetDirections(self, direction:Vector2) -> list:
+    def GetDirections(self, facing:Vector2) -> list:
         return DefaultPathfindingRuleSet.default_directions
 
     # Return how much it cost to go to this tile
@@ -207,16 +207,22 @@ class Pathfinding:
             if currentNode.position == endPosition:
                 break
 
+            directions = [ 
+                (1, currentNode.position + currentNode.facing, currentNode.facing),
+                (1000, currentNode.position, currentNode.facing.rotateLeft()), 
+                (1000, currentNode.position, currentNode.facing.rotateRight()) 
+                ]
+
             # Path in the different directions
-            nextDirections = self.pathRuleset.GetDirections(currentNode.facing)
-            for direction in nextDirections:
-                nextPos = currentNode.position + direction
+            # TODO: Put thsi back in
+#            nextDirections = self.pathRuleset.GetFaceDirections(currentNode.facing)
+            for tileCost, nextPos, direction in directions:
 
                 if self.pathRuleset.GotoPosition(currentNode.position, nextPos):
-                    tileCost = self.pathRuleset.GetTileCost(currentNode.position,nextPos, currentNode.facing)
+                    #tileCost = self.pathRuleset.GetTileCost(currentNode.position,nextPos, currentNode.facing)
                     pathNode = PathNode(nextPos, direction, currentNode.cost + tileCost, currentNode)
 
-                    nodeKey = (pathNode.position,pathNode.facing)
+                    nodeKey = (nextPos,direction)
                     if nodeKey in self.visitedNodes:
                         continue
 
@@ -227,17 +233,13 @@ class Pathfinding:
         path.append(pathNode.position)
         checkPathNodes = [ pathNode ]
 
-#        while pathNode != None:
-#            pathNode = pathNode.parent
-#            if pathNode != None:
-#                path.append(pathNode.position)
-#                checkPathNodes.append(pathNode)
-
+        reverseVisitList = list()
+        start = (startPos, startFacing)
         while checkPathNodes:
 
             pathNode = heap.heappop(checkPathNodes)
-#            if pathNode.position == startPos:
-#                continue
+            if pathNode == start:
+                continue
 
             reverseFacing = pathNode.facing * -1
             reversePosition = pathNode.position + reverseFacing
@@ -245,28 +247,28 @@ class Pathfinding:
             # Check for alternative paths
             directions = [ 
                 (1,reversePosition, pathNode.facing),
-                (1000, pathNode.position, reverseFacing.rotateLeft()), 
-                (1000, pathNode.position, reverseFacing.rotateRight()) 
+                (1000, pathNode.position, pathNode.facing.rotateLeft()), 
+                (1000, pathNode.position, pathNode.facing.rotateRight()) 
                 ]
-#            directions = [ (1,facing) ]
+
             for cost, pos, direction in directions:
 
-                print("Check :", pos, " dir:", direction)
                 alternativePathNode = self.visitedNodes.get((pos,direction))
                 if alternativePathNode == None:
                     continue
 
                 # Add this node to the map
-                print("Path:", pathNode.position, "(", pathNode.cost, ") => ", alternativePathNode.position, "(", alternativePathNode.cost, ") ", cost)
                 if pathNode.cost == alternativePathNode.cost + cost:
                     if alternativePathNode.position not in path: 
                         path.append(alternativePathNode.position)
 
-                    # Follow this alternative path
-                    print("Follow:", pathNode.position, " => ", alternativePathNode.position, alternativePathNode.facing)
+                    key = (cost,pos,direction)
+
+                    if key in reverseVisitList:
+                        continue
+                    reverseVisitList.append(key)
+
                     heap.heappush( checkPathNodes, alternativePathNode )
-                else:
-                    print("Skip:", pathNode.ToString(), " => ", alternativePathNode.ToString() )
         path.reverse()
         return path
     #
@@ -290,7 +292,7 @@ class Pathfinding:
         # Print path in 
         pathMatrix = pathfindingArea.Duplicate("ShowPath")
 
-        for position,facing in self.visitedNodes:
+        for position,_ in self.visitedNodes:
             pathMatrix.SetPoint(position, char2)
 
         for path in shortestPath:

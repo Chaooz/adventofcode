@@ -10,7 +10,7 @@ sys.path.insert(1, '../Libs')
 
 from advent_libs import *
 from advent_libs_matrix import *
-from advent_libs_pathfinding_new import *
+from advent_libs_pathfinding_astar import *
 
 setupCode("Day 16: Reindeer Maze")
 
@@ -36,18 +36,17 @@ class MazeDefaultPathfindingRuleSet(DefaultPathfindingRuleSet):
         # If we turn, add 1000 to the cost
         dir = endPosition - startPosition
         if dir != facing:
-            cost += 1000
+            cost = 1000
 
         return cost
 
     # Return the different directions the pathfinding can go
     # Default is the 4 corners ( North/South and East/West )
-    def GetDirections(self, curretNode:Node) -> list:
-        direction = curretNode.facing
+    def GetDirections(self, direction:Vector2) -> list:
+        # Turn
         leftDirection = direction.rotateLeft()
         rightDirection = direction.rotateRight()
         return [ direction, leftDirection, rightDirection ]
-        #return super().GetDirections(curretNode)
 
 
 def solvePuzzle1(filename):
@@ -62,24 +61,7 @@ def solvePuzzle1(filename):
     endPos = matrix.FindFirst("E")
     path = pathfinding.AStarPathTo(matrix, startPos, endPos, Vector2(0,-1))
 
-    matrix.SetPoint(startPos, ".")
-    matrix.SetPoint(endPos, ".")
-
-    # Overengineering 101
-    colorList = list()
-    colorList.append(("o", bcolors.YELLOW))
-    colorList.append(("1", bcolors.YELLOW))
-    colorList.append(("2", bcolors.YELLOW))
-    colorList.append(("3", bcolors.RED))
-    colorList.append((".", bcolors.DARK_GREY))
-    colorList.append(("#", bcolors.DARK_GREY))
-
-    for x in range(0, matrix.width):
-        for y in range(0, matrix.height):
-            if matrix.GetPoint(Vector2(x,y)) == "#":
-                pathfinding.costMatrix.Set(x,y, "#")
-
-#    pathfinding.costMatrix.PrintWithColor(colorList, bcolors.DARK_GREY, "  ", " ")
+#    pathfinding.DebugPrintPath(matrix, path, "o")
 
     if path is None:
         return -1
@@ -94,20 +76,8 @@ def solvePuzzle1(filename):
             continue
 
         if direction != pointB - pointA:
-#            print("TURN", direction, pointA, pointB)
             direction = pointB - pointA
             cost += 1000
-
-    for p in path:
-        d = matrix.GetPoint(p)
-        if d == ".":
-            d = 1
-        else:
-            d = d + 1
-        matrix.SetPoint(p, d)
-
-    # Overengineering 101
-#    matrix.PrintWithColor(colorList, bcolors.DARK_GREY, "", " ")
 
     return cost
 
@@ -121,44 +91,17 @@ def solvePuzzle2(filename):
 
     startPos = matrix.FindFirst("S")
     endPos = matrix.FindFirst("E")
-    pathList = pathfinding.AStarAllPathsTo(matrix, startPos, endPos, Vector2(0,-1))
+    path = pathfinding.AStarAllPathsTo(matrix, startPos, endPos, Vector2(1,0))
 
-    print("PATHS", len(pathList))
+#    pathfinding.DebugPrintPath(matrix, path, "o")
+#    pathfinding.DebugPrintVisitedPath(matrix, path, "o", "x", "")
 
-    if pathList is None:
-        return -1
-
-    matrix.SetPoint(startPos, ".")
-    matrix.SetPoint(endPos, ".")
-
-    # Overengineering 101
-    colorList = list()
-    colorList.append(("o", bcolors.YELLOW))
-    colorList.append(("1", bcolors.YELLOW))
-    colorList.append(("2", bcolors.YELLOW))
-    colorList.append(("3", bcolors.RED))
-    colorList.append((".", bcolors.DARK_GREY))
-    colorList.append(("#", bcolors.DARK_GREY))
-
-    for x in range(0, matrix.width):
-        for y in range(0, matrix.height):
-            if matrix.GetPoint(Vector2(x,y)) == "#":
-                pathfinding.costMatrix.Set(x,y, "#")
-
-#    pathfinding.costMatrix.PrintWithColor(colorList, bcolors.DARK_GREY, "  ", " ")
-
-    sum = 0
-    for path in pathList:
-        sum += len(path)
-
-    # Overengineering 101
-#    matrix.PrintWithColor(colorList, bcolors.DARK_GREY, "", " ")
-
-    return sum
+    return len(path)
 
 unittest(solvePuzzle1, 7036, "unittest1_1.txt")
 unittest(solvePuzzle1, 11048, "unittest1_2.txt")
-#unittest(solvePuzzle2, -1, "unittest1.txt")
+unittest(solvePuzzle2, 45, "unittest1_1.txt")
+unittest(solvePuzzle2, 64, "unittest1_2.txt")
 
 runCode(16,solvePuzzle1, 135536, "input.txt") # Too high
 runCode(16,solvePuzzle2, 583, "input.txt")
