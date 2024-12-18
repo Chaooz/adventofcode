@@ -44,7 +44,7 @@ def solvePuzzle1(filename):
     colorList.append(("M", bcolors.DARK_GREY))
     colorList.append(("A", bcolors.DARK_GREY))
     colorList.append(("S", bcolors.DARK_GREY))
-#    matrix.PrintWithColor(colorList, bcolors.DARK_GREY, "", " ")
+   #matrix.PrintWithColor(colorList,"", " ")
 
     # Loop through all points to find X
     xList = []
