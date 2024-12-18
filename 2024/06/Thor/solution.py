@@ -211,4 +211,4 @@ unittest(solvePuzzle2Smart, 6, "unittest1.txt")
 
 runCode(6,solvePuzzle1, 4711, "input.txt")
 runCode(6,solvePuzzle2Smart, 1562, "input.txt")
-runCode(6,solvePuzzle2Brute, 1562, "input.txt")
+#runCode(6,solvePuzzle2Brute, 1562, "input.txt")
