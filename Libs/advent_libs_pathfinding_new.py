@@ -17,7 +17,7 @@ from advent_libs_vector2 import *
 class Node:
     position:Vector2
     facing:Vector2
-    cost:int
+    count:int
 
 class PathNode:
 
@@ -53,14 +53,6 @@ class PathNode:
     def ToString(self):
         return str(self.position.x) + "x" + str(self.position.y)
 
-    def getPath(self):
-        path = []
-        node = self
-        while node != None:
-            path.append(node.position)
-            node = node.parent
-        return path
-
 # 
 # Default rule to navigate a pathfind map
 #
@@ -73,21 +65,21 @@ class DefaultPathfindingRuleSet:
 
     # Return the different directions the pathfinding can go
     # Default is the 4 corners ( North/South and East/West )
-    def GetDirections(self, curretNode:PathNode = None) -> list:
+    def GetDirections(self) -> list:
         return DefaultPathfindingRuleSet.default_directions
 
     # Return how much it cost to go to this tile
     # Heuristic is the default rule: It is more expensive the further you go from the position
-    def GetTileCost(self, startPosition:Vector2, endPosition:Vector2, facing:Vector2 = None) -> int:
+    def GetTileCost(self, startPosition:Vector2, endPosition:Vector2):
         heuristicCost = math.sqrt((startPosition.x - endPosition.x) ** 2) + ((startPosition.y - endPosition.y) ** 2)
         return heuristicCost
 
     # Check if it is valid to go to the next/end position
-    def GotoPosition(self, startPosition:Vector2, endPosition:Vector2):
+    def GotoPosition(self, startPosition:Vector2, endPositon:Vector2):
         # Outside of matrix?
-        if not self.pathfinding.pathfindingMatrix.IsPointInside(endPosition):
+        if not self.pathfinding.pathfindingMatrix.IsPointInside(endPositon):
             return None
-        return endPosition
+        return endPositon
 
     # Return True if the goal position have been reached 
     def DidReachGoal(self, currentNode:PathNode, startPosition:Vector2, endPosition:Vector2, camFrom:list) -> bool:
@@ -238,7 +230,7 @@ class Pathfinding:
     #
     # Noprmal A-Star path
     #    
-    def AStarPathTo(self, sourceMatrix:Matrix, startPos:Vector2, endPosition:Vector2, startFacing:Vector2 = Vector2(0,1) ):
+    def AStarPathTo(self, sourceMatrix:Matrix, startPos:Vector2, endPosition:Vector2 ):
 
         self.pathfindingMatrix = sourceMatrix
     
@@ -247,7 +239,7 @@ class Pathfinding:
             self.costMatrix.SetPoint( startPos, 0 )
 
         done = dict[Node, Node]()
-        startNode = Node(startPos, startFacing, 0)
+        startNode = Node(startPos, Vector2(0, 1), 0)
         frontier: list[PathNode] = [PathNode(0, startNode, None)]
         while frontier:
             current = heap.heappop(frontier)
@@ -270,46 +262,43 @@ class Pathfinding:
                 path.reverse()
                 return path
 
-            nextDirections = self.pathRuleset.GetDirections(current.node)
+            nextDirections = self.pathRuleset.GetDirections()
             for direction in nextDirections:
 
                 pathNode = None
                 nextPos = current.node.position + direction
 
                 if self.pathRuleset.GotoPosition(current.node.position, nextPos):
-                    tileCost = self.pathRuleset.GetTileCost(current.node.position,nextPos, current.node.facing)
-
-                    newNode = Node(nextPos, direction, tileCost)
+                    tileCost = self.pathRuleset.GetTileCost(current.node.position,nextPos)
+                    newNode = Node(nextPos, direction, 1)
                     pathNode = PathNode(current.cost + tileCost, newNode, current.node)
 
                     if Pathfinding.DEBUG_PATH == True:
-                        self.costMatrix.SetPoint( nextPos, tileCost )
+                        self.costMatrix.SetPoint( nextPos, "X" + self.pathfindingMatrix.GetPoint(nextPos) )
+
+                if pathNode == None:
+                    continue
 
                 if pathNode == None or pathNode.node in done:
                     continue
 
                 heap.heappush( frontier, pathNode )
 
-        # Exhaused all possibilities
-        print("ERROR: No path found")
-        return None
-
     #
     # A-Star : Find all ways to the target
     #    
-    def AStarAllPathsTo(self, sourceMatrix:Matrix, startPos:Vector2, endPosition:Vector2, startFacing:Vector2 = Vector2(0,1) ):
-        maxIterations:int = Pathfinding.MAX_ITERATIONS
+    def AStarAllPathsTo(self, sourceMatrix:Matrix, startPos:Vector2, endPosition:Vector2, maxIterations:int = MAX_ITERATIONS ):
 
         self.pathfindingMatrix = sourceMatrix
 
         if Pathfinding.DEBUG_PATH == True:
             colorList = list()
             colorList.append(("X", bcolors.YELLOW))
-            self.costMatrix = self.pathfindingMatrix.Duplicate("CostMatrix")
+            self.costMatrix = self.pathfindingMatrix.EmptyCopy("CostMatrix", -1)
             self.costMatrix.SetPoint( startPos, 0 )
 
         done = dict[Node, Node]()
-        startNode = Node(startPos, startFacing, 0)
+        startNode = Node(startPos, Vector2(0, 1), 0)
         frontier: list[PathNode] = [PathNode(0, startNode, None)]
 
         allPaths = []
@@ -317,14 +306,10 @@ class Pathfinding:
         while frontier:
             current = heap.heappop(frontier)
 
-            if current.node in done:
-                continue
-
             # Safety block for deadlock
             iterations = iterations + 1
             if iterations > maxIterations:
-                #print_assert(False, "Max iterations reached for pathfinding!")
-                print_error( "Max iterations reached for pathfinding!")
+                print_assert("Max iterations reached for pathfinding!")
                 return allPaths
 
             done[current.node] = current.parent
@@ -333,31 +318,28 @@ class Pathfinding:
                 node = current.node
                 path = []
                 path.append(node.position)
-                t = 0
                 while True:
                     node = done[node]
                     if node is None:
                         break
                     path.append(node.position)
-                    t = t + node.cost
 
                 path.reverse()
                 allPaths.append(path)
-                print("T:" + str(t))
 
-            nextDirections = self.pathRuleset.GetDirections(current.node)
+            nextDirections = self.pathRuleset.GetDirections()
             for direction in nextDirections:
 
                 pathNode = None
                 nextPos = current.node.position + direction
 
                 if self.pathRuleset.GotoPosition(current.node.position, nextPos):
-                    tileCost = self.pathRuleset.GetTileCost(current.node.position,nextPos,current.node.facing)
-                    newNode = Node(nextPos, direction, tileCost)
+                    tileCost = self.pathRuleset.GetTileCost(current.node.position,nextPos)
+                    newNode = Node(nextPos, direction, 1)
                     pathNode = PathNode(current.cost + tileCost, newNode, current.node)
 
                     if Pathfinding.DEBUG_PATH:
-                        self.costMatrix.SetPoint( nextPos, tileCost )
+                        self.costMatrix.SetPoint( nextPos, "X" + self.pathfindingMatrix.GetPoint(nextPos) )
 
                 if pathNode == None:
                     continue
