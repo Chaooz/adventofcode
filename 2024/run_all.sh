@@ -1,6 +1,6 @@
 export PYTHONPATH=/Users/thorh/Develop/DarkFactor/adventofcode/Libs
 
-for i in {1..14}
+for i in {1..16}
 do
    if [ $i -lt 10 ]
    then
