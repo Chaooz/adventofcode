@@ -30,24 +30,39 @@ class MazeDefaultPathfindingRuleSet(DefaultPathfindingRuleSet):
     # Check if the previous step is valid ( not in wall or outside of matrix)
     # If it is then we increase cost by 1000
     # It is EXPENSIVE to turn :D
-    def GetTileCost(self, startPosition:Vector2, endPosition:Vector2, facing:Vector2):
+    def GetTileCost(self, startNode:PathNode, endPosition:Vector2, endFacing:Vector2 = None):
         cost = 1 #math.sqrt((startPosition.x - endPosition.x) ** 2) + ((startPosition.y - endPosition.y) ** 2)
 
+        # check if we only turn
+        if endPosition == startNode.position and startNode.facing != endFacing:
+            return 1000
+
         # If we turn, add 1000 to the cost
-        dir = endPosition - startPosition
-        if dir != facing:
+        dir = endPosition - startNode.position
+        if dir != startNode.facing:
             cost = 1000
 
         return cost
 
     # Return the different directions the pathfinding can go
     # Default is the 4 corners ( North/South and East/West )
-    def GetDirections(self, direction:Vector2) -> list:
-        # Turn
-        leftDirection = direction.rotateLeft()
-        rightDirection = direction.rotateRight()
-        return [ direction, leftDirection, rightDirection ]
+    def GetDirections(self, pathNode:PathNode) -> list:
+        directions = [ 
+            (pathNode.facing, pathNode.facing),
+            (Vector2(0,0), pathNode.facing.rotateLeft()), 
+            (Vector2(0,0), pathNode.facing.rotateRight()) 
+            ]
+        return directions
 
+    # Return the different directions the pathfinding can go
+    # Default is the 4 corners ( North/South and East/West )
+    def GetReversedDirections(self, pathNode:PathNode) -> list:
+        directions = [ 
+            (1, pathNode.facing, pathNode.facing),
+            (1000, Vector2(0,0), pathNode.facing.rotateLeft()), 
+            (1000, Vector2(0,0), pathNode.facing.rotateRight()) 
+            ]
+        return directions
 
 def solvePuzzle1(filename):
     matrix = Matrix.CreateFromFile(filename)
@@ -59,25 +74,18 @@ def solvePuzzle1(filename):
 
     startPos = matrix.FindFirst("S")
     endPos = matrix.FindFirst("E")
-    path = pathfinding.AStarPathTo(matrix, startPos, endPos, Vector2(0,-1))
+    pathNodes = pathfinding.AStarPathTo(matrix, startPos, endPos, Vector2(1,0))
 
 #    pathfinding.DebugPrintPath(matrix, path, "o")
 
     if path is None:
         return -1
 
-    direction = Vector2(0,0)
-    cost = len(path) - 1 + 1000
-    for index in range(1, len(path)):
-        pointA = path[index-1]
-        pointB = path[index]
-        if direction == Vector2(0,0):
-            direction = pointB - pointA
-            continue
+    lastNode:PathNode = pathNodes[len(pathNodes)-1]
+    return lastNode.cost
 
-        if direction != pointB - pointA:
-            direction = pointB - pointA
-            cost += 1000
+#    pathfinding.DebugPrintPath(matrix, path, "o")
+#    pathfinding.DebugPrintVisitedPath(matrix, path, "o", "x", "")
 
     return cost
 
@@ -91,12 +99,12 @@ def solvePuzzle2(filename):
 
     startPos = matrix.FindFirst("S")
     endPos = matrix.FindFirst("E")
-    path = pathfinding.AStarAllPathsTo(matrix, startPos, endPos, Vector2(1,0))
+    pathNodes = pathfinding.AStarAllPathsTo(matrix, startPos, endPos, Vector2(1,0))
 
 #    pathfinding.DebugPrintPath(matrix, path, "o")
 #    pathfinding.DebugPrintVisitedPath(matrix, path, "o", "x", "")
 
-    return len(path)
+    return len(pathNodes)
 
 unittest(solvePuzzle1, 7036, "unittest1_1.txt")
 unittest(solvePuzzle1, 11048, "unittest1_2.txt")
