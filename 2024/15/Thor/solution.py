@@ -135,20 +135,24 @@ def findBoxes(map:Matrix, boxList:list, xPos:int, yPos:int, pushSize:int, boxSiz
 #
 # Find all boxes that will be moved by robot
 #
-def findSmallBoxes(map:Matrix, boxList:list, currentPos:Vector2, pushSize:int, boxSize:int, direction:Vector2) -> bool:
+def findSmallBoxes(map:Matrix, boxList:list, currentPos:Vector2, direction:Vector2) -> bool:
     if map.IsOutOfBounds(currentPos):
         print_debug("Outofbounds:", currentPos)
         return False
 
-    nextPos = Vector2(currentPos.x + direction.x, currentPos.y)
+    nextPos = currentPos + direction
 
     data = map.GetPoint(currentPos)
     if data == "#":
         return False
     elif data == "[" or data == "]":
-        if not findSmallBoxes(map,boxList, nextPos, boxSize, boxSize, direction):
+        if not findSmallBoxes(map,boxList, nextPos, direction):
             return False
-        boxList.append((data,nextPos))
+        boxList.append((data,currentPos))
+    elif data == "O":
+        if not findSmallBoxes(map,boxList, nextPos, direction):
+            return False
+        boxList.append((data,currentPos))
     elif data == ".":
         return True
     else:
@@ -158,14 +162,14 @@ def findSmallBoxes(map:Matrix, boxList:list, currentPos:Vector2, pushSize:int, b
 # 
 # Move all boxes in the list
 #
-def moveBoxList(map:Matrix, boxList:list, directionY:int):
+def moveBoxList(map:Matrix, boxList:list, direction:Vector2):
     # First set all spaces to "."
     for data,boxPos in boxList:
         map.Set(boxPos.x, boxPos.y, ".")
     
     # First set all spaces to "."
     for data,boxPos in boxList:
-        map.Set(boxPos.x, boxPos.y + directionY, data)
+        map.Set(boxPos.x + direction.x, boxPos.y + direction.y, data)
 
 def moveRobot(map, moveLines, box) -> bool:
     startPoint = map.FindFirst("@")
@@ -208,11 +212,11 @@ def moveRobotIcon(matrix:Matrix, fromPos:Vector2, direction:Vector2) -> bool:
         return True
     return False
 
-def calculateSum1(map, box):
+def calculateSum1(map):
     sum = 0
     for x in range(0,map.sizeX):
         for y in range(0,map.sizeY):
-            if map.Get(x,y) in box:
+            if map.Get(x,y) == "O":
                 sum += x + (y * 100)
     return sum
 
@@ -225,27 +229,39 @@ def calculateSum2(map):
     return sum
 
 def solvePuzzle1(filename):
+
+    colorList = list()
+    colorList.append(("X", bcolors.LIGHT_GREY))
+    colorList.append(("O", bcolors.WHITE))
+    colorList.append(("@", bcolors.YELLOW))
+    colorList.append(("*", bcolors.YELLOW))
+
     matLines, moveLines = readInput(filename)
     smallMap = Matrix.CreateFromList("mat", matLines,".")
-    box = ["O"]
 
-    moveRobot(smallMap, moveLines, box)
+#    smallMap.PrintWithColor(colorList, bcolors.DARK_GREY, "", " ")
 
-    if UNITTEST.VISUAL_GRAPH_ENABLED:
-        colorList = list()
-        colorList.append(("X", bcolors.LIGHT_GREY))
-        colorList.append(("O", bcolors.WHITE))
-        colorList.append(("@", bcolors.YELLOW))
-        colorList.append(("*", bcolors.YELLOW))
+    currentPos = smallMap.FindFirst("@")
+    for move in moveLines:
+        direction = dirmap.get(move)
+        boxList = list()
+
+        # Moving boxes in the x axis is the same as before
+        nextPos = currentPos + direction
+        if findSmallBoxes(smallMap, boxList, nextPos, direction):
+            moveBoxList(smallMap, boxList, direction)
+            if moveRobotIcon(smallMap, currentPos, direction):
+                currentPos = nextPos
+
+#    if UNITTEST.VISUAL_GRAPH_ENABLED:
 #        smallMap.PrintWithColor(colorList, bcolors.DARK_GREY, "", " ")
 
-    return calculateSum1(smallMap, box)
+    return calculateSum1(smallMap)
 
 def solvePuzzle2(filename):
     matLines, moveLines = readInput(filename)
     smallMap = Matrix.CreateFromList("mat", matLines,".")
     largeMap = Matrix("largemap", smallMap.width * 2, smallMap.height, ".")
-    box = ["[","]"]
 
     colorList = list()
     colorList.append(("#", bcolors.DARK_GREY))
@@ -278,13 +294,13 @@ def solvePuzzle2(filename):
         # Moving boxes in the x axis is the same as before
         if direction.y == 0:
             nextPos = currentPos + direction
-            if findSmallBoxes(largeMap, boxList, nextPos, 1, 1, direction):
-                moveBoxList(largeMap, boxList, direction.y)
+            if findSmallBoxes(largeMap, boxList, nextPos, direction):
+                moveBoxList(largeMap, boxList, direction)
                 if moveRobotIcon(largeMap, currentPos, direction):
                    currentPos = nextPos
         else:
             if findBoxes(largeMap, boxList, currentPos.x, currentPos.y, 1, 2, direction):
-                moveBoxList(largeMap, boxList, direction.y)
+                moveBoxList(largeMap, boxList, direction)
                 if moveRobotIcon(largeMap, currentPos, direction):
                     currentPos = currentPos + direction
 
