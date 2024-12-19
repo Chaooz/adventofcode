@@ -64,9 +64,8 @@ def moveSmallBox(map, iteration, point, direction) -> bool:
     elif nextData == "#":
         print_debug("[", iteration, "] Small-Box: Hit wall", point.ToString(), "=>",nextPoint.ToString())
         return False
-    else:
-        print_error("ERROR")
-
+#    else:
+#        print_error("ERROR: " + nextData)
 
 def updateCurrent(name, largemap, currentPosA, nextPosA):
 
@@ -95,81 +94,78 @@ def updateCurrent(name, largemap, currentPosA, nextPosA):
         print_assert(False, "ERROR")
 
 
-def moveBigBox(map, iteration, level, currentPosA, direction, doMove) -> bool:
-    global boxShapes
-    global robotShape
+#
+# Find all boxes that will be moved by robot
+#
+def findBoxes(map:Matrix, boxList:list, xPos:int, yPos:int, pushSize:int, boxSize:int, direction:Vector2) -> bool:
+    for x in range(0,pushSize):
+        pos:Vector2 = Vector2( xPos + (x * direction.x), yPos + direction.y)
+        if map.IsOutOfBounds(pos):
+            print_debug("Outofbounds:", pos)
+            continue
 
-    thisDataA = map.GetPoint(currentPosA)
-    nextPosA = currentPosA + direction
-    nextDataA = map.GetPoint(nextPosA)
+        data = map.GetPoint(pos)
+        if data == "#":
+            return False
+        elif data == "[" and x == 0:
+            if not findBoxes(map,boxList, xPos + x + direction.x, yPos + direction.y, boxSize, boxSize, direction):
+                return False
+            if not findBoxes(map,boxList, xPos + x + 1 + direction.x, yPos + direction.y, boxSize, boxSize, direction):
+                return False
+#            boxList.append(pos)
+            boxList.append(("[",Vector2(pos.x,pos.y)))
+            boxList.append(("]",Vector2(pos.x+1,pos.y)))
+        elif data == "]" and x==1:
+            pass
+        elif data == "[" and x==1:
+            pass
+        elif data == "]" and x == 0:
+            if not findBoxes(map,boxList, xPos + x -1 + direction.x, yPos + direction.y, boxSize, boxSize, direction):
+                return False
+            if not findBoxes(map,boxList, xPos + x + direction.x, yPos + direction.y, boxSize, boxSize, direction):
+                return False
+            boxList.append(("[",Vector2(pos.x-1,pos.y)))
+            boxList.append(("]",Vector2(pos.x,pos.y)))
+        elif data == ".":
+            return True
+        else:
+            print_assert(False,"unknown type: " + data)
+    return True
 
-    level += 1
-
-    # Find the other part of the box
-    currentPosB = currentPosA + Vector2(-1,0)
-    nextPosB = nextPosA + Vector2(-1,0)
-    thisDataB = "["
-    if thisDataA == "[":
-        nextPosB = nextPosA + Vector2(1,0)
-        currentPosB = currentPosA + Vector2(1,0)
-        thisDataB = "]"
-    nextDataB = map.GetPoint(nextPosB)
-
-    # Free space above or below the box, can move it freely
-    if nextDataA == "." and nextDataB == ".":
-        if doMove and thisDataA in boxShapes:
-#            print_debug("[", iteration, "][", level, "] Big-Box:Move free A:", currentPosA.ToString(), "=>",nextPosA.ToString(),thisDataA)
-#            print_debug("[", iteration, "][", level, "] Big-Box:Move free B:", currentPosB.ToString(), "=>",nextPosB.ToString(),thisDataB)
-#            map.SetPoint(nextPosA, thisDataA)
-#            map.SetPoint(nextPosB, thisDataB)
-#            map.SetPoint(currentPosA, ".")
-#            map.SetPoint(currentPosB, ".")
-#            map.Print()
-            updateCurrent("bottom",map, currentPosA, nextPosA)
-        elif doMove and thisDataA == robotShape:
-            print_debug("[", iteration, "][", level, "] Big-Box:Move free 2:", currentPosA.ToString(), "=>",nextPosA.ToString(),thisDataA)
-            map.SetPoint(nextPosA, robotShape)
-            map.SetPoint(currentPosA, ".")
-        elif doMove:
-            # This is a bug
-            print_assert(False,"[" +  str(iteration) + "][" +  str(level) + "] Big-Box:Move free ??:", currentPosA.ToString(), "=>",nextPosA.ToString(),thisDataA)            
-        return True
-
-    # Something is blocking
-    elif nextDataA == "#" or nextDataB == "#":
-        print_debug("[", iteration, "][", level, "] Big-Box: Blocked A", currentPosA.ToString(), "=>",nextPosA.ToString(), nextDataA)
-        print_debug("[", iteration, "][", level, "] Big-Box: Blocked B", currentPosB.ToString(), "=>",nextPosB.ToString(), nextDataB)
+#
+# Find all boxes that will be moved by robot
+#
+def findSmallBoxes(map:Matrix, boxList:list, currentPos:Vector2, pushSize:int, boxSize:int, direction:Vector2) -> bool:
+    if map.IsOutOfBounds(currentPos):
+        print_debug("Outofbounds:", currentPos)
         return False
 
-    # A box is blocking
-    else:
+    nextPos = Vector2(currentPos.x + direction.x, currentPos.y)
 
-        # Must be able to move block
-        nextDataA = map.GetPoint(nextPosA)
-        print_debug("[", iteration, "][", level, "] Big-Box: Box A", currentPosA.ToString(), "=>",nextPosA.ToString(), nextDataA)
-        if nextDataA == "[" or nextDataA == "]":
-            if not moveBigBox(map, iteration, level, nextPosA, direction, doMove):
-                return False
-
-        nextDataB = map.GetPoint(nextPosB)
-        print_debug("[", iteration, "][", level, "] Big-Box: Box B", currentPosB.ToString(), "=>",nextPosB.ToString(), nextDataB)
-        if nextDataB == "[" or nextDataB == "]":
-            if not moveBigBox(map, iteration, level, nextPosB, direction, doMove):
-                return False
-
-        if doMove:            
-            updateCurrent("box",map, currentPosA, nextPosA)
-
-#            map.Print()
-
+    data = map.GetPoint(currentPos)
+    if data == "#":
+        return False
+    elif data == "[" or data == "]":
+        if not findSmallBoxes(map,boxList, nextPos, boxSize, boxSize, direction):
+            return False
+        boxList.append((data,nextPos))
+    elif data == ".":
         return True
+    else:
+        print_assert(False,"unknown type: " + data)
+    return True
 
-def moveBox(map, iteration, point, direction, box) -> bool:
-    if len(box) == 1:
-        return moveSmallBox(map, iteration, point, direction)
-#    else:
-#        if moveBigBox(map, iteration, point, direction, False):
-#            return moveBigBox(map, iteration, point, direction, True)
+# 
+# Move all boxes in the list
+#
+def moveBoxList(map:Matrix, boxList:list, directionY:int):
+    # First set all spaces to "."
+    for data,boxPos in boxList:
+        map.Set(boxPos.x, boxPos.y, ".")
+    
+    # First set all spaces to "."
+    for data,boxPos in boxList:
+        map.Set(boxPos.x, boxPos.y + directionY, data)
 
 def moveRobot(map, moveLines, box) -> bool:
     startPoint = map.FindFirst("@")
@@ -195,7 +191,7 @@ def moveRobot(map, moveLines, box) -> bool:
 
         # Box that might be moved
         elif data in box:
-            if not moveBox(map, iteration, nextPoint, direction, box):
+            if not moveSmallBox(map, iteration, nextPoint, direction):
                 continue
             print_debug("[", iteration, "] Moved box", startPoint.ToString(), "=>",nextPoint.ToString())
             map.SetPoint(startPoint, ".")
@@ -204,11 +200,27 @@ def moveRobot(map, moveLines, box) -> bool:
         else:
             print_assert(False, "ERROR")
 
-def calculateSum(map, box):
+def moveRobotIcon(matrix:Matrix, fromPos:Vector2, direction:Vector2) -> bool:
+    toPos = fromPos + direction
+    if matrix.IsPointInside(toPos):
+        matrix.SetPoint(fromPos, ".")
+        matrix.SetPoint(toPos, robotShape)
+        return True
+    return False
+
+def calculateSum1(map, box):
     sum = 0
     for x in range(0,map.sizeX):
         for y in range(0,map.sizeY):
             if map.Get(x,y) in box:
+                sum += x + (y * 100)
+    return sum
+
+def calculateSum2(map):
+    sum = 0
+    for x in range(0,map.sizeX):
+        for y in range(0,map.sizeY):
+            if map.Get(x,y) == "[":
                 sum += x + (y * 100)
     return sum
 
@@ -227,7 +239,7 @@ def solvePuzzle1(filename):
         colorList.append(("*", bcolors.YELLOW))
 #        smallMap.PrintWithColor(colorList, bcolors.DARK_GREY, "", " ")
 
-    return calculateSum(smallMap, box)
+    return calculateSum1(smallMap, box)
 
 def solvePuzzle2(filename):
     matLines, moveLines = readInput(filename)
@@ -241,7 +253,6 @@ def solvePuzzle2(filename):
     colorList.append(("]", bcolors.WHITE))
     colorList.append(("@", bcolors.YELLOW))
     colorList.append(("*", bcolors.YELLOW))
-
 
     # Create widge map based off the small map
     for x in range(0,smallMap.sizeX):
@@ -258,41 +269,34 @@ def solvePuzzle2(filename):
                 largeMap.Set(xx,y,"@")
 
 
-    UNITTEST.DEBUG_ENABLED = True
-
     currentPos = largeMap.FindFirst("@")
-    iteration = 0
+   
     for move in moveLines:
-        iteration += 1
         direction = dirmap.get(move)
+        boxList = list()
 
-#        if UNITTEST.VISUAL_GRAPH_ENABLED:
-#            largeMap.PrintWithColor(colorList, bcolors.DARK_GREY, "", " ")
-
+        # Moving boxes in the x axis is the same as before
         if direction.y == 0:
-            moveSmallBox(largeMap, iteration, currentPos, direction)
-            currentPos = currentPos + direction
-        elif moveBigBox(largeMap, iteration, 0, currentPos, direction, False):
-            moveBigBox(largeMap, iteration, 0, currentPos, direction, True)
-            currentPos = currentPos + direction
+            nextPos = currentPos + direction
+            if findSmallBoxes(largeMap, boxList, nextPos, 1, 1, direction):
+                moveBoxList(largeMap, boxList, direction.y)
+                if moveRobotIcon(largeMap, currentPos, direction):
+                   currentPos = nextPos
+        else:
+            if findBoxes(largeMap, boxList, currentPos.x, currentPos.y, 1, 2, direction):
+                moveBoxList(largeMap, boxList, direction.y)
+                if moveRobotIcon(largeMap, currentPos, direction):
+                    currentPos = currentPos + direction
 
-#        if iteration > 5:
-#            break
+#    if UNITTEST.VISUAL_GRAPH_ENABLED:
+#        largeMap.PrintWithColor(colorList, bcolors.DARK_GREY, "", "")
 
-    if UNITTEST.VISUAL_GRAPH_ENABLED:
-        largeMap.PrintWithColor(colorList, bcolors.DARK_GREY, "", " ")
-
-#    moveRobot(largeMap, moveLines, box)
-
-    UNITTEST.DEBUG_ENABLED = False
-
-
-    return calculateSum(largeMap, box)
+    return calculateSum2(largeMap)
 
 unittest(solvePuzzle1, 2028, "unittest1_1.txt")
 unittest(solvePuzzle1, 10092, "unittest1_2.txt")
-unittest(solvePuzzle2, -1, "unittest2_1.txt")
-#unittest(solvePuzzle2, 9021, "unittest1_2.txt")
+unittest(solvePuzzle2, 1751, "unittest1_1.txt")
+unittest(solvePuzzle2, 9021, "unittest3.txt")
 
 runCode(15,solvePuzzle1, 1436690, "input.txt")
 runCode(15,solvePuzzle2, 1482350, "input.txt")
