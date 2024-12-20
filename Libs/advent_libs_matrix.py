@@ -11,10 +11,16 @@ class Matrix:
     sizeX:int
     sizeY:int
 
+    # Replace with this
+    width:int
+    height:int
+
     def __init__(self, name:str, sizeX:int, sizeY:int, value) -> None:
         self.name = name
         self.sizeX = sizeX
         self.sizeY = sizeY
+        self.width = sizeX
+        self.height = sizeY 
         if sizeX > 0 and sizeY > 0:
             self.data = [[value for col in range(sizeY)] for row in range(sizeX)]
 
@@ -56,8 +62,11 @@ class Matrix:
         else:
             print_error("Matrix.Set : " + str(x) + "x" + str(y) + " is outside of matrix")
 
-    def SetPoint(self, point, character ):
+    def SetPoint(self, point, character, exclude = None ):
         if self.IsPointInside(point):
+            if exclude != None:
+                if self.data[point.x][point.y] in exclude:
+                    return
             self.data[point.x][point.y] = character
         else:
             print_error("Matrix.Set : " + point.ToString() + " is outside of matrix")
@@ -90,6 +99,8 @@ class Matrix:
     def CreateFromList(name:str,file_lines:list, defaultValue:str):
         sizeY = len(file_lines)
         sizeX = len(file_lines[0].strip())
+        width = sizeX
+        height = sizeY
         matrix = Matrix(name,sizeX, sizeY, defaultValue)
 
         for y in range(0,len(file_lines)):
@@ -99,16 +110,32 @@ class Matrix:
                 matrix.data[x][y] = line[x]
         return matrix
 
-    def CreateFromFile(textfile:str, defaultValue:str):
+    def CreateFromFile(textfile:str, defaultValue:str = "."):
         file_lines = loadfile(textfile)
         return Matrix.CreateFromList(textfile, file_lines, defaultValue)
 
-    def FindFirst(self, character:str):
+    def FindFirst(self, character:str) -> Vector2:
         for y in range(self.sizeY):
             for x in range(self.sizeX):
                 if self.data[x][y] == character:
                     return Vector2(x,y)
         return None
+
+    def FindFirst(self, listOfChars:list) -> Vector2:
+        for y in range(self.sizeY):
+            for x in range(self.sizeX):
+                for character in listOfChars:
+                    if self.data[x][y] == character:
+                        return Vector2(x,y)
+        return None
+
+    def FindAll(self, character:str) -> list:
+        pointList = list()
+        for y in range(self.sizeY):
+            for x in range(self.sizeX):
+                if self.data[x][y] == character:
+                    pointList.append(Vector2(x,y))
+        return pointList
 
     # Count the number of occurances of a character
     def Count(self, character:str):
