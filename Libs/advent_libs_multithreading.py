@@ -24,7 +24,8 @@ class JobRunner:
         for job in self.jobs:
             job.join()
 
-    def GetValue(self):
-        if not self.q.empty():
-            return self.q.get()
-        return None
+    def GetValues(self):
+        ret = []
+        while not self.q.empty():
+            ret.append( self.q.get() )
+        return ret

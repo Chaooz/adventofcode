@@ -21,18 +21,33 @@ class Cpu:
     registerC:int
     registerPointer:int
     output:list
-    useOutput:bool
+    programAsReturn:bool
     idx:int
 
-    def __init__(self):
+    def __init__(self, programAsReturn:bool):
         self.registerA = 0
         self.registerB = 0
         self.registerC = 0
         self.registerPointer = 0
         self.output = []
-        self.useOutput = True
+        self.programAsReturn = programAsReturn
         self.idx = 0
     
+    def CreateFromFile(filename:str, programAsReturn:bool):
+        lines = loadfile(filename)
+        cpu = Cpu(programAsReturn)
+
+        for line in lines:
+            if line.startswith("Register A:"):
+                b, c = line.split(": ")
+                cpu.registerA = int(c)
+            if line.startswith("Program:"):
+                b, c = line.split(": ")
+                cpu.program = [int(x) for x in c.split(",") ]
+
+        return cpu
+
+
     def print(self):
         print("A: " + str(self.registerA) + " B: " + str(self.registerB) + " C: " + str(self.registerC) + " Pointer: " + str(self.registerPointer))
 
@@ -74,13 +89,12 @@ class Cpu:
         # out
         elif opCode == 5:
             w = self.getInstruction(instruction) % 8
-            if not self.useOutput:
+            if self.programAsReturn:
                 if self.idx >= len(self.program):
                     return False
                 if self.program[self.idx] != w:
                     return False
                 self.idx += 1
-            
             self.output.append( w )
 
         # bdv
@@ -95,116 +109,104 @@ class Cpu:
         self.registerPointer += 2
         return True
 
+    # 
+    # Run the program once with the current values in the register
+    #
+    def RunOnePermutation(self, registerA):
+        self.registerA = registerA
+        self.registerB = 0
+        self.registerC = 0
+        self.registerPointer = 0
+        self.idx = 0
+        self.output = []
+
+        while 0 <= self.registerPointer < len(self.program):
+            opcode, instruction = self.program[self.registerPointer], self.program[self.registerPointer+1]
+            if not self.runOpCode(opcode, instruction):
+                return None
+        return self.output
 
 def solvePuzzle1(filename):
-    global iteration
-    lines = loadfile(filename)
-    cpu = Cpu()
-    program = []
-    for line in lines:
-        if line.rstrip() == "":
-            continue
-        elif line.startswith("Register A:"):
-            b, c = line.split(": ")
-            cpu.registerA = int(c)
-        elif line.startswith("Register B:"):
-            b, c = line.split(": ")
-            cpu.registerB = int(c)
-        elif line.startswith("Register C:"):
-            b, c = line.split(": ")
-            cpu.registerC = int(c)
-        elif line.startswith("Program:"):
-            b, c = line.split(": ")
-            program = [int(x) for x in c.split(",") ]
-    
-    cpu.print()
-    print(program)
+    cpu = Cpu.CreateFromFile(filename, False)
+    intList = cpu.RunOnePermutation(cpu.registerA)    
+    return ','.join(str(x) for x in intList)
 
-    iteration = 0
-    while 0 <= cpu.registerPointer < len(program):
-        iteration += 1
-        opcode, instruction = program[cpu.registerPointer], program[cpu.registerPointer+1]
-        cpu.runOpCode(opcode, instruction)
+def RunThreadPermutation(q,Lock,startRange, numRange, program):
 
-    return ','.join(str(x) for x in cpu.output)
-
-def RunPermutation(q,Lock,startRange, numRange, program):
-
-    cpu = Cpu()
-    cpu.useOutput = False
+    cpu = Cpu(True)
     cpu.program = program
-    cpu.foundRegA = 0
-
     endRange = startRange + numRange
-    result = ','.join(str(x) for x in cpu.program)
-
-#    print("RunPermitations:", startRange, endRange, program)
 
     for a in range(startRange, endRange):
-        cpu.registerA = a
-        cpu.registerB = 0
-        cpu.registerC = 0
-        cpu.registerPointer = 0
-        cpu.idx = 0
-        cpu.output = []
-
-        iteration = 0
-        while 0 <= cpu.registerPointer < len(cpu.program):
-            iteration += 1
-            opcode, instruction = cpu.program[cpu.registerPointer], cpu.program[cpu.registerPointer+1]
-            if not cpu.runOpCode(opcode, instruction):
+        cpuOutput = cpu.RunOnePermutation( a )
+        if cpuOutput == cpu.program:
+            print_debug("A: " + str(a) + " Output: " + str(cpuOutput), " program:", cpu.program)
+            with Lock:
+                q.put(a)
                 break
 
-        pOut = ','.join(str(x) for x in cpu.output)
-        if pOut == result:
-            print("A: " + str(a) + " Output: " + pOut, " program:", cpu.program)
-            cpu.foundRegA = a
-            with Lock:
-                if q.empty():
-#                    print("PutA")
-                    q.put(a)
-                else:
-                    oldA = q.get()
-#                    print("b:",oldA,a)
-                    if oldA > a:
-                        q.put(a)
-                    else:
-                        q.put(oldA)
-        if cpu.foundRegA != 0:
-            break
+#
+# The brute varian is to start multiple cores and let each
+# core compute a set of start values for registerA
+#
+def solvePuzzle2Brute(filename):
+    cpu = Cpu.CreateFromFile(filename, False)
+ 
+    threads = 6        # Number of threads/cores
+    numbers = 500000   # Number of values for registerA to try out pr thread
 
-def solvePuzzle2(filename):
-    global iteration
-    lines = loadfile(filename)
-    program = []
-    for line in lines:
-        if line.rstrip() == "":
-            continue
-        elif line.startswith("Program:"):
-            b, c = line.split(": ")
-            program = [int(x) for x in c.split(",") ]
-    
-    threads = 2
-    numbers = 10000000
     runner:JobRunner = JobRunner(threads)
     for r in range(0,threads):
         s = r * numbers
-        runner.AddToQueue( RunPermutation, [s, numbers, program] )
+        runner.AddToQueue( RunThreadPermutation, [s, numbers, cpu.program] )
     runner.RunQueue()
 
-    ret = runner.GetValue()
-    if ret is not None:
-        n = (threads * numbers) / 1000000
-        print("Jobs done", ret, " tried: ", n, " millions")
-        return ret
-    return 0
+    ret = None
+    allValues = runner.GetValues()
+    for value in allValues:
+        if ret == None or ret > value:
+            ret = value
+
+    n = (threads * numbers) / 1000000
+    print_debug("Jobs done", ret, " tried: ", n, " million calculations with ", threads, " cores running ", numbers, " startvalues each")
+    return ret
+
+
+def solvePuzzle2(filename):
+    cpu = Cpu.CreateFromFile(filename, False)
+
+    j = 1
+    istart = 0
+    regA = 0
+    while j <= len(cpu.program) and j >= 0:
+        regA <<= 3
+        for i in range(istart, 8):
+            if cpu.program[-j:] == cpu.RunOnePermutation( regA + i ):
+                break
+        else:
+            j -= 1
+            regA >>= 3
+            istart = (regA % 8) + 1
+            regA >>= 3
+            continue
+        j += 1
+        regA += i
+        istart = 0
+    return regA
 
 if __name__ == '__main__':
 
     setupCode("Day 17: Chronospatial Computer")
 
-    #unittest(solvePuzzle1, "4,6,3,5,6,3,5,2,1,0", "unittest1.txt")
+#    UNITTEST.DEBUG_ENABLED = True
+
+    unittest(solvePuzzle1, "4,6,3,5,6,3,5,2,1,0", "unittest1.txt")
     unittest(solvePuzzle2, 117440, "unittest2.txt")
 
-    #runCode(17,solvePuzzle1, "1,5,0,3,7,3,0,3,1", "input.txt")
-    runCode(17,solvePuzzle2, -1, "input.txt")
+#   Enable for fun :)
+#    unittest(solvePuzzle2Brute, 117440, "unittest2.txt")
+#    runCode(17,solvePuzzle2Brute, 105981155568026, "input.txt")
+
+    runCode(17,solvePuzzle1, "1,5,0,3,7,3,0,3,1", "input.txt")
+    runCode(17,solvePuzzle2, 105981155568026, "input.txt")
+
