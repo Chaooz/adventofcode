@@ -91,6 +91,8 @@ class DefaultPathfindingRuleSet:
         # Outside of matrix?
         if not self.pathfinding.pathfindingMatrix.IsPointInside(endPosition):
             return None
+        if self.pathfinding.pathfindingMatrix.GetPoint(endPosition) == "#":
+            return None
         return endPosition
 
     # Return True if the goal position have been reached 
@@ -153,6 +155,7 @@ class Pathfinding:
 
         startNode = PathNode(startPos, startFacing, 0, None)
         frontier: list[PathNode] = [startNode]
+        didFindExit = False
         while frontier:
             currentNode = heap.heappop(frontier)
 
@@ -164,6 +167,7 @@ class Pathfinding:
 
             # We have reached the goal
             if currentNode.position == endPosition:
+                didFindExit = True
                 break
 
             # Path in the different directions
@@ -180,16 +184,20 @@ class Pathfinding:
                         continue
 
                     heap.heappush( frontier, pathNode )
-        return currentNode
+        if didFindExit:
+            return currentNode
+        return None
 
     # 
     # AStarPathTo: Find the shortest path from start to end
     #
     def AStarPathTo(self, sourceMatrix:Matrix, startPos:Vector2, endPosition:Vector2, startFacing:Vector2 = Vector2(0,1) ):
         currentNode:PathNode = self.InternalAStarPathTo(sourceMatrix, startPos, endPosition, startFacing)
-        path = currentNode.getPath()
-        path.reverse()
-        return path
+        if currentNode != None:
+            path = currentNode.getPath()
+            path.reverse()
+            return path
+        return None
 
     # 
     # AStarPathTo: Find the shortest path from start to end
@@ -234,6 +242,21 @@ class Pathfinding:
                     heap.heappush( checkPathNodes, alternativePathNode )
         path.reverse()
         return path
+    
+    #
+    # Retun number of unique ways to traverse this path
+    #
+    def GetPositions(self, path:list):
+        if path is None:
+            return None
+        
+        uniqueList = list()
+        for step in path:
+            if step.position in uniqueList:
+                continue
+            uniqueList.append((step.position.x, step.position.y))
+        return uniqueList
+        
     #
     # Show the path in a matrix
     #
