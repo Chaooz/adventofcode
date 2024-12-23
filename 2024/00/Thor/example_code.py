@@ -1,5 +1,3 @@
-#!/usr/local/bin/python3
-# https://adventofcode.com/2024/day/20
 
 import sys
 import re
@@ -12,9 +10,7 @@ from advent_libs import *
 from advent_libs_matrix import *
 from advent_libs_pathfinding_astar import *
 
-setupCode("Day 20: Race Condition")
-
-def solvePuzzle1(filename):
+def pathfindingExample(filename):
     matrix = Matrix.CreateFromFile(filename)
     pathfinding = Pathfinding(DefaultPathfindingRuleSet())
 
@@ -34,12 +30,3 @@ def solvePuzzle1(filename):
     matrix.PrintWithColor(colorList, bcolors.DARK_GREY, "", " ")
 
     return len(nodePathList)
-
-def solvePuzzle2(filename):
-    return 0
-
-unittest(solvePuzzle1, -1, "unittest1.txt")
-#unittest(solvePuzzle2, -1, "unittest1.txt")
-
-#runCode(0,solvePuzzle1, -1, "input.txt")
-#runCode(0,solvePuzzle2, -1, "input.txt")
