@@ -14,7 +14,7 @@ from advent_libs_pathfinding_astar import *
 
 setupCode("Day 20: Race Condition")
 
-def solvePuzzle1(filename):
+def solveMaze(filename, minCheatSaved):
     matrix = Matrix.CreateFromFile(filename)
     pathfinding = Pathfinding(DefaultPathfindingRuleSet())
 
@@ -22,14 +22,7 @@ def solvePuzzle1(filename):
     endPos = matrix.FindFirst("E")
     
     nodePathList = pathfinding.AStarPathTo(matrix, startPos, endPos)
-    for path in nodePathList:
-        matrix.SetPoint(path.position, "o")
 
-    # Find cheat tracks
-    # Check all nodes where I turn go 1-2 forward
-      # Do I go out of bounds -> Not good path
-      # Do I go to a path node existing in the current cheat path -> No good route
-      # Do I go to a path node further in the normal path ! Good . Create it as new cheat path
     posPaths = dict()
     checkedPath = []
 
@@ -37,56 +30,65 @@ def solvePuzzle1(filename):
 
     # Create a path with position as keys
     for node in nodePathList:
+        matrix.SetPoint(node.position, "o")
         posPaths[node.position] = node
 
     for index in range(0, len(nodePathList)):
         currentNode = nodePathList[index]
         checkedPath.append(currentNode.position)
 
+        # Mark the spot where we are so we can se where we have checked the path
+        matrix.SetPoint(currentNode.position, "O")
+
         # Go all 4 corners and check for other path nodes
         for pos, dir in DefaultPathfindingRuleSet.default_directions:
+
+            # The position next to ours must be a wall
+            wallPos = currentNode.position + dir
+            if matrix.IsOutOfBounds(wallPos) or (matrix.GetPoint(wallPos) != "#" and matrix.GetPoint(wallPos) != "|"):
+                continue
+
+            # The position 2 steps away must an unpathed position in the path
             newPos = currentNode.position + dir * 2
-            if matrix.IsOutOfBounds(newPos):
+            if matrix.IsOutOfBounds(newPos) or matrix.GetPoint(newPos) != "o":
                 continue
 
-            # Make sure we do not try to cheat and connect to an earlier part of the path
-            if newPos in checkedPath:
-#                print("Already in path:", newPos )
-                continue
+            # Mark this positio
+            matrix.SetPoint(wallPos, "|")
 
-            # If we are connecting to another point in the full path
-            # find that place in the path
-            if newPos in posPaths:
-#                print("Pos is in normal path:", newPos )
+            node = posPaths.get(newPos)
+            newIndex = nodePathList.index(node)
+            newPathLength = index + 1 + (len(nodePathList) - newIndex)
+            saved = len(nodePathList) - newPathLength - 1
 
-                matrix.SetPoint(newPos, "O")
+            if saved >= minCheatSaved:
+               sum += 1
 
-                node = posPaths.get(newPos)
-                newIndex = nodePathList.index(node)
-                # We have a shortcut path
-                # Splice the path together
-                newPath = nodePathList[:index] + nodePathList[newIndex:]
-
-                # Print path 
-#                print(len(newPath), len(nodePathList), len(nodePathList) - len(newPath)  )
-                sum += 1
+    matrix.SetPoint(startPos, "S")
+    matrix.SetPoint(endPos, "E")
 
     # Overengineering 101
     colorList = list()
     colorList.append(("#", bcolors.DARK_GREY))
     colorList.append(("o", bcolors.YELLOW))
-    colorList.append(("O", bcolors.WHITE))
+    colorList.append(("O", bcolors.YELLOW))
+    colorList.append(("|", bcolors.DARK_GREY))
     colorList.append(("S", bcolors.WHITE))
     colorList.append(("E", bcolors.WHITE))
-    matrix.PrintWithColor(colorList, bcolors.DARK_GREY, "", " ")
+#    matrix.PrintWithColor(colorList, bcolors.DARK_GREY, "", "")
 
     return sum
+
+def solveUnittest1(filename):
+    return solveMaze(filename, 1)
+
+def solvePuzzle1(filename):
+    return solveMaze(filename, 100)
 
 def solvePuzzle2(filename):
     return 0
 
-unittest(solvePuzzle1, -1, "unittest1.txt")
+unittest(solveUnittest1, 44, "unittest1.txt")
 #unittest(solvePuzzle2, -1, "unittest1.txt")
-
-#runCode(0,solvePuzzle1, -1, "input.txt")
-#runCode(0,solvePuzzle2, -1, "input.txt")
+runCode(0,solvePuzzle1, 1307, "input.txt")
+#runCode(0,solvePuzzle2, 986545, "input.txt")
