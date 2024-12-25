@@ -35,9 +35,10 @@ def solveMaze(filename, maxCheatTime, minCheatSaved):
     sum = 0
 
     # Create a path with position as keys
-    for node in nodePathList:
+    for index in range(0,len(nodePathList)):
+        node = nodePathList[index]
         matrix.SetPoint(node.position, SYMBOLS.NORMAL_PATH)
-        posPaths[node.position] = node
+        posPaths[node.position] = index
 
     for index in range(0, len(nodePathList)):
         currentNode = nodePathList[index]
@@ -63,9 +64,8 @@ def solveMaze(filename, maxCheatTime, minCheatSaved):
                     break
 
             if data == "o":
-                node = posPaths.get(currentPos)
-                newIndex = nodePathList.index(node)
-                newPathLength = index + 1 + (len(nodePathList) - newIndex)
+                pathLen = posPaths.get(currentPos)
+                newPathLength = index + 1 + (len(nodePathList) - pathLen)
                 saved = len(nodePathList) - newPathLength - 1
 
                 if saved >= minCheatSaved:
