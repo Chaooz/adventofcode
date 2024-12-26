@@ -42,6 +42,7 @@ def solveMaze(filename, maxCheatTime, minCheatSaved, debug):
 
     for index in range(0, len(nodePathList)):
         currentNode = nodePathList[index]
+        pathStart = posPaths.get(currentNode.position)
 
         # Mark the spot where we are so we can se where we have checked the path
         matrix.SetPoint(currentNode.position, SYMBOLS.SCANNING_PATH)
@@ -53,19 +54,15 @@ def solveMaze(filename, maxCheatTime, minCheatSaved, debug):
             for posX in range(-maxX, maxX+1):
                 currentPos = currentNode.position + Vector2(posX, posY)
 
-                if matrix.IsOutOfBounds(currentPos):
+                pathEnd = posPaths.get(currentPos)
+                if pathEnd == None:
                     continue
 
-                # If we go back to a different part of the path
-                if matrix.GetPoint(currentPos) == SYMBOLS.NORMAL_PATH:
+                picoLen = abs(posX) + abs(posY)
+                saved = pathEnd - pathStart - picoLen
 
-                    pathStart = posPaths.get(currentNode.position)
-                    pathEnd = posPaths.get(currentPos)
-                    picoLen = abs(posX) + abs(posY)
-                    saved = pathEnd - pathStart - picoLen
-
-                    if saved >= minCheatSaved:
-                        sum += 1
+                if saved >= minCheatSaved:
+                    sum += 1
 
     # Overengineering 101
     if debug:
