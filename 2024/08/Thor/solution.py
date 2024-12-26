@@ -105,4 +105,4 @@ unittest(solvePuzzle1, 14, "unittest1.txt")
 unittest(solvePuzzle2, 34, "unittest1.txt")
 
 runCode(8,solvePuzzle1, 426, "input.txt") # 410 too low
-runCode(0,solvePuzzle2, 1359, "input.txt")
+runCode(8,solvePuzzle2, 1359, "input.txt")
