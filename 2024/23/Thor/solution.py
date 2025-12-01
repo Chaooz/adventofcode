@@ -37,15 +37,15 @@ def solvePuzzle1(filename):
     computerLink = createComputerLink(filename)
 
     # Go through all computers and see if they have 3 computers that are connected to each other
-    sum = 0
+    total = 0
     for network1 in computerLink:
         for network2 in computerLink[network1]:
             for network3 in computerLink[network1]:
                 if network2 != network3:
                     if network2 in computerLink[network3]:
-                        sum += any(node.startswith('t') for node in (network1, network2, network3))        
+                        total += any(node.startswith('t') for node in (network1, network2, network3))        
 
-    return sum // 6
+    return total // 6
 
 
 def max_group(computerLink, nodes):
