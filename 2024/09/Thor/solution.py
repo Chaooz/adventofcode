@@ -13,7 +13,7 @@ from advent_libs_linkedlist import *
 
 setupCode("Day 9: Disk Fragmenter")
 
-MAX_INTERATIONS = 100000000
+MAX_ITERATIONS = 100000000
 
 class BlockType:
     DATA = 0
@@ -76,7 +76,7 @@ class Disk(LinkedList):
         maxIterations = 0
         while element is not None:
             maxIterations = maxIterations + 1
-            if maxIterations > MAX_INTERATIONS:
+            if maxIterations > MAX_ITERATIONS:
                 print_assert(False,"CalcChecksum: ERROR: Too many iterations")
                 return -1
             
@@ -124,7 +124,7 @@ def fragmentDisk1(disk:Disk) -> Disk:
             return disk
 
         runIterations = runIterations + 1
-        if runIterations > MAX_INTERATIONS:
+        if runIterations > MAX_ITERATIONS:
             print_assert(False, "ERROR: Too many iterations: " + str(runIterations) + " #" + str(disk.numElements) + " skipped: " + str(skippedBlocks))
            
             return disk
@@ -134,7 +134,7 @@ def fragmentDisk1(disk:Disk) -> Disk:
 #            print("skip free ...", dataBlock.ToString())
             dataBlock = dataBlock.prev
             skippedBlocks = skippedBlocks + 1
-            if skippedBlocks > MAX_INTERATIONS:
+            if skippedBlocks > MAX_ITERATIONS:
                 print_assert(False,"ERROR: Too many skipped blocks")
                 disk.PrintDebug("Too many skipped blocks")
                 return disk
@@ -210,7 +210,7 @@ def fragmentDisk2(disk:Disk) -> Disk:
             return disk
 
         runIterations = runIterations + 1
-        if runIterations > MAX_INTERATIONS:
+        if runIterations > MAX_ITERATIONS:
             print_assert(False, "ERROR: Too many iterations: " + str(runIterations) + " #" + str(disk.numElements) + " skipped: " + str(skippedBlocks))
            
             return disk
@@ -220,7 +220,7 @@ def fragmentDisk2(disk:Disk) -> Disk:
 #            print("skip free ...", dataBlock.ToString())
             dataBlock = dataBlock.prev
             skippedBlocks = skippedBlocks + 1
-            if skippedBlocks > MAX_INTERATIONS:
+            if skippedBlocks > MAX_ITERATIONS:
                 print_assert(False,"ERROR: Too many skipped blocks")
                 disk.PrintDebug("Too many skipped blocks")
                 return disk
