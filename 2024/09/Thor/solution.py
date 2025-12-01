@@ -190,7 +190,7 @@ def fragmentDisk1(disk:Disk) -> Disk:
             dataBlock.SetData(freeBlock.length)
             disk.InsertAfterBlock(dataBlock, newDataBlock)
 
-            # Swap the free block and the first data black
+            # Swap the free block and the first data block
             disk.Swap(dataBlock, freeBlock)
             dataBlock = freeBlock
 
@@ -232,6 +232,7 @@ def fragmentDisk2(disk:Disk) -> Disk:
         # No free blocks -> return disk
         if freeBlock is None:
             print("ERROR: No free blocks: Should move to next datablock")
+            dataBlock = dataBlock.prev           
             continue
         skippedBlocks = 0
 
