@@ -1,9 +1,10 @@
 import os
 
 # Base directory where folders will be created
-base_dir = '/home/simon/src/adventofcode/2024'
+base_dir = './2025/'
+num_days = 12
 
-for day in range(1, 26):
+for day in range(1, num_days + 1):
     day_folder = os.path.join(base_dir, f'{day:02d}')
     os.makedirs(day_folder, exist_ok=True)
 
@@ -17,7 +18,7 @@ for day in range(1, 26):
         # Check if the folder is empty
         if not os.listdir(folder):
             # Folder is empty, so create the files
-            for filename in ['input.txt', 'sample_input.txt', 'solution.py']:
+            for filename in ['input.txt', 'unittest1.txt', 'solution.py']:
                 file_path = os.path.join(folder, filename)
                 if not os.path.exists(file_path):
                     with open(file_path, 'w') as f:
