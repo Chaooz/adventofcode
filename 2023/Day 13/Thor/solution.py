@@ -13,11 +13,11 @@ from advent_libs_matrix import *
 setupCode("Day 13: Point of Incidence")
 
 def SetBit(number, bit):
-    print_debug ("SetBit:", number, bit)
+#    print_debug ("SetBit:", number, bit)
     return number | ( 1 << bit )
 
 def IsBitSet(number, bit):
-    print_debug ("IsBitSet:", number, bit)
+#    print_debug ("IsBitSet:", number, bit)
     return number & ( 1 << bit )
 
 # function to check if x is power of 2
@@ -32,6 +32,9 @@ def isPowerOfTwo( x ):
 def differAtOneBitPos( a , b ):
     return isPowerOfTwo(a ^ b)
 
+#
+# Return the bits that are different between two numbers
+#
 def getBitDiff(a,b):
     # 0b100000
     diff = a^b
@@ -232,8 +235,19 @@ def flip_bit_in_line(line1:int, line2:int, source_list:list, dest_list:list):
 
     return dest_list
 
+#
+# Explain this :D
+#
 def solvePuzzle2(filename):
     sum = 0
+
+    # Overengineering 101
+    colorList = list()
+    colorList.append(("O", bcolors.YELLOW))
+    colorList.append((":", bcolors.YELLOW))
+    colorList.append(("#", bcolors.DARK_GREY))
+    colorList.append((".", bcolors.DARK_GREY))
+
     mirror_list = read_mirrors(filename)
     for mirror in mirror_list:
         rows = get_rows_from_matrix(mirror)
@@ -247,22 +261,27 @@ def solvePuzzle2(filename):
         mirror_col = mirror_equal_flipped(cols)
         if mirror_col > 0:
             rows = flip_bit_in_line(mirror_col,mirror_col-1, cols, rows)
+            print_debug("smudge col: ", mirror_col, "len: ", len(rows), "x",len(cols))
+
 
         # Check if the smudge is somewhere else
         if mirror_row == 0 and mirror_col == 0:
             mirror_row, smudge_line = mirror_equal_other_flipped(rows)
             if smudge_line > 0:
                 if UNITTEST.DEBUG_ENABLED:
-                    mirror.Print()
+                    mirror.PrintWithColor(colorList,"", " ")
+
                 offset = mirror_row - smudge_line
-                print_debug("smudge", mirror_row, smudge_line, offset,len(rows),len(cols))
+                print_debug("smudge other row:", mirror_row, " line:", smudge_line, " offset:", offset, "len: ", len(rows), "x",len(cols))
                 cols = flip_bit_in_line(smudge_line, mirror_row + offset, rows, cols)
 
             mirror_col, smudge_line = mirror_equal_other_flipped(cols)
 
         sum += mirror_row + mirror_col * 100
+        return
 
     return sum
+
 
 unittest(solvePuzzle1, 5 , "unittest1.txt")
 unittest(solvePuzzle1, 400 , "unittest2.txt")
@@ -273,4 +292,7 @@ unittest(solvePuzzle2, 100 , "unittest2.txt")   # Mirror line is flipped
 unittest(solvePuzzle2, 400 , "unittest4.txt")
 
 runCode(13, solvePuzzle1, 33780 , "input.txt")
+
+UNITTEST.DEBUG_ENABLED = True
+
 runCode(13, solvePuzzle2, 23479 , "input.txt")
