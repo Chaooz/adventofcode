@@ -59,7 +59,7 @@ def max_group(computerLink, nodes):
 
     group_without = max_group(computerLink, temp_nodes)
 
-    # Find all elements in temp_notes that are in the computerLink[node] list
+    # Find all elements in temp_nodes that are in the computerLink[node] list
     # This will give us the nodes that are connected to the current node
     # If max_group returns a blank set, then we will return the current node
     group_with = max_group(computerLink, computerLink[node] & temp_nodes) | {node}
