@@ -16,36 +16,23 @@ def createComputerLink(filename):
     computerLink = defaultdict(set)
     for line in lines:
         pc1, pc2 = line.split("-")
-
-        if pc1 not in computerLink:
-#            computerLink[pc1] = defaultdict(set)
-            computerLink[pc1].add(pc2)
-        else:
-#            computerLink[pc1] = defaultdict(set)
-            computerLink[pc1].add(pc2)
-
-        if pc2 not in computerLink:
-#            computerLink[pc2] = defaultdict(set)
-            computerLink[pc2].add(pc1)
-#            computerLink[pc2] = [pc1]
-        else:
-#            computerLink[pc2] = defaultdict(set)
-            computerLink[pc2].add(pc1)
+        computerLink[pc1].add(pc2)
+        computerLink[pc2].add(pc1)
     return computerLink
 
 def solvePuzzle1(filename):
     computerLink = createComputerLink(filename)
 
     # Go through all computers and see if they have 3 computers that are connected to each other
-    sum = 0
+    total = 0
     for network1 in computerLink:
         for network2 in computerLink[network1]:
             for network3 in computerLink[network1]:
                 if network2 != network3:
                     if network2 in computerLink[network3]:
-                        sum += any(node.startswith('t') for node in (network1, network2, network3))        
+                        total += any(node.startswith('t') for node in (network1, network2, network3))        
 
-    return sum // 6
+    return total // 6
 
 
 def max_group(computerLink, nodes):
