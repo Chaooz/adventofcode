@@ -29,7 +29,6 @@ def solvePuzzle1(filename):
 
 def solvePuzzle2(filename):
     pos = 50
-    num_dials = 100
     counts = 0
     lines = loadfile(filename)
     for line in lines:
@@ -65,5 +64,5 @@ setupCode("Day 1: Secret Entrance")
 unittest(solvePuzzle1, 3, "unittest1.txt")
 unittest(solvePuzzle2, 6, "unittest1.txt")
 
-runCode(0,solvePuzzle1, 1076, "input.txt")
-runCode(0,solvePuzzle2, 6379, "input.txt") # Too High
+runCode(1,solvePuzzle1, 1076, "input.txt")
+runCode(1,solvePuzzle2, 6379, "input.txt")
