@@ -1,6 +1,7 @@
 #!/usr/local/bin/python3
 # https://adventofcode.com/2024/day/24
 
+from email.mime import text
 import sys
 import re
 
@@ -38,43 +39,40 @@ def solvePuzzle2(filename):
     total = 0
     for line in lines:
         idRange = line.split('-')
-        start = idRange[0].strip()
-        end = idRange[1].strip()
+        start = idRange[0]
+        end = idRange[1]
         # Process each range here
         for n in range(int(start), int(end)+1):
             # Split the number in half
             s = str(n)
+            strLen = len(s)
+            halfLen = strLen // 2
 
-            found = False
+            if strLen % 2 == 0:
+                first,second = s[:halfLen], s[halfLen:]
+                if first == second:
+                    total += n
+                    continue
 
-            for letter in range(1,len(s)-1):
-                if len(s) % letter != 0:
+            for letter in range(1, halfLen + 1):
+                if strLen % letter != 0:
                     continue
                     
                 aa = s[:letter]
                 bb = re.sub(f'({aa})+', '', s)
                 if bb == '':
-                    found = True
+                    total += n
+                    #print_debug("2 Invalid even digit: " + s)
                     break
 
-            if found:
-                total += n
-                #print("invalid digit [" + line + "]: " + s)
-                continue
-
-            half = len(s) // 2
-            a = s[:half]
-            b = s[half:]
-            # Check if the sums are equal
-            if a == b:
-#                print("invalid digit [" + line + "]: " + str(n))
-                total += n
     return total
 
 setupCode("Day 2: Gift Shop")
 
+#UNITTEST.DEBUG_ENABLED = True
+
 unittest(solvePuzzle1, 1227775554, "unittest1.txt")
 unittest(solvePuzzle2, 4174379265, "unittest1.txt")
-
+    
 runCode(2,solvePuzzle1, 13108371860, "input.txt")
 runCode(2,solvePuzzle2, 22471660255, "input.txt")
