@@ -83,5 +83,5 @@ setupCode("Day 5: Cafeteria")
 unittest(solvePuzzle1, 3, "unittest1.txt")
 unittest(solvePuzzle2, 14, "unittest1.txt")
 
-runCode(0,solvePuzzle1, 865, "input.txt")
-runCode(0,solvePuzzle2, 352556672963116, "input.txt")
+runCode(5,solvePuzzle1, 865, "input.txt")
+runCode(5,solvePuzzle2, 352556672963116, "input.txt")
