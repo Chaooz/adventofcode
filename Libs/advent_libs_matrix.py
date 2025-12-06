@@ -56,6 +56,12 @@ class Matrix:
     def IsOutOfBounds(self, point:Vector2 ) -> bool:
         return self.IsPointInside(point) == False
 
+    def setValue(self,x, y, character ):
+        if self.IsInside(x,y):
+            self.data[x][y] = character
+        else:
+            print_error("Matrix.setValue : " + str(x) + "x" + str(y) + " is outside of matrix")
+
     def Set(self,x, y, character ):
         if self.IsInside(x,y):
             self.data[x][y] = character
@@ -98,14 +104,14 @@ class Matrix:
 
     def CreateFromList(name:str,file_lines:list, defaultValue:str):
         sizeY = len(file_lines)
-        sizeX = len(file_lines[0].strip())
+        sizeX = len(file_lines[0])
         width = sizeX
         height = sizeY
         matrix = Matrix(name,sizeX, sizeY, defaultValue)
 
         for y in range(0,len(file_lines)):
             line = file_lines[y]
-            line = line.strip()
+#            line = line.strip()
             for x in range(len(line)):
                 matrix.data[x][y] = line[x]
         return matrix
@@ -251,6 +257,37 @@ class Matrix:
                     compressed_matrix.data[xx][yy] = val
 
         return compressed_matrix
+    
+    def CropToContent(self):
+        minX = self.sizeX
+        maxX = 0
+        minY = self.sizeY
+        maxY = 0
+
+        for y in range(self.sizeY):
+            for x in range(self.sizeX):
+                val = self.data[x][y]
+                if val != " " and val != "":
+                    if x < minX:
+                        minX = x
+                    if x > maxX:
+                        maxX = x
+                    if y < minY:
+                        minY = y
+                    if y > maxY:
+                        maxY = y
+
+        newWidth = (maxX - minX) + 1
+        newHeight = (maxY - minY) + 1
+
+        newMatrix = Matrix(self.name + "_cropped", newWidth, newHeight, " ")
+
+        for y in range(minY, maxY + 1):
+            for x in range(minX, maxX + 1):
+                val = self.data[x][y]
+                newMatrix.Set(x - minX, y - minY, val)
+
+        return newMatrix
 
 #
 # Depricated
