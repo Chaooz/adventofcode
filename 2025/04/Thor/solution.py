@@ -59,10 +59,10 @@ def solvePuzzle2(filename):
         total += nTotal
     return total
 
-setupCode("Day 24: Crossed Wires")
+setupCode("Day 4: Printing Department")
 
 unittest(solvePuzzle1, 13, "unittest1.txt")
 unittest(solvePuzzle2, 43, "unittest1.txt")
 
-runCode(0,solvePuzzle1, 1356, "input.txt")
-runCode(0,solvePuzzle2, 8713, "input.txt")
+runCode(4,solvePuzzle1, 1356, "input.txt")
+runCode(4,solvePuzzle2, 8713, "input.txt")
