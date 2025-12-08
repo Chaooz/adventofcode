@@ -12,7 +12,7 @@ from advent_libs import *
 from advent_libs_vector3 import *
 
 class BlockList:
-    blockList:list[Vector3]
+    blockList:list[int]
 
     def __init__(self):
         self.blockList = list()
@@ -24,8 +24,6 @@ class BlockList:
         return self.blockList.__contains__(block)
     
     def AddList(self, otherList:'BlockList'):
-#        for block in otherList.blockList:
-#            self.AddBlock(block)
         self.blockList.extend(otherList.blockList)
 
     def ToString(self):
@@ -40,121 +38,97 @@ class BlockList:
         return len(self.blockList)
 
 
-
-def findClosestPoint(startVec:Vector3, vectorList:list[Vector3]) -> Vector3:
-    foundVec = None
-    foundDist = None
-    for vec in vectorList:
-        if vec == startVec:
-            continue
-
-        dist = vec.Distance(startVec)
-
-        if foundVec is None:
-            foundVec = vec
-            foundDist = dist
-        elif dist < foundDist:
-            foundVec = vec
-            foundDist = dist
-
-    return foundVec
-
-def createConnectionList(filename, maxConnected=1000):
-    connected = list()
+def createVectorList(filename) -> list[Vector3]:
+    vectorList = []
     lines = loadfile(filename)
-
-    vectorList = list()
-    checkList = list()
 
     for line in lines:
         line = line.strip()
         (x,y,z) = map(int, line.split(","))
-        point = Vector3(x,y,z)
-        vectorList.append(point)
-        checkList.append(point)
+        vectorList.append(Vector3(x,y,z))
+
+    return vectorList
+
+def createConnectionList(vectorList:list[Vector3], maxConnected=1000):
+    connected = []
 
     # Create a list of connected points sorted by distance
-    for x in range(0, len(vectorList) - 1):
-        thisPoint = vectorList[x]
-        checkList.remove(thisPoint)
+    for i, thisPoint in enumerate(vectorList):
+        for j, nextPoint in enumerate(vectorList):
+            if i>j:
+                dist = thisPoint.Distance(nextPoint)            
+                connected.append( (dist, i, j) )
 
-        for nextPoint in checkList:
-            dist = thisPoint.Distance(nextPoint)            
-            connected.append( (dist, thisPoint, nextPoint) )
-
-#        shortestPoint = findClosestPoint(thisPoint, checkList)
-#        dist = thisPoint.Distance(shortestPoint)
-#        print(f"Distance from {thisPoint.ToString()} to {shortestPoint.ToString()} is {dist}")
-#        connected.append( (dist, thisPoint, shortestPoint) )
-
+    # Sort list by distance
     connected.sort(key=lambda item: item[0])
 
     # Connect the first N closest points
-    connectionList = list()
+    connectionList = []
     mx = min(maxConnected, len(connected))
     lastPoint = None
     for x in range(0, mx):
-        (dist, pointA, pointB) = connected[x]
+        (dist, indexA, indexB) = connected[x]
 
         blockListA:BlockList = None
         blockListB:BlockList = None
+
+        # Find if either point is already in a block list
         for n in range(0, len(connectionList)):
             blockList:BlockList = connectionList[n]
-            if blockList.HasBlock(pointA):
+            if blockList.HasBlock(indexA):
                 blockListA = blockList
-            if blockList.HasBlock(pointB):
+            if blockList.HasBlock(indexB):
                 blockListB = blockList
             if blockListA is not None and blockListB is not None:
                 break
 
+        # If both are found, merge the lists
         if blockListA is not None and blockListB is not None:
             if blockListA != blockListB:
-                lastPoint = (pointA, pointB)
+                lastPoint = (indexA, indexB)
                 blockListA.AddList(blockListB)
                 connectionList.remove(blockListB)
         elif blockListA is not None:
-            lastPoint = (pointA, pointB)
-            blockListA.AddBlock(pointB)
+            lastPoint = (indexA, indexB)
+            blockListA.AddBlock(indexB)
         elif blockListB is not None:
-            lastPoint = (pointA, pointB)
-            blockListB.AddBlock(pointA)
+            lastPoint = (indexA, indexB)
+            blockListB.AddBlock(indexA)
         else:
-            lastPoint = (pointA, pointB)
+            lastPoint = (indexA, indexB)
             blockList = BlockList()
-            blockList.AddBlock(pointA)
-            blockList.AddBlock(pointB)
+            blockList.AddBlock(indexA)
+            blockList.AddBlock(indexB)
             connectionList.append(blockList)
+
     return connectionList, lastPoint
 
 def solvePuzzle1(filename, maxConnected=1000):    
-    connectionList, lastPoint = createConnectionList(filename, maxConnected)
+    vectorList = createVectorList(filename)
+    connectionList, lastPoint = createConnectionList(vectorList, maxConnected)
 
-#    print("Total BlockLists:" + str(len(connectionList)))
+    # Create a list sorted by size
     countedLists = list()
     for blockList in connectionList:
         blockLength = blockList.len()
         countedLists.append(( blockLength, blockList))
     countedLists.sort(key=lambda item: item[0], reverse=True)
 
+    # Multiply the sizes of the 3 largest connected lists
     linkedcount = 1
-#    print("Total CountedList:" + str(len(countedLists)))
     for index in range(0, min(3, len(countedLists))):
         blockList = countedLists[index][1]
-#        print("Larger Blocklist # " +str(blockList.len()))
         linkedcount *= blockList.len()
-#        print("Largest BlockList #" + str(index+1) + ":" + blockList.ToString() + " Size:" + str(blockList.len()))
-
-#    print("Linked Nodes:" + str(linkedcount) + " of " + str(len(vectorList)))
 
     return linkedcount
 
 def solvePuzzle2(filename, maxConnected=200000):
-    connectionList, lastPoint = createConnectionList(filename, maxConnected)
-    pointA, pointB = lastPoint
+    vectorList = createVectorList(filename)
+    connectionList, lastPoint = createConnectionList(vectorList, maxConnected)
+    indexA, indexB = lastPoint
 
-    print("Total CountedList:" + str(len(connectionList)))
-#    print("Point A:" + pointA.ToString())
-#    print("Point B:" + pointB.ToString())
+    pointA = vectorList[indexA]
+    pointB = vectorList[indexB]
 
     return pointA.x * pointB.x
 
