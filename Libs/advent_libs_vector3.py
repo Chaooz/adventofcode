@@ -55,7 +55,7 @@ class Vector3:
         if z > 0: z = 1
         if z < 0: z = -1
         if x == 0 and y == 0 and z == 0:
-            print("BUG!" + self.ToString())
+            print("Vector3.Normalize:BUG!" + self.ToString())
         return Vector3(x,y,z)
     
     def Distance(self, other) :

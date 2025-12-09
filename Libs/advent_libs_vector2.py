@@ -44,7 +44,7 @@ class Vector2:
         if y > 0: y = 1
         if y < 0: y = -1
         if x == 0 and y == 0:
-            print("BUG!" + self.ToString())
+            print("Vector2.Normalize:BUG!" + self.ToString())
         return Vector2(x,y)
     
     def Tuple(self) :

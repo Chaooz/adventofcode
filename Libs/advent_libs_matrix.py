@@ -77,6 +77,19 @@ class Matrix:
         else:
             print_error("Matrix.Set : " + point.ToString() + " is outside of matrix")
 
+    def SetLine(self, line, character, exclude = None ):
+        direction = line[1] - line[0]
+        length = abs( direction.x ) + abs(direction.y)
+#        length = direction.ManhattanLength()
+        step = direction.Normalize()
+
+#        print("Matrix.SetLine:" + line[0].ToString() + " -> " + line[1].ToString() + " :" + str(line) + " " + character)
+
+        position = line[0]
+        for i in range(length + 1):
+            self.SetPoint(position, character, exclude)
+            position = position + step
+
     def SetMatrix(self,matrix):
         for y in range(matrix.sizeY):
             for x in range(matrix.sizeX):
